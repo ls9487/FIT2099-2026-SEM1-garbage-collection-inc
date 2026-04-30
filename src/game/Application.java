@@ -1,6 +1,7 @@
 package game;
 
 import edu.monash.fit2099.engine.displays.Display;
+import game.locations.EclipseNebula;
 
 /**
  * The starting point of the game. Think of it as the Big Bang, but written in Java.

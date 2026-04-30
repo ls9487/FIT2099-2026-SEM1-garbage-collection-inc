@@ -1,4 +1,4 @@
-package game;
+package game.grounds;
 
 import edu.monash.fit2099.engine.positions.Ground;
 
@@ -10,7 +10,12 @@ import edu.monash.fit2099.engine.positions.Ground;
  * @author Adrian Kristanto
  */
 public class Floor extends Ground {
+
+    /**
+     * Constructor for the Floor class.
+     */
     public Floor() {
         super('_', "Floor");
     }
+
 }

@@ -1,6 +1,4 @@
-package game;
-
-import edu.monash.fit2099.engine.items.Item;
+package game.items;
 
 /**
  * A class representing a small rectangular piece of plastic that holds entirely
@@ -10,9 +8,17 @@ import edu.monash.fit2099.engine.items.Item;
  * Essential for progressing the plot,
  *
  * @author Adrian Kristanto
+ * @author echu0057
  */
-public class AccessCard extends Item {
+public class AccessCard extends EclipseItem {
+
+    /**
+     * Constructor for the AccessCard class.
+     * Has a weight of 1 unit, and possesses the UNLOCKER capability (i.e. can open doors).
+     */
     public AccessCard() {
-        super("Access Card", '▤');
+        super("Access Card", '▤', 1);
+        this.enableAbility(ItemAbilities.UNLOCKER);
     }
+
 }

@@ -1,4 +1,4 @@
-package game;
+package game.grounds;
 
 import edu.monash.fit2099.engine.positions.Ground;
 
@@ -10,7 +10,12 @@ import edu.monash.fit2099.engine.positions.Ground;
  * @author Adrian Kristanto
  */
 public class Dirt extends Ground {
+
+    /**
+     * Constructor for the Dirt class.
+     */
     public Dirt() {
         super('.', "Dirt");
     }
+
 }

@@ -1,8 +1,9 @@
-package game;
+package game.inventories;
 
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
+import game.items.ItemStatistics;
 
 /**
  * At its core, this is just an oversized {@code ArrayList}.
@@ -23,6 +24,7 @@ public class WeightLimitedInventory extends Inventory {
     /**
      * Perform additional check when adding an item, making sure that by adding the item, the weight limit of the
      * inventory is not exceeded.
+     * Also, any item being added must have a weight statistic.
      *
      * @param item The Item to add.
      * @return true if the item is successfully added, false otherwise.
@@ -32,7 +34,7 @@ public class WeightLimitedInventory extends Inventory {
         Display display = new Display();
         if (item.hasStatistic(ItemStatistics.WEIGHT)) {
             int itemWeight =  item.getStatistic(ItemStatistics.WEIGHT);
-            if (weight + itemWeight < this.weightLimit) {
+            if (weight + itemWeight <= this.weightLimit) {
                 items.add(item);
                 this.weight += itemWeight;
                 display.println(String.format("%s added successfully. Current inventory weight (%d/%d)", item, weight, weightLimit));
