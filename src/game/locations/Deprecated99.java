@@ -40,7 +40,7 @@ public class Deprecated99 extends GameMap
                 "....................########################################",
                 "...#######..........#__________________#___________________#",
                 "...#_____#..........=__________________=___________________#",
-                "...#_____=...~......#__________________#___________________#",
+                "...#≡____=...~......#__________________#___________________#",
                 "...#_____#..~~~.....########=#####=#####___#############___#",
                 "...#######.~~~~.....#______#_#_________#___#___________#___#",
                 ".........~~~~.......#______#_#_________#####___________#####",
@@ -68,7 +68,7 @@ public class Deprecated99 extends GameMap
      */
     private void addLooseItems() {
         // Add the loose items onto the ship.
-        this.at(7, 2).addItem(new AccessCard());
+        this.at(7, 2).addItem(AccessCard.levelOne());  // was: new AccessCard()
         this.at(6, 2).addItem(new FirstAidKit());
         this.at(5, 2).addItem(new SterilisationBox());
         // Add other loose items around as well.

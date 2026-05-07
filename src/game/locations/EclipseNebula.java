@@ -13,6 +13,7 @@ import game.grounds.Puddle;
 import game.grounds.Wall;
 import game.inventories.WeightLimitedInventory;
 import game.items.Flask;
+import game.grounds.SuperComputer;
 
 /**
  * This class handles the miracle of creation, translating a bunch of periods
@@ -36,6 +37,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('~', Puddle::new);
         groundCreator.registerGround('_', Floor::new);
         groundCreator.registerGround('=', Door::new);
+        groundCreator.registerGround('≡', SuperComputer::new);
         // NOTE: We cannot use the default ground creator to create holes,
         // as holes take a parameter of what they can spawn.
 
