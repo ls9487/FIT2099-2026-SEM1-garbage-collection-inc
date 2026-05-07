@@ -24,16 +24,24 @@ public class BuyAction extends Action {
      * Constructor. The item must implement Buyable; if it doesn't this action
      * will just refuse politely at execute time.
      * @param item The item being offered.
+     * @author esoo0013
      */
     public BuyAction(Item item) {
         this.item = item;
     }
 
     /**
-     * Run the transaction. Order: check buyable, find wallet, check affordability
-     * (delegate to cannotAfford if broke), deduct, run side effect, add to inventory.
-     * Side effect runs BEFORE the item is added so things like SterilisationBox's
-     * radiation operate on the pre-purchase inventory and can't erase themselves.
+     * Handles the full purchase flow for an item.
+     *
+     * The action checks whether the item is buyable, verifies the actor has
+     * a valid Wallet and enough credits, deducts the cost, applies any
+     * purchase effects, and finally adds the item to the inventory.
+     *
+     * Purchase side effects happen before the item is added to the inventory.
+     * This allows effects such as the SterilisationBox radiation to operate
+     * on the actor's existing inventory without deleting the newly bought item.
+     *
+     * @author esoo0013
      */
     @Override
     public String execute(Actor actor, GameMap map) {
@@ -61,6 +69,7 @@ public class BuyAction extends Action {
 
     /**
      * Pull the wallet off an EclipseActor. Returns null for any other actor type.
+     * @author esoo0013
      */
     private Wallet walletOf(Actor actor) {
         return actor.asCapability(EclipseActor.class).map(EclipseActor::getWallet).orElse(null);
