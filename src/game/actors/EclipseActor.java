@@ -8,6 +8,7 @@ import game.behaviours.FollowBehaviour;
 import game.statuses.Alarmable;
 import game.statuses.Flammable;
 import game.statuses.Poisonable;
+import game.inventories.Wallet;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +26,7 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
 {
 
     private final Map<Integer, Behaviour<Actor, Action>> behaviours;
+    private final Wallet wallet;
 
     /**
      * Constructor for the EclipseActor class.
@@ -36,6 +38,7 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
     public EclipseActor(String name, char displayChar, int hitPoints, Inventory inventory) {
         super(name, displayChar, hitPoints, inventory);
         this.behaviours = new TreeMap<>();
+        this.wallet = new Wallet();
     }
 
     /**
@@ -102,6 +105,17 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
         if (this.hasAbility(ActorAbilities.WORKER_HOSTILE)) {
             this.removeBehaviour(998);
         }
+    }
+
+    /**
+     * The actor's wallet. Even Undead and Slimes technically have one,
+     * they just have NO WAY to put credits in it. Thus, keeping the type-checking
+     * simple at transaction time.
+     * @return The actor's wallet.
+     * @author esoo0013
+     */
+    public Wallet getWallet() {
+        return wallet;
     }
 
 }
