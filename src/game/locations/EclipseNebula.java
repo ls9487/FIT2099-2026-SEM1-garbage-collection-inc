@@ -56,6 +56,17 @@ public class EclipseNebula extends World {
         //this.addPlayer(contractedWorker3, moon99DeprecatedMap.at(8, 2));
         //this.addPlayer(contractedWorker4, moon99DeprecatedMap.at(6, 4));
         //this.addPlayer(contractedWorker5, moon99DeprecatedMap.at(8, 4));
+
+        /*
+         * TESTING HELPER for any REQ involving credit amount:
+         * Uncomment this line when testing REQ involving purchases
+         * (FirstAidKit, SterilisationBox, AccessCards, Creatures, etc.)
+         * since workers normally start with 0 credits.
+         *
+         * Comment it out again for normal gameplay/evaluation (start as a broke).
+         */
+        //contractedWorker1.getWallet().add(1000);
+
     }
 
     /**
