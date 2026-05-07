@@ -16,7 +16,7 @@ import game.statuses.Poisonable;
  *
  * @author echu0057
  */
-public class Apple extends EclipseItem implements Consumable {
+public class Apple extends EclipseItem implements Consumable, Sellable {
 
     /**
      * Constructor for the Apple class.
@@ -89,6 +89,33 @@ public class Apple extends EclipseItem implements Consumable {
             }
             return actor + " was poisoned (1 dmg, 5 turns) from eating the spoiled apple!";
         }
+    }
+
+    /**
+     * Apples sell for 1 credit. The Supercomputer doesn't care that they're spoiled.
+     * @author esoo0013
+     */
+    @Override
+    public int sellPrice(Actor seller) {
+        return 1;
+    }
+
+    /**
+     * If the seller is carrying a Sterilisation Box, the apple gets neutralised
+     * on the way out and nothing nasty happens. Otherwise the seller catches
+     * a 2-turn poison (2 dmg/turn) from handling the spoiled fruit.
+     * @author esoo0013
+     */
+    @Override
+    public String soldBy(Actor seller, GameMap map) {
+        if (seller.hasAbility(ItemAbilities.STERILISER)) {
+            return "The apple is neutralised by the Sterilisation Box on its way out.";
+        }
+        Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
+        if (poisonable != null) {
+            seller.addStatus(new PoisonStatus(2, 2, poisonable));
+        }
+        return seller + " is poisoned (2 dmg, 2 turns) from handling the spoiled apple.";
     }
 
 }
