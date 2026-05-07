@@ -19,7 +19,7 @@ import game.actors.ActorAbilities;
  *
  * @author echu0057
  */
-public class FirstAidKit extends EclipseItem implements Consumable {
+public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
 
     /**
      * Constructor for the FirstAidKit class. Rather heavy, with a weight of 25 units.
@@ -108,6 +108,38 @@ public class FirstAidKit extends EclipseItem implements Consumable {
     public void tick(Location currentLocation, Actor actor) {
         // Won't ever go negative. BaseStatistic handles that logic.
         this.modifyStatistic(ItemStatistics.COOLDOWN, StatisticOperations.DECREASE, 1);
+    }
+
+    /**
+     * This is the corporate price so buying it without 1000 credits is a terminal mistake.
+     * @author esoo0013
+     */
+    @Override
+    public int buyPrice(Actor buyer) {
+        return 1000;
+    }
+
+    /**
+     * Nothing really happens on a successful buy. The kit just goes in the bag and
+     * follows its existing cooldown rules from there.
+     * @author esoo0013
+     */
+    @Override
+    public String boughtBy(Actor buyer, GameMap map) {
+        return "The kit is added to inventory.";
+    }
+
+    /**
+     * Trying to buy this WITHOUT the funds UPSETS the SuperComputer enough
+     * to kill the worker on the spot. We hurt them by their full current HP
+     * so they basically drop to 0 regardless of how much they had left.
+     * @author esoo0013
+     */
+    @Override
+    public String cannotAfford(Actor buyer, GameMap map) {
+        int currentHp = buyer.getStatistic(ActorStatistics.HEALTH);
+        buyer.hurt(currentHp);
+        return "The Supercomputer is enraged by the audacity. " + buyer + " is killed on the spot.";
     }
 
 }

@@ -17,7 +17,7 @@ import game.actors.ActorAbilities;
  *
  * @author echu0057
  */
-public class CookiePack extends EclipseItem implements Consumable {
+public class CookiePack extends EclipseItem implements Consumable, Sellable {
 
     /**
      * Constructor for the CookiePack class.
@@ -89,6 +89,28 @@ public class CookiePack extends EclipseItem implements Consumable {
             actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.DECREASE, 1);
             return actor + " feels unhealthier from eating the unsterilised cookie!";
         }
+    }
+
+    /**
+     * One credit per remaining cookie. A fresh pack of 5 sells for 5; if the
+     * worker's already eaten three, it's only worth 2.
+     * @author esoo0013
+     */
+    @Override
+    public int sellPrice(Actor seller) {
+        return this.getStatistic(ItemStatistics.DURABILITY);
+    }
+
+    /**
+     * The "organic processing fee". One HP loss per cookie sold. The whole
+     * pack goes at once, so a full pack costs the seller 5 HP immediately.
+     * @author esoo0013
+     */
+    @Override
+    public String soldBy(Actor seller, GameMap map) {
+        int cookies = this.getStatistic(ItemStatistics.DURABILITY);
+        seller.hurt(cookies);
+        return seller + " loses " + cookies + " HP to the organic processing fee.";
     }
 
 }

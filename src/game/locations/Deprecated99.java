@@ -11,10 +11,10 @@ import game.items.Alarm;
 import game.items.Apple;
 import game.items.CookiePack;
 import game.items.CrtMonitor;
-import game.items.FirstAidKit;
+//import game.items.FirstAidKit;
 import game.items.FloppyDisk;
 import game.items.Lantern;
-import game.items.SterilisationBox;
+//import game.items.SterilisationBox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class Deprecated99 extends GameMap
                 "....................########################################",
                 "...#######..........#__________________#___________________#",
                 "...#_____#..........=__________________=___________________#",
-                "...#_____=...~......#__________________#___________________#",
+                "...#≡____=...~......#__________________#___________________#",
                 "...#_____#..~~~.....########=#####=#####___#############___#",
                 "...#######.~~~~.....#______#_#_________#___#___________#___#",
                 ".........~~~~.......#______#_#_________#####___________#####",
@@ -68,9 +68,9 @@ public class Deprecated99 extends GameMap
      */
     private void addLooseItems() {
         // Add the loose items onto the ship.
-        this.at(7, 2).addItem(new AccessCard());
-        this.at(6, 2).addItem(new FirstAidKit());
-        this.at(5, 2).addItem(new SterilisationBox());
+        this.at(7, 2).addItem(AccessCard.levelOne());  // was: new AccessCard()
+        //this.at(6, 2).addItem(new FirstAidKit()); removed since it should only be bought / cannot get for FREE
+        //this.at(5, 2).addItem(new SterilisationBox()); removed since it should only be bought / cannot get for FREE
         // Add other loose items around as well.
         this.at(6, 13).addItem(new Apple());
         this.at(48, 10).addItem(new Apple());
