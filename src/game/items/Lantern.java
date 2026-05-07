@@ -4,6 +4,11 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import edu.monash.fit2099.engine.positions.GameMap;
+import game.statuses.BurnStatus;
+import game.statuses.Flammable;
+import java.util.Random;
+
 
 /**
  * Lantern is a class representing a lantern.
@@ -11,7 +16,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
  *
  * @author echu0057
  */
-public class Lantern extends EclipseItem {
+public class Lantern extends EclipseItem implements Sellable {
 
     /**
      * Constructor for the Lantern class.
@@ -36,6 +41,44 @@ public class Lantern extends EclipseItem {
             // Create fire on currentLocation.
             currentLocation.addItem(new Fire());
         }
+    }
+
+    private final Random random = new Random();
+
+    /**
+     * Five credits per oil unit remaining. It caps at 50 for a full lantern,
+     * so if it leaks it will be less.
+     * @author esoo0013
+     */
+    @Override
+    public int sellPrice(Actor seller) {
+        return 5 * this.getStatistic(ItemStatistics.DURABILITY);
+    }
+
+    /**
+     * Two independent rolls when the lantern leaves the seller's hands.
+     * 50% chance the seller gets a 3-turn 2-dmg burn from the remaining fuel.
+     * 25% chance fire flashes onto every adjacent tile.
+     * Both can fire on the SAME transaction.
+     * @author esoo0013
+     */
+    @Override
+    public String soldBy(Actor seller, GameMap map) {
+        StringBuilder msg = new StringBuilder();
+        if (random.nextDouble() < 0.50) {
+            Flammable flammable = seller.asCapability(Flammable.class).orElse(null);
+            if (flammable != null) {
+                seller.addStatus(new BurnStatus(3, 2, flammable));
+            }
+            msg.append(" The fuel sloshes and burns ").append(seller).append(" (2 dmg, 3 turns).");
+        }
+        if (random.nextDouble() < 0.25) {
+            for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
+                adjacent.addItem(new Fire());
+            }
+            msg.append(" Sparks ignite the surrounding tiles.");
+        }
+        return msg.length() == 0 ? "The lantern is sold without incident." : msg.toString().trim();
     }
 
 }
