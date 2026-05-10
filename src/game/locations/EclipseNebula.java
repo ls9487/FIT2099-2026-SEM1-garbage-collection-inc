@@ -65,7 +65,7 @@ public class EclipseNebula extends World {
          *
          * Comment it out again for normal gameplay/evaluation (start as a broke).
          */
-        //contractedWorker1.getWallet().add(1000);
+        //contractedWorker1.addCredits(1000);
 
     }
 

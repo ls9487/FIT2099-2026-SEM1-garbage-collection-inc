@@ -5,15 +5,17 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.actors.EclipseActor;
-import game.inventories.Wallet;
 import game.items.Buyable;
 
 /**
- * The "give me that thing" action. Handles the affordability check,
- * the wallet deduction, the side effect, and the inventory add.
- * Specific item weirdness (hidden fees, dying for being broke, radiation
- * eating your stuff) is left to the Buyable's own methods.
+ * Handles purchasing items from the SuperComputer.
  *
+ * This action performs affordability check, deducts credits,
+ * applies item-specific purchase effects, and finally attempts
+ * to place the item into the actor's inventory.
+ *
+ * Special purchase behaviour is given to the Buyable interface
+ * so the action itself stays generic and reusable.
  * @author esoo0013
  */
 public class BuyAction extends Action {
@@ -21,9 +23,8 @@ public class BuyAction extends Action {
     private final Item item;
 
     /**
-     * Constructor. The item must implement Buyable; if it doesn't this action
-     * will just refuse politely at execute time.
-     * @param item The item being offered.
+     * Constructor for a BuyAction.
+     * @param item The item being offered for purchase.
      * @author esoo0013
      */
     public BuyAction(Item item) {
@@ -33,46 +34,57 @@ public class BuyAction extends Action {
     /**
      * Handles the full purchase flow for an item.
      *
-     * The action checks whether the item is buyable, verifies the actor has
-     * a valid Wallet and enough credits, deducts the cost, applies any
+     * The action checks whether the item is buyable, verifies the actor
+     * has enough credits, deducts the transaction cost, applies any
      * purchase effects, and finally adds the item to the inventory.
      *
-     * Purchase side effects happen before the item is added to the inventory.
-     * This allows effects such as the SterilisationBox radiation to operate
-     * on the actor's existing inventory without deleting the newly bought item.
+     * Purchase effects happen before the item is added. This allows
+     * effects such as the SterilisationBox radiation to interact with
+     * the actor's existing inventory without deleting the newly bought item.
      *
      * @author esoo0013
      */
     @Override
     public String execute(Actor actor, GameMap map) {
+
+        // Making sure the item actually supports buying behaviour
         Buyable buyable = item.asCapability(Buyable.class).orElse(null);
         if (buyable == null) {
             return item + " is not for sale here.";
         }
 
-        Wallet wallet = walletOf(actor);
-        if (wallet == null) {
+        // Credits are only supported by EclipseActor-based actors
+        EclipseActor eclipseActor = actor.asCapability(EclipseActor.class).orElse(null);
+
+        if (eclipseActor == null) {
             return actor + " has nowhere to draw credits from.";
         }
 
+        // Ask the item itself how much it costs
         int price = buyable.buyPrice(actor);
-        if (!wallet.canAfford(price)) {
+
+        // Let the Buyable decide what happens if the actor cannot afford it.
+        // Example: FirstAidKit instantly kills the buyer when broke.
+        if (!eclipseActor.canAfford(price)) {
             return buyable.cannotAfford(actor, map);
         }
 
-        wallet.subtract(price);
-        String effect = buyable.boughtBy(actor, map);
-        boolean stowed = actor.getInventory().add(item);
-        String tail = stowed ? "" : " (Item too heavy and was discarded.)";
-        return actor + " buys " + item + " for " + price + " credits. " + effect + tail;
-    }
+        // Deduct the credits before applying purchase effects
+        eclipseActor.deductCredits(price);
 
-    /**
-     * Pull the wallet off an EclipseActor. Returns null for any other actor type.
-     * @author esoo0013
-     */
-    private Wallet walletOf(Actor actor) {
-        return actor.asCapability(EclipseActor.class).map(EclipseActor::getWallet).orElse(null);
+        // Run any item-specific purchase logic
+        // e.g Level 2 AccessCard damages the buyer OR SterilisationBox deletes a random inventory item
+        String effect = buyable.boughtBy(actor, map);
+
+        // Try to place the bought item into the inventory
+        boolean stowed = actor.getInventory().add(item);
+
+        // If inventory insertion fails (normally due to weight),
+        // the item is discarded after purchase.
+        String tail = stowed ? "" : " (Item too heavy and was discarded.)";
+
+        return actor + " buys " + item + " for "
+                + price + " credits. " + effect + tail;
     }
 
     @Override

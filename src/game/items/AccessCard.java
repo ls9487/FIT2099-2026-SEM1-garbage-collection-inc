@@ -132,15 +132,14 @@ public class AccessCard extends EclipseItem implements Buyable {
     }
 
     /**
-     * Hidden extra fee for Level 3 cards. The SuperComputer may charge
-     * an additional 50 credits after purchase using the buyer's Wallet.
-     * If the buyer doesn't use the EclipseActor wallet system, we just
-     * skip the fee instead of blowing up the transaction.
-     * Uses the Wallet deduction method to apply the hidden fee.
+     * Applies the hidden Level 3 processing fee
+     * The extra 50 credits are deducted directly from the buyer's
+     * credit balance if they are an EclipseActor.
+     *
      * @author esoo0013
      */
     private void deductHiddenFee(Actor buyer) {
         buyer.asCapability(EclipseActor.class)
-                .ifPresent(a -> a.getWallet().subtract(L3_HIDDEN_FEE));
+                .ifPresent(a -> a.deductCredits(L3_HIDDEN_FEE));
     }
 }
