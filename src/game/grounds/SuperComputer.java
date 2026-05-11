@@ -7,10 +7,12 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.BuyAction;
 import game.actions.SellAction;
-import game.items.AccessCard;
-import game.items.FirstAidKit;
 import game.items.Sellable;
+import game.items.AccessCardLevelOne;
+import game.items.AccessCardLevelTwo;
+import game.items.AccessCardLevelThree;
 import game.items.SterilisationBox;
+import game.items.FirstAidKit;
 
 /**
  * The SuperComputer terminal is sitting in the armoured ship (ground). Workers walk up
@@ -60,9 +62,9 @@ public class SuperComputer extends Ground {
         ActionList actions = super.allowableActions(actor, location, direction);
 
         // Items currently sold by the SuperComputer
-        actions.add(new BuyAction(AccessCard.levelOne()));
-        actions.add(new BuyAction(AccessCard.levelTwo()));
-        actions.add(new BuyAction(AccessCard.levelThree()));
+        actions.add(new BuyAction(new AccessCardLevelOne()));
+        actions.add(new BuyAction(new AccessCardLevelTwo()));
+        actions.add(new BuyAction(new AccessCardLevelThree()));
         actions.add(new BuyAction(new SterilisationBox()));
         actions.add(new BuyAction(new FirstAidKit()));
 

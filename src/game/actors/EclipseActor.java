@@ -4,11 +4,12 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.statistics.BaseStatistic;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.behaviours.FollowBehaviour;
 import game.statuses.Alarmable;
 import game.statuses.Flammable;
 import game.statuses.Poisonable;
-import game.inventories.Wallet;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,7 +27,9 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
 {
 
     private final Map<Integer, Behaviour<Actor, Action>> behaviours;
-    private final Wallet wallet;
+
+    /** Maximum amount of credits a worker can hold. */
+    public static final int MAX_CREDITS = 1000;
 
     /**
      * Constructor for the EclipseActor class.
@@ -37,8 +40,12 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
      */
     public EclipseActor(String name, char displayChar, int hitPoints, Inventory inventory) {
         super(name, displayChar, hitPoints, inventory);
+
         this.behaviours = new TreeMap<>();
-        this.wallet = new Wallet();
+
+        // Workers start with 0 credits, while the statistic itself + it keeps track of the 1000-credit cap
+        this.addNewStatistic(EclipseStatistics.CREDITS, new BaseStatistic(MAX_CREDITS));
+        this.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.UPDATE, 0);
     }
 
     /**
@@ -108,14 +115,60 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
     }
 
     /**
-     * The actor's wallet. Even Undead and Slimes technically have one,
-     * they just have NO WAY to put credits in it. Thus, keeping the type-checking
-     * simple at transaction time.
-     * @return The actor's wallet.
+     * Returns the actor's current credit balance.
+     * @return current amount of credits owned by the actor.
      * @author esoo0013
      */
-    public Wallet getWallet() {
-        return wallet;
+    public int getCredits() {
+        return this.getStatistic(EclipseStatistics.CREDITS);
+    }
+
+    /**
+     * Adds credits to the actor.
+     * Values above the maximum cap are automatically clamped by the statistic system.
+     * @param amount Number of credits to add.
+     * @author esoo0013
+     */
+    public void addCredits(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        this.modifyStatistic(
+                EclipseStatistics.CREDITS,
+                StatisticOperations.INCREASE,
+                amount
+        );
+    }
+
+    /**
+     * Removes credits from the actor.
+     * The balance will NEVER go below 0.
+     * @param amount Number of credits to deduct.
+     * @author esoo0013
+     */
+    public void deductCredits(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        this.modifyStatistic(
+                EclipseStatistics.CREDITS,
+                StatisticOperations.DECREASE,
+                amount
+        );
+    }
+
+    /**
+     * Checks whether the actor has enough credits
+     * for a transaction.
+     *
+     * @param amount Required amount.
+     * @return true if the actor can afford it.
+     * @author esoo0013
+     */
+    public boolean canAfford(int amount) {
+        return getCredits() >= amount;
     }
 
 }
