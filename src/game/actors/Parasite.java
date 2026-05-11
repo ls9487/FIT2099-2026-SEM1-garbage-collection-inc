@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
@@ -17,8 +18,7 @@ import game.inventories.BasicInventory;
  *
  * @author echu0057
  */
-public class Parasite extends EclipseActor
-{
+public class Parasite extends EclipseActor implements Infector {
     private static final int INFECT_BEHAVIOUR_PRIORITY = 1;
     private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
 
@@ -68,6 +68,18 @@ public class Parasite extends EclipseActor
         return new DoNothingAction();
 
 
+    }
+
+    /**
+     * Kills the parasite immediately when it infects something.
+     * Because the parasite lives inside the infected thing now, rather than existing on its own.
+     * @return A String description of what happens to itself, which is dying.
+     */
+    @Override
+    public String infectingSelfEffect() {
+        // Do damage equal to the parasite's max hp (instantly killing it).
+        this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
+        return String.format("%s dies as a result.", this);
     }
 
 }
