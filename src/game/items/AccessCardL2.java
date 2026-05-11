@@ -12,7 +12,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
  *
  * @author esoo0013
  */
-public class AccessCardLevelTwo extends AccessCard {
+public class AccessCardL2 extends AccessCard {
 
     /** Credit cost charged by the SuperComputer. */
     private static final int PRICE = 100;
@@ -30,14 +30,15 @@ public class AccessCardLevelTwo extends AccessCard {
      * Constructor for the L2 access card.
      * @author esoo0013
      */
-    public AccessCardLevelTwo() {
+    public AccessCardL2() {
         super("Access Card (Level 2)", SYMBOL, WEIGHT, PRICE, ClearanceLevel.LEVEL_2);
     }
 
     /**
      * Applies the 5 HP calibration damage to the buyer immediately on
-     * purchase. The damage is delivered via {@code Actor.hurt} so it
-     * interacts correctly with the engine's HEALTH statistic.
+     * purchase, then drops the card into their inventory. The damage is
+     * delivered via {@code Actor.hurt} so it interacts correctly with the
+     * engine's HEALTH statistic.
      *
      * @param buyer the buyer who just paid 100 credits
      * @param map   the buyer's map
@@ -47,6 +48,8 @@ public class AccessCardLevelTwo extends AccessCard {
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
         buyer.hurt(BLOOD_SAMPLE_DMG);
-        return "The terminal jabs " + buyer + " for a blood sample (-" + BLOOD_SAMPLE_DMG + " HP).";
+        buyer.getInventory().add(this);
+        return "The terminal jabs " + buyer + " for a blood sample (-"
+                + BLOOD_SAMPLE_DMG + " HP). Card added for " + PRICE + " credits.";
     }
 }

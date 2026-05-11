@@ -2,95 +2,72 @@ package game.actions;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.actors.EclipseActor;
 import game.items.Buyable;
 
 /**
- * Handles purchasing items from the SuperComputer.
+ * Handles purchasing a Buyable from the SuperComputer.
  *
- * This action performs affordability check, deducts credits,
- * applies item-specific purchase effects, and finally attempts
- * to place the item into the actor's inventory.
+ * This action confirms the actor can hold credits, checks affordability,
+ * deducts the price, and then delegates all item-specific purchase behaviour
+ * (side effects AND inventory placement) to the Buyable itself via boughtBy().
  *
- * Special purchase behaviour is given to the Buyable interface
- * so the action itself stays generic and reusable.
+ * It also holds the capability directly, never the concrete Item,
+ * so it has no knowledge of which Buyable subtype it is operating on.
+ *
  * @author esoo0013
  */
 public class BuyAction extends Action {
 
-    private final Item item;
+    private final Buyable buyable;
 
     /**
      * Constructor for a BuyAction.
-     * @param item The item being offered for purchase.
+     * @param buyable the buyable being offered for purchase.
      * @author esoo0013
      */
-    public BuyAction(Item item) {
-        this.item = item;
+    public BuyAction(Buyable buyable) {
+        this.buyable = buyable;
     }
 
     /**
-     * Handles the full purchase flow for an item.
+     * Runs the generic purchase flow.
      *
-     * The action checks whether the item is buyable, verifies the actor
-     * has enough credits, deducts the transaction cost, applies any
-     * purchase effects, and finally adds the item to the inventory.
-     *
-     * Purchase effects happen before the item is added. This allows
-     * effects such as the SterilisationBox radiation to interact with
-     * the actor's existing inventory without deleting the newly bought item.
+     * Affordability and the credit deduction are the action's
+     * responsibility. Item-specific side effects and inventory
+     * placement are delegated to the Buyable.
      *
      * @author esoo0013
      */
     @Override
     public String execute(Actor actor, GameMap map) {
 
-        // Making sure the item actually supports buying behaviour
-        Buyable buyable = item.asCapability(Buyable.class).orElse(null);
-        if (buyable == null) {
-            return item + " is not for sale here.";
-        }
-
         // Credits are only supported by EclipseActor-based actors
         EclipseActor eclipseActor = actor.asCapability(EclipseActor.class).orElse(null);
-
         if (eclipseActor == null) {
             return actor + " has nowhere to draw credits from.";
         }
 
-        // Ask the item itself how much it costs
         int price = buyable.buyPrice(actor);
 
-        // Let the Buyable decide what happens if the actor cannot afford it.
-        // Example: FirstAidKit instantly kills the buyer when broke.
+        // Let the Buyable decide what happens if the actor cannot afford it
+        // e.g FirstAidKit kills the buyer when broke
         if (!eclipseActor.canAfford(price)) {
             return buyable.cannotAfford(actor, map);
         }
 
-        // Deduct the credits before applying purchase effects
+        // Deduct the credits before the item-specific effect runs
         eclipseActor.deductCredits(price);
 
-        // Run any item-specific purchase logic
-        // e.g Level 2 AccessCard damages the buyer OR SterilisationBox deletes a random inventory item
-        String effect = buyable.boughtBy(actor, map);
-
-        // Try to place the bought item into the inventory
-        boolean stowed = actor.getInventory().add(item);
-
-        // If inventory insertion fails (normally due to weight),
-        // the item is discarded after purchase.
-        String tail = stowed ? "" : " (Item too heavy and was discarded.)";
-
-        return actor + " buys " + item + " for "
-                + price + " credits. " + effect + tail;
+        // Buyable owns its own purchase side-effects AND its own
+        // inventory insertion. The action has no opinion on either
+        return buyable.boughtBy(actor, map);
     }
 
     @Override
     public String menuDescription(Actor actor) {
-        Buyable buyable = item.asCapability(Buyable.class).orElse(null);
-        int price = (buyable != null) ? buyable.buyPrice(actor) : 0;
-        return String.format("%s buys %s for %d credits", actor, item, price);
+        return String.format("%s buys %s for %d credits",
+                actor, buyable, buyable.buyPrice(actor));
     }
 }
