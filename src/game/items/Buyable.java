@@ -22,11 +22,21 @@ public interface Buyable {
     int buyPrice(Actor buyer);
 
     /**
-     * Apply whatever special thing happens when the item is bought. Called after
-     * credits are deducted but before the item is added to inventory.
+     * Apply the item-specific purchase logic AND place the item into the
+     * buyer's inventory. Called by BuyAction after credits have been
+     * deducted.
+     *
+     * Implementations are expected to:
+     * 1 - run any side-effects (damage, hidden fees, radiation, etc.),
+     * 2 - call buyer.getInventory().add(...) with the item,
+     * 3 - return a full sentence describing the purchase
+     * including the price and any side-effect outcomes.
+     *
+     * BuyAction itself returns this string unchanged.
+     *
      * @param buyer The actor doing the buying.
      * @param map The map the buyer is on.
-     * @return A description of what happened.
+     * @return A full description describing the purchase and its effects.
      * @author esoo0013
      */
     String boughtBy(Actor buyer, GameMap map);

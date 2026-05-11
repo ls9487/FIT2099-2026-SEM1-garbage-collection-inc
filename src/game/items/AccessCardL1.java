@@ -10,7 +10,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
  *
  * @author esoo0013
  */
-public class AccessCardLevelOne extends AccessCard {
+public class AccessCardL1 extends AccessCard {
 
     /** Credit cost charged by the SuperComputer. */
     private static final int PRICE = 50;
@@ -25,7 +25,7 @@ public class AccessCardLevelOne extends AccessCard {
      * Constructor for the basic L1 access card.
      * @author esoo0013
      */
-    public AccessCardLevelOne() {
+    public AccessCardL1() {
         super("Access Card (Level 1)", SYMBOL, WEIGHT, PRICE, ClearanceLevel.LEVEL_1);
     }
 
@@ -40,6 +40,7 @@ public class AccessCardLevelOne extends AccessCard {
      */
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
-        return buyer + " buys an L1 access card.";
+        buyer.getInventory().add(this);
+        return buyer + " buys an L1 access card for " + PRICE + " credits.";
     }
 }

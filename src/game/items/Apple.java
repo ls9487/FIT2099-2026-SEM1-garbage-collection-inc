@@ -103,19 +103,26 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
     /**
      * If the seller is carrying a Sterilisation Box, the apple gets neutralised
      * on the way out and nothing nasty happens. Otherwise the seller catches
-     * a 2-turn poison (2 dmg/turn) from handling the spoiled fruit.
+     * a 2-turn poison (2 dmg/turn) from handling the spoiled fruit. The apple
+     * leaves the inventory either way.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
+        StringBuilder msg = new StringBuilder(seller + " sells an apple for 1 credit.");
+
         if (seller.hasAbility(ItemAbilities.STERILISER)) {
-            return "The apple is neutralised by the Sterilisation Box on its way out.";
+            msg.append(" The apple is neutralised by the Sterilisation Box on its way out.");
+        } else {
+            Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
+            if (poisonable != null) {
+                seller.addStatus(new PoisonStatus(2, 2, poisonable));
+            }
+            msg.append(" ").append(seller).append(" is poisoned (2 dmg, 2 turns) from handling the spoiled apple.");
         }
-        Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
-        if (poisonable != null) {
-            seller.addStatus(new PoisonStatus(2, 2, poisonable));
-        }
-        return seller + " is poisoned (2 dmg, 2 turns) from handling the spoiled apple.";
+
+        seller.getInventory().remove(this);
+        return msg.toString();
     }
 
 }
