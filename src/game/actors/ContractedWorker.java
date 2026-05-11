@@ -47,6 +47,13 @@ public class ContractedWorker extends EclipseActor {
         // whatever actions can be done with inventory items or surroundings.
         // Those are already provided by the engine. How cool!
 
+        // Show the worker's current wallet balance before the menu, so the
+        // player can plan purchases against the 1000-credit cap.
+        // I placed before isConscious so balance to ALSO prints when the worker is unconscious,
+        // So the player sees their final wallet in the death message
+        display.println(String.format("[%s] Credits: %d / %d",
+                this, this.getCredits(), EclipseActor.MAX_CREDITS));
+
         // Required and forced if the actor isn't conscious.
         if (!this.isConscious()) {
             display.println(this.unconscious(map));

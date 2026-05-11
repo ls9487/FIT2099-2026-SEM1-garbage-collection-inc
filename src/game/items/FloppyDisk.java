@@ -39,7 +39,7 @@ public class FloppyDisk extends EclipseItem implements Sellable {
     @Override
     public String soldBy(Actor seller, GameMap map) {
         if (random.nextDouble() < 0.50) {
-            seller.asCapability(EclipseActor.class).ifPresent(a -> a.getWallet().subtract(50));
+            seller.asCapability(EclipseActor.class).ifPresent(a -> a.deductCredits(50));
             return "The terminal glitches and pockets 50 credits.";
         }
         return "The disk is sold without incident.";
