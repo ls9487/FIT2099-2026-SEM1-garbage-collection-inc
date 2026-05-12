@@ -92,8 +92,10 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
     /**
      * The infection finds the fuel yummy, draining it by 1 unit per turn.
      * Note that the "blowing up" doesn't actually affect its surroundings.
+     * @param location The location where the infection tick is happening.
      */
-    public void infection() {
+    @Override
+    public void infection(Location location) {
         // Decrease its oil (durability) by 1. No need to check if it's greater than 0 or anything.
         // Due to how the engine's statistics work, it'll already prevent it going negative.
         this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);

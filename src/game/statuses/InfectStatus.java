@@ -28,11 +28,13 @@ public class InfectStatus implements Status {
      * Called once per tick to update the status of the current entity.
      * Whatever the infection does is up to the entity, spawning parasites for example.
      * @param currEntity The entity this status is attached to.
+     * @param location The current location of the entity.
      */
+    @Override
     public void tickStatus(GameEntity currEntity, Location location) {
-        // Logic here is like in the mars example (see PoisonStatus' tickStatus for more detail)
+        // Note the location of the entity is included (useful for, say, spawning a parasite).
         if (infectable != null) {
-            infectable.infection();
+            infectable.infection(location);
         }
     }
 

@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.AttackBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.inventories.BasicInventory;
@@ -78,8 +79,10 @@ public class Undead extends EclipseActor implements Infectable
     /**
      * The infection causes the undead to kaboom and instantly die.
      * Note that the "blowing up" doesn't actually affect its surroundings.
+     * @param location The location where the infection tick is happening.
      */
-    public void infection() {
+    @Override
+    public void infection(Location location) {
         // Damage equal to max hp guarantees killing it.
         this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
     }
