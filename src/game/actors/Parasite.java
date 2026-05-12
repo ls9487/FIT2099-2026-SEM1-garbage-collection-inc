@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
+import game.behaviours.InfectBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.inventories.BasicInventory;
 
@@ -29,7 +30,7 @@ public class Parasite extends EclipseActor implements Infector {
      */
     public Parasite() {
         super("Parasite", 'x', 30, new BasicInventory());
-        // Add a new InfectBehaviour here when implemented.
+        this.addNewBehaviour(INFECT_BEHAVIOUR_PRIORITY, new InfectBehaviour());
         this.addNewBehaviour(WANDER_BEHAVIOUR_PRIORITY, new WanderBehaviour());
     }
 
@@ -66,7 +67,6 @@ public class Parasite extends EclipseActor implements Infector {
         }
         // No valid action was taken, so just do nothing.
         return new DoNothingAction();
-
 
     }
 

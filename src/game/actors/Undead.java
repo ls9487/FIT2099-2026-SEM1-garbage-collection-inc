@@ -4,12 +4,14 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.behaviours.AttackBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.inventories.BasicInventory;
+import game.statuses.Infectable;
 import game.weapons.BareFist;
 
 /**
@@ -20,7 +22,8 @@ import game.weapons.BareFist;
  *
  * @author echu0057
  */
-public class Undead extends EclipseActor {
+public class Undead extends EclipseActor implements Infectable
+{
 
     /**
      * Constructor for the Undead class. Has 15 hp.
@@ -70,7 +73,15 @@ public class Undead extends EclipseActor {
         // No valid action was taken, so just do nothing.
         return new DoNothingAction();
 
+    }
 
+    /**
+     * The infection causes the undead to kaboom and instantly die.
+     * Note that the "blowing up" doesn't actually affect its surroundings.
+     */
+    public void infection() {
+        // Damage equal to max hp guarantees killing it.
+        this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
     }
 
 }
