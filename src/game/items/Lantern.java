@@ -59,12 +59,15 @@ public class Lantern extends EclipseItem implements Sellable {
      * Two independent rolls when the lantern leaves the seller's hands.
      * 50% chance the seller gets a 3-turn 2-dmg burn from the remaining fuel.
      * 25% chance fire flashes onto every adjacent tile.
-     * Both can fire on the SAME transaction.
+     * Both can fire on the SAME transaction. The lantern always leaves the
+     * inventory at the end of the transaction.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        StringBuilder msg = new StringBuilder();
+        int price = sellPrice(seller);
+        StringBuilder msg = new StringBuilder(seller + " sells the lantern for " + price + " credits.");
+
         if (random.nextDouble() < 0.50) {
             Flammable flammable = seller.asCapability(Flammable.class).orElse(null);
             if (flammable != null) {
@@ -72,13 +75,15 @@ public class Lantern extends EclipseItem implements Sellable {
             }
             msg.append(" The fuel sloshes and burns ").append(seller).append(" (2 dmg, 3 turns).");
         }
+
         if (random.nextDouble() < 0.25) {
             for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
                 adjacent.addItem(new Fire(FIRE_DURATION));
             }
             msg.append(" Sparks ignite the surrounding tiles.");
         }
-        return msg.length() == 0 ? "The lantern is sold without incident." : msg.toString().trim();
-    }
 
+        seller.getInventory().remove(this);
+        return msg.toString();
+    }
 }

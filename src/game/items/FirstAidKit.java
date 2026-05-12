@@ -120,13 +120,14 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
     }
 
     /**
-     * Nothing really happens on a successful buy. The kit just goes in the bag and
-     * follows its existing cooldown rules from there.
+     * Nothing dramatic on a successful buy. The kit lands in the inventory
+     * with its existing 20-turn cooldown rules intact.
      * @author esoo0013
      */
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
-        return "The kit is added to inventory.";
+        buyer.getInventory().add(this);
+        return buyer + " buys the First Aid Kit for 1000 credits.";
     }
 
     /**

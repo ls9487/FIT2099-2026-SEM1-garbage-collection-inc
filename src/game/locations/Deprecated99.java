@@ -6,14 +6,14 @@ import edu.monash.fit2099.engine.positions.GroundCreator;
 import game.actors.Slime;
 import game.actors.Undead;
 import game.grounds.Hole;
-import game.items.AccessCard;
-import game.items.Alarm;
+import game.items.AccessCardL1;
 import game.items.Apple;
 import game.items.CookiePack;
-import game.items.CrtMonitor;
-//import game.items.FirstAidKit;
-import game.items.FloppyDisk;
 import game.items.Lantern;
+import game.items.FloppyDisk;
+import game.items.CrtMonitor;
+import game.items.Alarm;
+//import game.items.FirstAidKit;
 //import game.items.SterilisationBox;
 
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class Deprecated99 extends GameMap
      */
     private void addLooseItems() {
         // Add the loose items onto the ship.
-        this.at(7, 2).addItem(AccessCard.levelOne());  // was: new AccessCard()
+        this.at(7, 2).addItem(new AccessCardL1());
         //this.at(6, 2).addItem(new FirstAidKit()); removed since it should only be bought / cannot get for FREE
         //this.at(5, 2).addItem(new SterilisationBox()); removed since it should only be bought / cannot get for FREE
         // Add other loose items around as well.
