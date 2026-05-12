@@ -12,7 +12,7 @@ public interface EnvironmentalTriggerer {
     /**
      * This method will handle the logic of the effect upon being spawned.
      * This should only be called once, and immediately upon spawning the creature.
-     * @param location The location where the creature is being spawned.
+     * @param location The location where the creature was spawned.
      */
     public void onSpawnEffect(Location location);
 
