@@ -4,6 +4,9 @@ import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.InfectAction;
+import game.actors.EnvironmentalTriggerer;
+import game.statuses.Infectable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +47,15 @@ public interface Spawner {
             // Because addActor could throw an exception, IntelliJ requires me to do this...
             try {
                 spawningLocation.addActor(actor);
-
-                // For REQ4, spawning some actors may cause an immediate effect.
-                // Check if the actor has that capability, and trigger it here.
-
+                // Check if the actor implements EnvironmentalTriggerer. If it does, that means
+                // it has an effect upon spawning, which needs to be called.
+                EnvironmentalTriggerer triggerer = actor.asCapability(EnvironmentalTriggerer.class).orElse(null);
+                if (triggerer != null) {
+                    triggerer.onSpawnEffect(spawningLocation);
+                }
                 // Actor was spawned successfully.
                 return true;
+
             } catch (GameEngineException e) {
                 // Something went wrong on the engine's end, so it failed.
                 return false;
