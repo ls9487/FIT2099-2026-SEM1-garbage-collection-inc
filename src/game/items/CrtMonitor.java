@@ -32,15 +32,17 @@ public class CrtMonitor extends EclipseItem implements Sellable {
     }
 
     /**
-     * Selling unconditionally will heal 5 HP from the relief of finally putting
+     * Selling unconditionally heals 5 HP from the relief of finally putting
      * down 30 units of dead weight. Then there's a 20% chance the ancient
      * hardware shorts out: 2 damage to the seller, fire on every neighbour.
+     * The monitor leaves the inventory at the end of the transaction.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
         seller.heal(5);
-        StringBuilder msg = new StringBuilder("Offloading the monitor heals " + seller + " for 5 HP.");
+        StringBuilder msg = new StringBuilder(seller + " sells the CRT monitor for 25 credits. Offloading it heals 5 HP.");
+
         if (random.nextDouble() < 0.20) {
             seller.hurt(2);
             for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
@@ -48,6 +50,8 @@ public class CrtMonitor extends EclipseItem implements Sellable {
             }
             msg.append(" The terminal shorts out, dealing 2 damage and igniting the area.");
         }
+
+        seller.getInventory().remove(this);
         return msg.toString();
     }
 

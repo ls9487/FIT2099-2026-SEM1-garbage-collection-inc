@@ -22,11 +22,20 @@ public interface Sellable {
     int sellPrice(Actor seller);
 
     /**
-     * Apply whatever special thing happens when the item is sold. Called after
-     * credits are added to the wallet but before the item leaves the inventory.
+     * Apply the item-specific sale logic AND remove the item from the
+     * seller's inventory. Called by SellAction after credits have been
+     * paid.
+     *
+     * Implementations are expected to:
+     * 1 - run any side-effects (poison, burns, fires, glitches, etc.),
+     * 2 - call seller.getInventory().remove(...) for this item,
+     * 3 - return a full sentence describing the sale, including the price and any side-effect outcomes.
+     *
+     * SellAction itself returns this string unchanged.
+     *
      * @param seller The actor doing the selling.
-     * @param map The map the seller is on (for spawning fire on neighbours, etc).
-     * @return A description of what happened.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     String soldBy(Actor seller, GameMap map);

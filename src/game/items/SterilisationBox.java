@@ -3,6 +3,8 @@ package game.items;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,21 +39,35 @@ public class SterilisationBox extends EclipseItem implements Buyable {
     }
 
     /**
-     * The radiation kicks in immediately on purchase -> Picks a random item
-     * from the buyer's existing inventory and permanently deletes it.
-     * The box itself is added AFTER this runs (BuyAction's responsibility),
-     * so it CANNOT accidentally erase itself.
+     * The radiation kicks in immediately on purchase. The box is added to
+     * the inventory first, and then a random item is sampled from the full
+     * inventory and permanently erased.
+     *
+     * The box is eligible to be its OWN victim (radiation spread to itself)
+     * , in which case the buyer pays 750
+     * credits for nothing.
      * @author esoo0013
      */
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
-        List<Item> existing = buyer.getInventory().getItems();
-        if (existing.isEmpty()) {
-            return "The radiation finds nothing to erase.";
-        }
-        Item victim = existing.get(random.nextInt(existing.size()));
+        StringBuilder result = new StringBuilder();
+        result.append(buyer).append(" buys ").append(this)
+                .append(" for 750 credits.");
+
+        // Box is added FIRST so it is eligible to be the victim, per Ed clarification.
+        buyer.getInventory().add(this);
+
+        List<Item> inventory = new ArrayList<>(buyer.getInventory().getItems());
+        Item victim = inventory.get(random.nextInt(inventory.size()));
         buyer.getInventory().remove(victim);
-        return "The radiation erases " + victim + " from the inventory.";
+
+        if (victim == this) {
+            result.append(" The radiation erases the box itself.");
+        } else {
+            result.append(" Radiation erases ").append(victim).append(".");
+        }
+
+        return result.toString();
     }
 
 }
