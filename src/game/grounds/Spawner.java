@@ -1,0 +1,56 @@
+package game.grounds;
+
+import edu.monash.fit2099.engine.GameEngineException;
+import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.positions.Exit;
+import edu.monash.fit2099.engine.positions.Location;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Spawner is an interface providing logic for spawning an actor.
+ *
+ * @author echu0057
+ */
+public interface Spawner {
+
+    /**
+     * Default implementation is to attempt to spawn an actor on a random valid
+     * adjacent location of a given location.
+     * @param actor The actor to be spawned.
+     * @param sourceLocation The source of the spawner (will attempt to spawn around it).
+     */
+    default void spawnActor(Actor actor, Location sourceLocation) {
+        final Random random = new Random();
+        List<Location> validLocations = new ArrayList<>();
+
+        // Get all the surrounding exits.
+        for (Exit exit : sourceLocation.getExits()) {
+            Location destination = exit.getDestination();
+            // A location will only be valid for spawning if there isn't an actor there already.
+            if (!destination.containsAnActor()) {
+                validLocations.add(destination);
+            }
+        }
+
+        // If the list is non-empty, choose a random location.
+        if (!validLocations.isEmpty()) {
+            Location spawningLocation = validLocations.get(random.nextInt(validLocations.size()));
+            // Then, place the actor onto the map at the chosen location.
+            // Because addActor could throw an exception, IntelliJ requires me to do this...
+            try {
+                spawningLocation.addActor(actor);
+
+                // For REQ4, spawning some actors may cause an immediate effect.
+                // Check if the actor has that capability, and trigger it here.
+
+            } catch (GameEngineException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+}

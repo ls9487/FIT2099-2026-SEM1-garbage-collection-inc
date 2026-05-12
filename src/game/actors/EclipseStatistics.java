@@ -9,4 +9,5 @@ package game.actors;
  */
 public enum EclipseStatistics {
     CREDITS,
+    INFECTION_PROGRESS,
 }

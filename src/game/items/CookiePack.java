@@ -9,6 +9,8 @@ import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.ConsumeAction;
 import game.actors.ActorAbilities;
+import game.actors.Parasite;
+import game.grounds.Spawner;
 import game.statuses.Infectable;
 
 /**
@@ -18,7 +20,8 @@ import game.statuses.Infectable;
  *
  * @author echu0057
  */
-public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable {
+public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable, Spawner
+{
 
     /**
      * Constructor for the CookiePack class.
@@ -128,7 +131,8 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
         if (this.getStatistic(ItemStatistics.DURABILITY) > 0) {
             // The infection continues to eat those cookies and spawning a parasite...
             this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
-            // Do the spawning here. It's uh... not here yet.
+            // Use Spawner's default implementation to spawn a parasite around the cookie.
+            spawnActor(new Parasite(), location);
         }
     }
 
