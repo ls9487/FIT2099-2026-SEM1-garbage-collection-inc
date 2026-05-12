@@ -18,8 +18,8 @@ import game.statuses.Infectable;
 public class InfectAction extends Action {
 
     // The target is not of Infectable type since a status effect needs to be added later.
-    private GameEntity target;
-    private Infector infector;
+    private final GameEntity target;
+    private final Infector infector;
 
     /**
      * Constructor for the InfectAction class.
@@ -34,7 +34,7 @@ public class InfectAction extends Action {
     /**
      * When executed, it will attempt to inflict an InfectStatus onto the target entity.
      * If successful, this also causes the infector to suffer a side effect (e.g. dying).
-     * @param actor The actor executing this action.
+     * @param actor The actor executing this action (not involved, it's the infector instead).
      * @param map The map the actor is on.
      * @return The description of the result of infecting the infectable.
      */
