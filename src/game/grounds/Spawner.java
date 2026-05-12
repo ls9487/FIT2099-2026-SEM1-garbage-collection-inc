@@ -8,6 +8,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 /**
  * Spawner is an interface providing logic for spawning an actor.
@@ -21,8 +22,9 @@ public interface Spawner {
      * adjacent location of a given location.
      * @param actor The actor to be spawned.
      * @param sourceLocation The source of the spawner (will attempt to spawn around it).
+     * @return A boolean denoting whether the spawn was successful.
      */
-    default void spawnActor(Actor actor, Location sourceLocation) {
+    default boolean spawnActor(Actor actor, Location sourceLocation) {
         final Random random = new Random();
         List<Location> validLocations = new ArrayList<>();
 
@@ -46,11 +48,30 @@ public interface Spawner {
                 // For REQ4, spawning some actors may cause an immediate effect.
                 // Check if the actor has that capability, and trigger it here.
 
+                // Actor was spawned successfully.
+                return true;
             } catch (GameEngineException e) {
-                throw new RuntimeException(e);
+                // Something went wrong on the engine's end, so it failed.
+                return false;
             }
+        } else {
+            // No valid locations to spawn, so it failed.
+            return false;
         }
+    }
 
+    /**
+     * Default implementation is to pick a random actor from the given list and try to spawn it.
+     * @param spawnableActors A list of suppliers of actors that can be spawned.
+     * @param sourceLocation The source of the spawner (will attempt to spawn around it).
+     * @return A boolean denoting whether the spawn was successful.
+     */
+    default boolean spawnRandomActor(List<Supplier<Actor>> spawnableActors, Location sourceLocation) {
+        final Random random = new Random();
+        // Create a new actor from the list of suppliers. This will be the one spawned.
+        Actor chosenActor = spawnableActors.get(random.nextInt(spawnableActors.size())).get();
+        // Pass the spawning logic onto the spawnActor method. Return whatever it returns.
+        return spawnActor(chosenActor, sourceLocation);
     }
 
 }
