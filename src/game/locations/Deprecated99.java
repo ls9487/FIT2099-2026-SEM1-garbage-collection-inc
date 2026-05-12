@@ -13,13 +13,15 @@ import game.items.Lantern;
 import game.items.FloppyDisk;
 import game.items.CrtMonitor;
 import game.items.Alarm;
+import game.grounds.SuperComputer;
+import java.util.function.Supplier;
+
 //import game.items.FirstAidKit;
 //import game.items.SterilisationBox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * The starter moon of the Eclipse Nebula, and this game.
@@ -60,6 +62,7 @@ public class Deprecated99 extends GameMap
         );
         this.addLooseItems();
         this.setHoles();
+        this.setSuperComputer();
     }
 
     /**
@@ -107,5 +110,21 @@ public class Deprecated99 extends GameMap
         this.at(33, 17).setGround(new Hole(spawnableActors));
         this.at(57, 17).setGround(new Hole(spawnableActors));
     }
+
+    /**
+     * Configures the SuperComputer terminal with its catalogue through dependency injection.
+     * The catalogue is defined here at the map level, keeping SuperComputer generic
+     * and decoupled from concrete item types.
+     *
+     * In short, superComputer doesn't need to know about specific item types.
+     *
+     * It is only used internally within this class only.
+     * @author esoo0013
+     */
+    private void setSuperComputer() {
+        // '≡' is at map position (4, 3) in the ship layout
+        this.at(4, 3).setGround(new SuperComputer(SuperComputer.defaultCatalogue()));
+    }
+
 
 }
