@@ -1,8 +1,9 @@
 package game.items;
 
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.actors.EclipseStatistics;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.actors.EclipseActor;
 
 import java.util.Random;
 
@@ -13,7 +14,7 @@ import java.util.Random;
  * 50% chance the SuperComputer will slap an extra 50-credit hidden fee onto
  * the buyer immediately after the base purchase is processed. The hidden
  * deduction is applied directly to the buyer's CREDITS statistic via
- * {@link EclipseActor#deductCredits(int)}.
+ * {@link EclipseStatistics#CREDITS}.
  *
  * @author esoo0013
  */
@@ -59,8 +60,9 @@ public class AccessCardL3 extends AccessCard {
     public String boughtBy(Actor buyer, GameMap map) {
         StringBuilder msg = new StringBuilder(buyer + " buys an L3 access card for " + PRICE + " credits.");
         if (random.nextDouble() < HIDDEN_FEE_CHANCE) {
-            buyer.asCapability(EclipseActor.class)
-                    .ifPresent(a -> a.deductCredits(HIDDEN_FEE));
+            if (buyer.hasStatistic(EclipseStatistics.CREDITS)) {
+                buyer.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, HIDDEN_FEE);
+            }
             msg.append(" Hidden fee! The terminal pockets an extra ")
                     .append(HIDDEN_FEE).append(" credits.");
         }

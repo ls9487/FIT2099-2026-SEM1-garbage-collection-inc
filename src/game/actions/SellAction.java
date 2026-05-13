@@ -1,10 +1,11 @@
 package game.actions;
 
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.actors.EclipseActor;
 import game.items.Sellable;
+import game.actors.EclipseStatistics;
 
 /**
  * Handles selling a Sellable to the SuperComputer.
@@ -30,16 +31,11 @@ public class SellAction extends Action {
 
     @Override
     public String execute(Actor actor, GameMap map) {
-        EclipseActor eclipseActor = actor.asCapability(EclipseActor.class).orElse(null);
-        if (eclipseActor == null) {
+        if (!actor.hasStatistic(EclipseStatistics.CREDITS)) {
             return actor + " has nowhere to put credits.";
         }
-
-        // Lock in the price before any side-effects change item state
         int price = sellable.sellPrice(actor);
-
-        // Pay the seller first; soldBy() handles consequences and removal
-        eclipseActor.addCredits(price);
+        actor.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.INCREASE, price);
 
         return sellable.soldBy(actor, map);
     }

@@ -23,6 +23,9 @@ import game.statuses.Infectable;
  */
 public class ContractedWorker extends EclipseActor implements Infectable, Spawner {
 
+    /** Maximum amount of credits a worker can hold. */
+    public static final int MAX_CREDITS = 1000;
+
     /**
      * Constructor for the ContractedWorker class.
      * @param name The name of the worker.
@@ -35,6 +38,9 @@ public class ContractedWorker extends EclipseActor implements Infectable, Spawne
         this.enableAbility(ActorAbilities.VENT_ACTIVATOR);
         this.enableAbility(ActorAbilities.SLIME_EFFECT_SUSCEPTIBLE);
         this.enableAbility(ActorAbilities.PARASITE_EFFECT_SUSCEPTIBLE);
+        // Workers start with 0 credits. The statistic itself enforces the 1000-credit cap.
+        this.addNewStatistic(EclipseStatistics.CREDITS, new BaseStatistic(MAX_CREDITS));
+        this.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.UPDATE, 0);
     }
 
     /**
@@ -61,7 +67,7 @@ public class ContractedWorker extends EclipseActor implements Infectable, Spawne
         // Placed before isConscious so balance to ALSO prints when the worker is unconscious,
         // So the player sees their final wallet in the death message
         display.println(String.format("[%s] Credits: %d / %d",
-                this, this.getCredits(), EclipseActor.MAX_CREDITS));
+                this, this.getCredits(), MAX_CREDITS));
 
         // Required and forced if the actor isn't conscious.
         if (!this.isConscious()) {
@@ -125,6 +131,63 @@ public class ContractedWorker extends EclipseActor implements Infectable, Spawne
                     this.getMaximumStatistic(EclipseStatistics.INFECTION_PROGRESS));
         }
 
+    }
+
+    /**
+     * Returns the worker's current credit balance.
+     * @return current amount of credits owned by the worker.
+     * @author esoo0013
+     */
+    public int getCredits() {
+        return this.getStatistic(EclipseStatistics.CREDITS);
+    }
+
+    /**
+     * Adds credits to the worker.
+     * Values above the maximum cap are automatically clamped by the statistic system.
+     * @param amount Number of credits to add.
+     * @author esoo0013
+     */
+    public void addCredits(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        this.modifyStatistic(
+                EclipseStatistics.CREDITS,
+                StatisticOperations.INCREASE,
+                amount
+        );
+    }
+
+    /**
+     * Removes credits from the worker.
+     * The balance will NEVER go below 0.
+     * @param amount Number of credits to deduct.
+     * @author esoo0013
+     */
+    public void deductCredits(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        this.modifyStatistic(
+                EclipseStatistics.CREDITS,
+                StatisticOperations.DECREASE,
+                amount
+        );
+    }
+
+    /**
+     * Checks whether the worker has enough credits
+     * for a transaction.
+     *
+     * @param amount Required amount.
+     * @return true if the worker can afford it.
+     * @author esoo0013
+     */
+    public boolean canAfford(int amount) {
+        return getCredits() >= amount;
     }
 
 }

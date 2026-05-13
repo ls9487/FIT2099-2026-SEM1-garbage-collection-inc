@@ -19,6 +19,7 @@ import java.util.Random;
  * @author echu0057
  */
 public class Lantern extends EclipseItem implements Sellable, Infectable {
+    private static final int FIRE_DURATION = 5;
 
     /**
      * Constructor for the Lantern class.
@@ -41,7 +42,7 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
         if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && Math.random() <= 0.05) {
             this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
             // Create fire on currentLocation.
-            currentLocation.addItem(new Fire());
+            currentLocation.addItem(new Fire(FIRE_DURATION));
         }
     }
 
@@ -80,7 +81,7 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
 
         if (random.nextDouble() < 0.25) {
             for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
-                adjacent.addItem(new Fire());
+                adjacent.addItem(new Fire(FIRE_DURATION));
             }
             msg.append(" Sparks ignite the surrounding tiles.");
         }
