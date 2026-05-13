@@ -46,7 +46,7 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
         if (unlocker == null) {
             return false;
         } else {
-            return unlocker.currentClearanceLevel().ordinal() >= requiredClearance().ordinal() &&
+            return unlocker.currentClearanceLevel() >= requiredClearance() &&
                     !isUnlocked && !isAlarmed;
         }
     }
