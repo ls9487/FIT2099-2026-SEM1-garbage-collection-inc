@@ -49,7 +49,7 @@ public class ContractedWorker extends EclipseActor {
 
         // Show the worker's current wallet balance before the menu, so the
         // player can plan purchases against the 1000-credit cap.
-        // I placed before isConscious so balance to ALSO prints when the worker is unconscious,
+        // Placed before isConscious so balance to ALSO prints when the worker is unconscious,
         // So the player sees their final wallet in the death message
         display.println(String.format("[%s] Credits: %d / %d",
                 this, this.getCredits(), EclipseActor.MAX_CREDITS));

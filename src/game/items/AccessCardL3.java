@@ -17,7 +17,7 @@ import java.util.Random;
  *
  * @author esoo0013
  */
-public class AccessCardLevelThree extends AccessCard {
+public class AccessCardL3 extends AccessCard {
 
     /** Credit cost charged by the SuperComputer. */
     private static final int PRICE = 200;
@@ -41,27 +41,30 @@ public class AccessCardLevelThree extends AccessCard {
      * Constructor for the L3 access card.
      * @author esoo0013
      */
-    public AccessCardLevelThree() {
+    public AccessCardL3() {
         super("Access Card (Level 3)", SYMBOL, WEIGHT, PRICE, ClearanceLevel.LEVEL_3);
     }
 
     /**
      * 50% chance to roll the hidden fee and pull an extra 50 credits out of
      * the buyer's account on top of the 200 already deducted by the
-     * surrounding BuyAction.
+     * surrounding BuyAction. The card is then placed in the inventory.
      *
      * @param buyer the buyer who just paid 200 credits
-     * @param map the buyer's map
+     * @param map   the buyer's map
      * @return a description of whether the hidden fee triggered
      * @author esoo0013
      */
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
+        StringBuilder msg = new StringBuilder(buyer + " buys an L3 access card for " + PRICE + " credits.");
         if (random.nextDouble() < HIDDEN_FEE_CHANCE) {
             buyer.asCapability(EclipseActor.class)
                     .ifPresent(a -> a.deductCredits(HIDDEN_FEE));
-            return "Hidden fee! The terminal pockets an extra " + HIDDEN_FEE + " credits.";
+            msg.append(" Hidden fee! The terminal pockets an extra ")
+                    .append(HIDDEN_FEE).append(" credits.");
         }
-        return buyer + " buys an L3 access card.";
+        buyer.getInventory().add(this);
+        return msg.toString();
     }
 }

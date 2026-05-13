@@ -23,3 +23,6 @@
 |   | | | |   ||     |_ |   |                                                            
 |___| |_|  |__||_______||___|                                                                                                                                                                                                                         
 ```
+LINK TO OUR CONTRIBUTION LOGS:
+
+https://docs.google.com/spreadsheets/d/1TWNLnvuanieYjkHCNkfedISp4kWQJtyMlGK2CqDwMns/edit?usp=sharing

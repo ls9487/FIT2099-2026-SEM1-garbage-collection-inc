@@ -32,16 +32,21 @@ public class FloppyDisk extends EclipseItem implements Sellable {
     }
 
     /**
-     * 50% chance the SuperComputer glitches AFTER paying out and yoinks
+     * 50% chance the SuperComputer glitches AFTER paying out and snatches
      * 50 credits straight out of the wallet. Worker has been warned.
+     * The disk leaves the inventory regardless of whether the glitch fires.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
+        StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for 1 credit.");
+
         if (random.nextDouble() < 0.50) {
             seller.asCapability(EclipseActor.class).ifPresent(a -> a.deductCredits(50));
-            return "The terminal glitches and pockets 50 credits.";
+            msg.append(" The terminal glitches and pockets 50 credits.");
         }
-        return "The disk is sold without incident.";
+
+        seller.getInventory().remove(this);
+        return msg.toString();
     }
 }

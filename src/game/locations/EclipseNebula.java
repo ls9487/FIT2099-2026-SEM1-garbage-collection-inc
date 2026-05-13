@@ -37,7 +37,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('~', Puddle::new);
         groundCreator.registerGround('_', Floor::new);
         groundCreator.registerGround('=', Door::new);
-        groundCreator.registerGround('≡', SuperComputer::new);
+        groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue()));
         // NOTE: We cannot use the default ground creator to create holes,
         // as holes take a parameter of what they can spawn.
 
