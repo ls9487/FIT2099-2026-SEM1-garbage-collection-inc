@@ -4,9 +4,7 @@ import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actions.InfectAction;
 import game.actors.EnvironmentalTriggerer;
-import game.statuses.Infectable;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -58,7 +58,7 @@ public class Vent extends Ground implements Spawner {
             boolean spawnSuccess = this.spawnRandomActor(this.spawnableActors, location);
             // Successful spawning will try to cause poisoning around the vent.
             if (spawnSuccess) {
-                this.poisonSurroundings(location);
+                this.poisonAdjacent(location);
             }
         }
     }
@@ -69,7 +69,7 @@ public class Vent extends Ground implements Spawner {
      * To be used internally within this class only.
      * @param location The location of the original hole.
      */
-    private void poisonSurroundings(Location location) {
+    private void poisonAdjacent(Location location) {
         final int POISON_DAMAGE = 1;
         final int POISON_DURATION = 5;
         final int POISON_RANGE = 1;
