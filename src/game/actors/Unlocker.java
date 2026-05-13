@@ -1,7 +1,5 @@
 package game.actors;
 
-import game.items.ClearanceLevel;
-
 /**
  * Capability for actors whose inventory may contain access cards that grant
  * door clearance.
