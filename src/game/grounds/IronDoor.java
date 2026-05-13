@@ -1,13 +1,9 @@
 package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.items.ClearanceLevel;
 import game.items.Fire;
-
-import java.util.List;
 
 /**
  * Tier-2 door that overheats neighbouring floor tiles when opened.

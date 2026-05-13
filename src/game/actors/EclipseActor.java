@@ -5,8 +5,6 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Inventory;
 import game.behaviours.FollowBehaviour;
-import game.items.AccessCard;
-import game.items.ClearanceLevel;
 import game.statuses.Alarmable;
 import game.statuses.Flammable;
 import game.statuses.Poisonable;
