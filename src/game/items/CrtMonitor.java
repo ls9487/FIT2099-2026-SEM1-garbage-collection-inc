@@ -11,7 +11,7 @@ import java.util.Random;
  * @author echu0057
  */
 public class CrtMonitor extends EclipseItem implements Sellable {
-
+    private static final int FIRE_DURATION = 5;
     private final Random random = new Random();
 
     /**
@@ -46,7 +46,7 @@ public class CrtMonitor extends EclipseItem implements Sellable {
         if (random.nextDouble() < 0.20) {
             seller.hurt(2);
             for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
-                adjacent.addItem(new Fire());
+                adjacent.addItem(new Fire(FIRE_DURATION));
             }
             msg.append(" The terminal shorts out, dealing 2 damage and igniting the area.");
         }

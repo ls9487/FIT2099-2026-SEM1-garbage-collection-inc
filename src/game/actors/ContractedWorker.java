@@ -9,13 +9,22 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.displays.Menu;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.statistics.BaseStatistic;
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.grounds.Spawner;
+import game.items.ItemStatistics;
+import game.statuses.Infectable;
 
 /**
  * This brave soul is capable of performing complex tasks such as picking up trash
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends EclipseActor {
+public class ContractedWorker extends EclipseActor implements Infectable, Spawner {
+
+    /** Maximum amount of credits a worker can hold. */
+    public static final int MAX_CREDITS = 1000;
 
     /**
      * Constructor for the ContractedWorker class.
@@ -26,6 +35,12 @@ public class ContractedWorker extends EclipseActor {
      */
     public ContractedWorker(String name, char displayChar, int hitPoints, Inventory inventory) {
         super(name, displayChar, hitPoints, inventory);
+        this.enableAbility(ActorAbilities.VENT_ACTIVATOR);
+        this.enableAbility(ActorAbilities.SLIME_EFFECT_SUSCEPTIBLE);
+        this.enableAbility(ActorAbilities.PARASITE_EFFECT_SUSCEPTIBLE);
+        // Workers start with 0 credits. The statistic itself enforces the 1000-credit cap.
+        this.addNewStatistic(EclipseStatistics.CREDITS, new BaseStatistic(MAX_CREDITS));
+        this.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.UPDATE, 0);
     }
 
     /**
@@ -52,7 +67,7 @@ public class ContractedWorker extends EclipseActor {
         // Placed before isConscious so balance to ALSO prints when the worker is unconscious,
         // So the player sees their final wallet in the death message
         display.println(String.format("[%s] Credits: %d / %d",
-                this, this.getCredits(), EclipseActor.MAX_CREDITS));
+                this, this.getCredits(), MAX_CREDITS));
 
         // Required and forced if the actor isn't conscious.
         if (!this.isConscious()) {
@@ -85,6 +100,94 @@ public class ContractedWorker extends EclipseActor {
             actions.add(new AttackAction(this, direction));
         }
         return actions;
+    }
+
+    /**
+     * The infection causes the worker to lose 1 hp each turn.
+     * Additionally, every 5 turns, a new parasite spawns around the worker!
+     * @param location The location where the infection tick is happening.
+     */
+    @Override
+    public void infection(Location location) {
+        final int INFECTION_DAMAGE = 1;
+        final int TICKS_INTERVAL = 5;
+        // Deal damage to the infected worker.
+        this.hurt(INFECTION_DAMAGE);
+        // If this worker doesn't have it already, add this statistic to keep track
+        // of the ticks left before spawning a parasite.
+        if (!this.hasStatistic(EclipseStatistics.INFECTION_PROGRESS)) {
+            this.addNewStatistic(EclipseStatistics.INFECTION_PROGRESS,
+                    new BaseStatistic(TICKS_INTERVAL));
+        }
+        // Deal damage to the infected worker and tick down the progress.
+        this.hurt(INFECTION_DAMAGE);
+        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+        // If the progress reached 0, spawn a new parasite.
+        if (this.getStatistic(EclipseStatistics.INFECTION_PROGRESS) <= 0) {
+            // Spawning logic is handled by Spawner's default implementation.
+            this.spawnActor(new Parasite(), location);
+            // Also, reset the infection progress.
+            this.modifyStatistic(EclipseStatistics.INFECTION_PROGRESS, StatisticOperations.UPDATE,
+                    this.getMaximumStatistic(EclipseStatistics.INFECTION_PROGRESS));
+        }
+
+    }
+
+    /**
+     * Returns the worker's current credit balance.
+     * @return current amount of credits owned by the worker.
+     * @author esoo0013
+     */
+    public int getCredits() {
+        return this.getStatistic(EclipseStatistics.CREDITS);
+    }
+
+    /**
+     * Adds credits to the worker.
+     * Values above the maximum cap are automatically clamped by the statistic system.
+     * @param amount Number of credits to add.
+     * @author esoo0013
+     */
+    public void addCredits(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        this.modifyStatistic(
+                EclipseStatistics.CREDITS,
+                StatisticOperations.INCREASE,
+                amount
+        );
+    }
+
+    /**
+     * Removes credits from the worker.
+     * The balance will NEVER go below 0.
+     * @param amount Number of credits to deduct.
+     * @author esoo0013
+     */
+    public void deductCredits(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        this.modifyStatistic(
+                EclipseStatistics.CREDITS,
+                StatisticOperations.DECREASE,
+                amount
+        );
+    }
+
+    /**
+     * Checks whether the worker has enough credits
+     * for a transaction.
+     *
+     * @param amount Required amount.
+     * @return true if the worker can afford it.
+     * @author esoo0013
+     */
+    public boolean canAfford(int amount) {
+        return getCredits() >= amount;
     }
 
 }

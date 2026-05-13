@@ -1,7 +1,11 @@
 package game.items;
+
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.actors.EclipseActor;
+
+import game.actors.EclipseStatistics;
+
 import java.util.Random;
 
 /**
@@ -41,8 +45,8 @@ public class FloppyDisk extends EclipseItem implements Sellable {
     public String soldBy(Actor seller, GameMap map) {
         StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for 1 credit.");
 
-        if (random.nextDouble() < 0.50) {
-            seller.asCapability(EclipseActor.class).ifPresent(a -> a.deductCredits(50));
+        if (random.nextDouble() < 0.5 && seller.hasStatistic(EclipseStatistics.CREDITS)) {
+            seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, 50);
             msg.append(" The terminal glitches and pockets 50 credits.");
         }
 

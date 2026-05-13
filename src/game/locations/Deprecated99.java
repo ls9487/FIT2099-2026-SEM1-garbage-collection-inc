@@ -3,6 +3,7 @@ package game.locations;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
+import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Slime;
 import game.actors.Undead;
 import game.grounds.Hole;
@@ -29,11 +30,12 @@ import java.util.List;
  *
  * @author echu0057
  */
-public class Deprecated99 extends GameMap
-{
+public class Deprecated99 extends GameMap {
+    private final List<Location> tubeLocations;
 
     /**
      * Constructor for the moon in Eclipse Nebula, 99-Deprecated.
+     *
      * @param groundCreator The ground creator object.
      * @throws Exception in case if anything goes wrong...
      */
@@ -60,8 +62,11 @@ public class Deprecated99 extends GameMap
                 "..~.................#______=___________=___=___________=___#",
                 "....................########################################")
         );
+        this.tubeLocations = new ArrayList<>();
         this.addLooseItems();
         this.setHoles();
+        // Pre-reserve a tube location inside the starter ship (bridge corridor).
+        this.tubeLocations.add(this.at(6, 2));
         this.setSuperComputer();
     }
 
@@ -119,6 +124,7 @@ public class Deprecated99 extends GameMap
      * In short, superComputer doesn't need to know about specific item types.
      *
      * It is only used internally within this class only.
+     *
      * @author esoo0013
      */
     private void setSuperComputer() {
@@ -126,5 +132,18 @@ public class Deprecated99 extends GameMap
         this.at(4, 3).setGround(new SuperComputer(SuperComputer.defaultCatalogue()));
     }
 
-
+    /**
+     * Reserved tile for installing the ship's teleportation tube once all maps
+     * are available.
+     *
+     * @return the pre-chosen tube location within 99-Deprecated
+     */
+    public List<Location> getTubeLocations() {
+        List<Location> tubeLocations = new ArrayList<>();
+        for (Location location : this.tubeLocations) {
+            tubeLocations.add(new Location(location.map(), location.x(), location.y()));
+        }
+        return tubeLocations;
+    }
 }
+

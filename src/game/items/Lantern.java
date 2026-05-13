@@ -7,6 +7,8 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.statuses.BurnStatus;
 import game.statuses.Flammable;
+import game.statuses.Infectable;
+
 import java.util.Random;
 
 
@@ -16,7 +18,8 @@ import java.util.Random;
  *
  * @author echu0057
  */
-public class Lantern extends EclipseItem implements Sellable {
+public class Lantern extends EclipseItem implements Sellable, Infectable {
+    private static final int FIRE_DURATION = 5;
 
     /**
      * Constructor for the Lantern class.
@@ -39,7 +42,7 @@ public class Lantern extends EclipseItem implements Sellable {
         if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && Math.random() <= 0.05) {
             this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
             // Create fire on currentLocation.
-            currentLocation.addItem(new Fire());
+            currentLocation.addItem(new Fire(FIRE_DURATION));
         }
     }
 
@@ -78,7 +81,7 @@ public class Lantern extends EclipseItem implements Sellable {
 
         if (random.nextDouble() < 0.25) {
             for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
-                adjacent.addItem(new Fire());
+                adjacent.addItem(new Fire(FIRE_DURATION));
             }
             msg.append(" Sparks ignite the surrounding tiles.");
         }
@@ -86,4 +89,17 @@ public class Lantern extends EclipseItem implements Sellable {
         seller.getInventory().remove(this);
         return msg.toString();
     }
+
+    /**
+     * The infection finds the fuel yummy, draining it by 1 unit per turn.
+     * Note that the "blowing up" doesn't actually affect its surroundings.
+     * @param location The location where the infection tick is happening.
+     */
+    @Override
+    public void infection(Location location) {
+        // Decrease its oil (durability) by 1. No need to check if it's greater than 0 or anything.
+        // Due to how the engine's statistics work, it'll already prevent it going negative.
+        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+    }
+
 }
