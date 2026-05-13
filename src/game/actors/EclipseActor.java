@@ -4,9 +4,12 @@ import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.behaviours.FollowBehaviour;
+import game.items.AccessCard;
+import game.items.ClearanceLevel;
 import game.statuses.Alarmable;
 import game.statuses.Flammable;
 import game.statuses.Poisonable;
@@ -23,7 +26,7 @@ import java.util.TreeMap;
  *
  * @author echu0057
  */
-public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable
+public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable, Unlocker
 {
 
     private final Map<Integer, Behaviour<Actor, Action>> behaviours;
@@ -169,6 +172,33 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
      */
     public boolean canAfford(int amount) {
         return getCredits() >= amount;
+    }
+
+    /**
+     * Scans the carried inventory for items that advertise door clearance and
+     * reports the strongest tier found.
+     *
+     * @return highest held clearance, or empty when carrying no access cards
+     * @author eche0116
+     * @version 1.0
+     */
+    @Override
+    public ClearanceLevel currentClearanceLevel() {
+        ClearanceLevel best = null;
+        for (Item item : this.getInventory().getItems()) {
+            AccessCard accessCard = item.asCapability(AccessCard.class).orElse(null);
+            if (accessCard != null) {
+                ClearanceLevel current = accessCard.getClearanceLevel();
+                if (best != null) {
+                    if (current.ordinal() > best.ordinal()) {
+                        best = current;
+                    }
+                } else {
+                    best = current;
+                }
+            }
+        }
+        return best;
     }
 
 }
