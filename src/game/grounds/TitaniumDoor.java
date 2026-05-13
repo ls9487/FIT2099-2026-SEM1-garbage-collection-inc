@@ -2,7 +2,6 @@ package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.items.ClearanceLevel;
 
 /**
  * Tier-3 door that triggers a brief decontamination heal when opened.

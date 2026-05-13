@@ -43,7 +43,7 @@ public class AccessCardL3 extends AccessCard {
      * @author esoo0013
      */
     public AccessCardL3() {
-        super("Access Card (Level 3)", SYMBOL, WEIGHT, PRICE, ClearanceLevel.LEVEL_3);
+        super("Access Card (Level 3)", SYMBOL, WEIGHT, PRICE, 3);
     }
 
     /**
