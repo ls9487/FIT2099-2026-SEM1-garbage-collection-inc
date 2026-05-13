@@ -9,4 +9,7 @@ package game.actors;
 public enum ActorAbilities {
     WORKER_HOSTILE,
     DIRECT_CONSUMER,
+    VENT_ACTIVATOR,
+    SLIME_EFFECT_SUSCEPTIBLE,
+    PARASITE_EFFECT_SUSCEPTIBLE
 }

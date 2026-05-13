@@ -31,7 +31,7 @@ public class AccessCardL2 extends AccessCard {
      * @author esoo0013
      */
     public AccessCardL2() {
-        super("Access Card (Level 2)", SYMBOL, WEIGHT, PRICE, ClearanceLevel.LEVEL_2);
+        super("Access Card (Level 2)", SYMBOL, WEIGHT, PRICE, 2);
     }
 
     /**

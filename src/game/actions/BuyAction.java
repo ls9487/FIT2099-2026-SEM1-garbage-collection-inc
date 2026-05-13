@@ -1,10 +1,13 @@
 package game.actions;
 
+import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.actors.EclipseActor;
+import game.actors.ContractedWorker;
 import game.items.Buyable;
+import game.actors.EclipseStatistics;
+
 
 /**
  * Handles purchasing a Buyable from the SuperComputer.
@@ -43,9 +46,8 @@ public class BuyAction extends Action {
     @Override
     public String execute(Actor actor, GameMap map) {
 
-        // Credits are only supported by EclipseActor-based actors
-        EclipseActor eclipseActor = actor.asCapability(EclipseActor.class).orElse(null);
-        if (eclipseActor == null) {
+        // Credits live on the ContractedWorker, not on every actor
+        if (!actor.hasStatistic(EclipseStatistics.CREDITS)) {
             return actor + " has nowhere to draw credits from.";
         }
 
@@ -53,12 +55,10 @@ public class BuyAction extends Action {
 
         // Let the Buyable decide what happens if the actor cannot afford it
         // e.g FirstAidKit kills the buyer when broke
-        if (!eclipseActor.canAfford(price)) {
+        if (actor.getStatistic(EclipseStatistics.CREDITS) < price) {
             return buyable.cannotAfford(actor, map);
         }
-
-        // Deduct the credits before the item-specific effect runs
-        eclipseActor.deductCredits(price);
+        actor.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, price);
 
         // Buyable owns its own purchase side-effects AND its own
         // inventory insertion. The action has no opinion on either

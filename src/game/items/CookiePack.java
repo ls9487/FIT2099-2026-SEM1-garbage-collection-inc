@@ -9,6 +9,9 @@ import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.ConsumeAction;
 import game.actors.ActorAbilities;
+import game.actors.Parasite;
+import game.grounds.Spawner;
+import game.statuses.Infectable;
 
 /**
  * CookiePack represents a pack of 5 cookies. Only one can be eaten at a time (by law).
@@ -17,7 +20,8 @@ import game.actors.ActorAbilities;
  *
  * @author echu0057
  */
-public class CookiePack extends EclipseItem implements Consumable, Sellable {
+public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable, Spawner
+{
 
     /**
      * Constructor for the CookiePack class.
@@ -114,6 +118,22 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable {
         seller.getInventory().remove(this);
         return seller + " sells the cookie pack for " + cookies + " credits and loses "
                 + cookies + " HP to the organic processing fee.";
+    }
+
+    /**
+     * The infection finds the cookies yummy, depleting it by 1 cookie per turn.
+     * It'll also spawn a new parasite around it as long as there's cookies left!
+     * @param location The location where the infection tick is happening.
+     */
+    @Override
+    public void infection(Location location) {
+        // Check if there's any cookies remaining.
+        if (this.getStatistic(ItemStatistics.DURABILITY) > 0) {
+            // The infection continues to eat those cookies and spawning a parasite...
+            this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+            // Use Spawner's default implementation to spawn a parasite around the cookie.
+            spawnActor(new Parasite(), location);
+        }
     }
 
 }

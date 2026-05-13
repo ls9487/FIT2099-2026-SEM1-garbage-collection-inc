@@ -7,7 +7,6 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.UnlockAction;
 import game.actors.Unlocker;
-import game.items.ClearanceLevel;
 import game.statuses.Alarmable;
 
 /**
