@@ -5,6 +5,8 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.ActorAbilities;
+import game.statuses.PoisonStatus;
+import game.statuses.Poisonable;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -53,7 +55,37 @@ public class Vent extends Ground implements Spawner {
         }
         // If activated, try to spawn.
         if (ventActivated) {
-            this.spawnRandomActor(this.spawnableActors, location);
+            boolean spawnSuccess = this.spawnRandomActor(this.spawnableActors, location);
+            // Successful spawning will try to cause poisoning around the vent.
+            if (spawnSuccess) {
+                this.poisonSurroundings(location);
+            }
+        }
+    }
+
+    /**
+     * Upon successful spawning, the vent poisons all actors adjacent to it.
+     * Poison does 1 damage per turn, for 5 turns.
+     * To be used internally within this class only.
+     * @param location The location of the original hole.
+     */
+    private void poisonSurroundings(Location location) {
+        final int POISON_DAMAGE = 1;
+        final int POISON_DURATION = 5;
+        final int POISON_RANGE = 1;
+
+        // Get the adjacent locations.
+        List<Location> adjacentLocations = location.getNearbyLocations(POISON_RANGE);
+        for (Location adjacentLocation : adjacentLocations) {
+            if (adjacentLocation.containsAnActor()) {
+                // Actor is present at this adjacent location. Try to poison it.
+                Actor adjacentActor = adjacentLocation.getActor();
+                Poisonable poisonable = adjacentActor.asCapability(Poisonable.class).orElse(null);
+                if (poisonable != null) {
+                    // Poison the poisonable actor.
+                    adjacentActor.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE, poisonable));
+                }
+            }
         }
     }
 
