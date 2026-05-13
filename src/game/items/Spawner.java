@@ -20,7 +20,7 @@ public interface Spawner {
      *
      * @param spawnLocation the reference location, usually the owner's tile
      */
-    void spawn(Location spawnLocation);
+    String spawn(Location spawnLocation);
 
     /**
      * get random spawnable actor from all spawnable actors
