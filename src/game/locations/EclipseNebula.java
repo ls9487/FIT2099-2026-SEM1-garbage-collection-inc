@@ -4,16 +4,25 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
+import game.grounds.AluminiumDoor;
 import game.grounds.Dirt;
-import game.grounds.Door;
 import game.grounds.Floor;
+import game.grounds.IronDoor;
+import game.grounds.MagicCircleGroup;
 import game.grounds.Puddle;
+import game.grounds.TitaniumDoor;
+import game.grounds.ToxicWaste;
 import game.grounds.Wall;
 import game.inventories.WeightLimitedInventory;
 import game.items.Flask;
 import game.grounds.SuperComputer;
+import game.grounds.TeleportationTube;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class handles the miracle of creation, translating a bunch of periods
@@ -36,14 +45,43 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('#', Wall::new);
         groundCreator.registerGround('~', Puddle::new);
         groundCreator.registerGround('_', Floor::new);
-        groundCreator.registerGround('=', Door::new);
+        groundCreator.registerGround('=', AluminiumDoor::new);
+        groundCreator.registerGround('N', IronDoor::new);
+        groundCreator.registerGround('M', TitaniumDoor::new);
+        groundCreator.registerGround('≈', ToxicWaste::new);
         groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue()));
+        // Placeholder mappings for special glyphs that are decorated later
+        groundCreator.registerGround('Φ', Floor::new);
+        groundCreator.registerGround('◎', Floor::new);
+        groundCreator.registerGround('◈', Floor::new);
+        groundCreator.registerGround('o', Dirt::new);
         // NOTE: We cannot use the default ground creator to create holes,
         // as holes take a parameter of what they can spawn.
 
-        // Produce the map...
-        GameMap moon99DeprecatedMap = new Deprecated99(groundCreator);
+
+        // Produce the maps...
+        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator);
+        Overflow20 overflow20Map = new Overflow20(groundCreator);
         this.addGameMap(moon99DeprecatedMap);
+        this.addGameMap(overflow20Map);
+
+        // Install teleportation tubes with mixed intra- and inter-map destinations.
+
+
+        for (Location tubeLocation : moon99DeprecatedMap.getTubeLocations()) {
+            List<Location> tubeTeleportableLocation = new ArrayList<>();
+            tubeTeleportableLocation.add(moon99DeprecatedMap.at(7, 2));
+            tubeTeleportableLocation.add(overflow20Map.at(3, 3));
+            tubeLocation.setGround(new TeleportationTube(tubeTeleportableLocation));
+        }
+
+        for (Location tubeLocation : overflow20Map.getTubeLocations()) {
+            List<Location> tubeTeleportableLocation = new ArrayList<>();
+            tubeTeleportableLocation.add(overflow20Map.at(10, 15));
+            tubeTeleportableLocation.add(overflow20Map.at(30, 4));
+            tubeTeleportableLocation.add(moon99DeprecatedMap.at(7, 2));
+            tubeLocation.setGround(new TeleportationTube(tubeTeleportableLocation));
+        }
 
         // BEHOLD, LOCAL MULTIPLAYER!!! ...comment some guys out for easier testing.
         ContractedWorker contractedWorker1 = initialiseNewWorker("#1 Bob", 'ඞ', 10);

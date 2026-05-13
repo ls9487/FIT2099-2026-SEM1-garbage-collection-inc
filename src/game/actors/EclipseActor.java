@@ -5,6 +5,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Inventory;
 import game.behaviours.FollowBehaviour;
+import game.items.AccessCard;
+import game.items.ClearanceLevel;
 import game.statuses.Alarmable;
 import game.statuses.Flammable;
 import game.statuses.Poisonable;
@@ -21,7 +23,7 @@ import java.util.TreeMap;
  *
  * @author echu0057
  */
-public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable
+public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable, Unlocker
 {
 
     private final Map<Integer, Behaviour<Actor, Action>> behaviours;

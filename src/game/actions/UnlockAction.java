@@ -33,7 +33,7 @@ public class UnlockAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        return unlockable.unlockedBy(actor);
+        return unlockable.unlockedBy(actor, map);
     }
 
     /**
