@@ -17,8 +17,8 @@ import java.util.Random;
  * @author echu0057
  */
 public class SterilisationBox extends EclipseItem implements Buyable {
-
-    private final Random random = new Random();
+    private static final Random random = new Random();
+    private static final int BUY_PRICE = 750;
 
     /**
      * Constructor for the SterilisationBox class.
@@ -34,40 +34,52 @@ public class SterilisationBox extends EclipseItem implements Buyable {
      * @author esoo0013
      */
     @Override
-    public int buyPrice(Actor buyer) {
-        return 750;
+    public int getBuyPrice() {
+        return BUY_PRICE;
     }
 
     /**
      * The radiation kicks in immediately on purchase. The box is added to
      * the inventory first, and then a random item is sampled from the full
      * inventory and permanently erased.
-     *
-     * The box is eligible to be its OWN victim (radiation spread to itself)
-     * , in which case the buyer pays 750
-     * credits for nothing.
+     * The box is eligible to be its OWN victim (radiation spread to itself),
+     * in which case the buyer pays 750 credits for nothing.
+     * @param buyer The actor doing the buying.
+     * @param map The map the buyer is on.
+     * @return A full description describing the purchase and its effects.
      * @author esoo0013
      */
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
-        StringBuilder result = new StringBuilder();
-        result.append(buyer).append(" buys ").append(this)
-                .append(" for 750 credits.");
+        StringBuilder result = new StringBuilder(buyer + " buys a sterilisation box for " +
+                getBuyPrice() + " credits.");
 
         // Box is added FIRST so it is eligible to be the victim, per Ed clarification.
         buyer.getInventory().add(this);
 
+        // Get the worker's inventory, pick a random item from it and remove it.
         List<Item> inventory = new ArrayList<>(buyer.getInventory().getItems());
         Item victim = inventory.get(random.nextInt(inventory.size()));
         buyer.getInventory().remove(victim);
-
+        // This is just to have a custom message if the box itself vanishes (truly unfortunate).
         if (victim == this) {
-            result.append(" The radiation erases the box itself.");
+            result.append(" The radiation erases the box that was just bought!.");
         } else {
             result.append(" Radiation erases ").append(victim).append(".");
         }
 
         return result.toString();
+    }
+
+    /**
+     * Nothing bad happens. The buyer just can't have the item.
+     * @param buyer The actor who lacks credits.
+     * @param map The map the buyer is on.
+     * @return A description of the failure.
+     */
+    @Override
+    public String cannotAfford(Actor buyer, GameMap map) {
+        return buyer + " cannot afford to buy the (overpriced) sterilisation box.";
     }
 
 }

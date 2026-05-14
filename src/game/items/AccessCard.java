@@ -23,7 +23,7 @@ import edu.monash.fit2099.engine.statistics.BaseStatistic;
 public abstract class AccessCard extends EclipseItem implements Buyable {
 
     /** What the SuperComputer charges for this card. Set once by the subclass. */
-    private final int price;
+    private final int buyPrice;
 
     /**
      * Constructor invoked by every concrete card subclass.
@@ -33,14 +33,14 @@ public abstract class AccessCard extends EclipseItem implements Buyable {
      * @param name           the card's display name (e.g. {@code "Access Card (Level 1)"})
      * @param displayChar    map symbol shown when the card is on the ground
      * @param weight         unit weight (counts toward the worker's 50-unit cap)
-     * @param price          credit cost charged by the SuperComputer
-     * @param clearanceLevel integer tier (1 = Aluminium, 2 = Iron, 3 = all)
+     * @param buyPrice          credit cost charged by the SuperComputer
+     * @param clearanceLevel integer tier (1 = Aluminium, 2 = Iron, 3 = Titanium)
      * @author esoo0013
      */
-    public AccessCard(String name, char displayChar, int weight, int price, int clearanceLevel) {
+    public AccessCard(String name, char displayChar, int weight, int buyPrice, int clearanceLevel) {
         super(name, displayChar, weight);
-        this.price = price;
-        addNewStatistic(ItemStatistics.CLEARANCE_LEVEL, new BaseStatistic(clearanceLevel));
+        this.buyPrice = buyPrice;
+        this.addNewStatistic(ItemStatistics.CLEARANCE_LEVEL, new BaseStatistic(clearanceLevel));
         this.enableAbility(ItemAbilities.UNLOCKER);
     }
 
@@ -49,7 +49,7 @@ public abstract class AccessCard extends EclipseItem implements Buyable {
      * statistic. REQ2 door logic calls this to decide whether the card is
      * allowed to open a given door.
      *
-     * @return the card's clearance tier (1, 2, or 3)
+     * @return the card's clearance tier (e.g. 1, 2, 3)
      * @author esoo0013
      */
     public int getClearanceLevel() {
@@ -60,25 +60,12 @@ public abstract class AccessCard extends EclipseItem implements Buyable {
      * Reports the credit cost. The price is fixed per subclass and does not
      * vary by buyer.
      *
-     * @param buyer the actor attempting to buy this card
      * @return the credit cost
      * @author esoo0013
      */
     @Override
-    public int buyPrice(Actor buyer) {
-        return price;
+    public int getBuyPrice() {
+        return buyPrice;
     }
 
-    /**
-     * Each subclass defines its own special-on-purchase effect. Called by
-     * {@code BuyAction} <em>after</em> credits have been deducted but
-     * <em>before</em> the card is inserted into the buyer's inventory.
-     *
-     * @param buyer the actor performing the purchase
-     * @param map   the map the buyer is on
-     * @return a description of what happened during the purchase
-     * @author esoo0013
-     */
-    @Override
-    public abstract String boughtBy(Actor buyer, GameMap map);
 }

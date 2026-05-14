@@ -18,6 +18,7 @@ public class ParasiteSpawner implements Spawner {
      * Successful spawning triggers an environmental reaction.
      * @param location The location for the parasite to be spawned at.
      */
+    @Override
     public void spawnAt(Location location) {
         Parasite spawnedParasite = new Parasite();
         // try/catch required by IntelliJ.

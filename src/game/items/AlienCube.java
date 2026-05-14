@@ -100,11 +100,10 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Spaw
     /**
      * the sell price of alien cube
      *
-     * @param seller The actor doing the selling.
      * @return fixed sale price
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return SELL_PRICE;
     }
 

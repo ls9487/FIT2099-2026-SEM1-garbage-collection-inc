@@ -20,6 +20,7 @@ public class UndeadSpawner implements Spawner {
      * Successful spawning triggers an environmental reaction.
      * @param location The location for the undead to be spawned at.
      */
+    @Override
     public void spawnAt(Location location) {
         Undead spawnedUndead = new Undead();
         // try/catch required by IntelliJ.

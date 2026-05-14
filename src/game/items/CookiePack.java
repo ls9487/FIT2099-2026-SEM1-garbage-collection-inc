@@ -105,7 +105,7 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return this.getStatistic(ItemStatistics.DURABILITY);
     }
 
@@ -113,15 +113,18 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
      * The "organic processing fee": one HP lost per cookie sold. The whole
      * pack goes at once, so a full pack costs the seller 5 HP immediately,
      * after which the pack leaves the inventory.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        int cookies = this.getStatistic(ItemStatistics.DURABILITY);
-        seller.hurt(cookies);
+        int damage = this.getStatistic(ItemStatistics.DURABILITY);
+        seller.hurt(damage);
         seller.getInventory().remove(this);
-        return seller + " sells the cookie pack for " + cookies + " credits and loses "
-                + cookies + " HP to the organic processing fee.";
+        return seller + " sells the cookie pack for " + getSellPrice() + " credits and loses "
+                + damage + " HP to the organic processing fee.";
     }
 
     /**

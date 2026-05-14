@@ -14,12 +14,11 @@ public interface Sellable {
 
     /**
      * What this item sells for. May depend on item state (e.g. a half-empty
-     * cookie pack is worth less). Should not have side effects.
-     * @param seller The actor doing the selling.
+     * cookie pack is worth less).
      * @return Credit value.
      * @author esoo0013
      */
-    int sellPrice(Actor seller);
+    public int getSellPrice();
 
     /**
      * Apply the item-specific sale logic AND remove the item from the
@@ -38,5 +37,5 @@ public interface Sellable {
      * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
-    String soldBy(Actor seller, GameMap map);
+    public String soldBy(Actor seller, GameMap map);
 }

@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * Vent represents a vent on some location. Actors cannot enter it.
  * However, some creatures could emerge from this...
- * Spawns one creature every 20 turns.
+ * Spawns a creature each turn if an adjacent actor has the ability of activating it.
  * What creatures it spawns should depend on the moon (GameMap).
  *
  * @author echu0057
@@ -93,7 +93,7 @@ public class Vent extends Ground {
      * Upon successful spawning, the vent poisons all actors adjacent to it.
      * Poison does 1 damage per turn, for 5 turns.
      * To be used internally within this class only.
-     * @param location The location of the original hole.
+     * @param location The location of the vent.
      */
     private void poisonAdjacent(Location location) {
         final int POISON_DAMAGE = 1;
