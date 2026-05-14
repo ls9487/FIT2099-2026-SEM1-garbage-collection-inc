@@ -21,7 +21,7 @@ import game.inventories.BasicInventory;
  *
  * @author echu0057
  */
-public class Parasite extends EclipseActor implements Infector, EnvironmentalTriggerer {
+public class Parasite extends EclipseActor implements Infector {
     private static final int INFECT_BEHAVIOUR_PRIORITY = 1;
     private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
 
@@ -82,24 +82,6 @@ public class Parasite extends EclipseActor implements Infector, EnvironmentalTri
         // Do damage equal to the parasite's max hp (instantly killing it).
         this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
         return String.format("%s dies as a result.", this);
-    }
-
-    /**
-     * Upon being spawned, deal 2 damage to actors susceptible to this effect (e.g. workers).
-     * @param location The location where the parasite was spawned.
-     */
-    @Override
-    public void onSpawnEffect(Location location) {
-        final int ADJACENT_DAMAGE = 2;
-        // Check each adjacent location.
-        for (Exit exit : location.getExits()) {
-            Location destination = exit.getDestination();
-            // Check if there's a susceptible actor. If so, deal damage to it.
-            if (destination.containsAnActor() &&
-                    destination.getActor().hasAbility(ActorAbilities.PARASITE_EFFECT_SUSCEPTIBLE)) {
-                destination.getActor().hurt(ADJACENT_DAMAGE);
-            }
-        }
     }
 
 }
