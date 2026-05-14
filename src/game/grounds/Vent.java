@@ -5,7 +5,6 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.ActorAbilities;
-import game.spawners.ParasiteSpawner;
 import game.spawners.Spawner;
 import game.statuses.PoisonStatus;
 import game.statuses.Poisonable;
