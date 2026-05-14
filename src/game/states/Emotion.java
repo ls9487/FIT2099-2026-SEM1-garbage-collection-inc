@@ -1,13 +1,10 @@
 package game.states;
 
 public enum Emotion {
-    IDLE,
-    AGGRESSIVE,
-    PASSIVE,
-    DEFENSIVE,
+    CAUTION,
+    MISCHIEVOUS,
     FEARFUL,
     CURIOUS,
-    NEUTRAL,
-    GREEDY,
-    FRIENDLY
+    ANGRY,
+    GREEDY
 }
