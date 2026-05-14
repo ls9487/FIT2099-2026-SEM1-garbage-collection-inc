@@ -3,14 +3,20 @@ package game.items;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.ConsumeAction;
 import game.actors.ActorAbilities;
-import game.actors.Parasite;
+import game.spawners.ParasiteSpawner;
+import game.spawners.Spawner;
 import game.statuses.Infectable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * CookiePack represents a pack of 5 cookies. Only one can be eaten at a time (by law).
@@ -129,9 +135,33 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
         if (this.getStatistic(ItemStatistics.DURABILITY) > 0) {
             // The infection continues to eat those cookies and spawning a parasite...
             this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
-            // Use Spawner's default implementation to spawn a parasite around the cookie.
-            spawnActor(new Parasite(), location);
+            this.infectionSpawn(location);
         }
+    }
+
+    /**
+     * The infection causes the cookies to spawn a parasite on a random adjacent location.
+     * To be used internally within this class only.
+     * @param location The location of the cookies when the infection spawns a parasite.
+     */
+    private void infectionSpawn(Location location) {
+        final Random random = new Random();
+        // Keep track of the valid adjacent locations around (i.e. no actor occupying).
+        List<Location> validLocations = new ArrayList<>();
+        // Get the valid locations.
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
+            if (!destination.containsAnActor()) {
+                validLocations.add(destination);
+            }
+        }
+        // There is at least one valid location. Randomly choose and spawn the parasite there.
+        if (!validLocations.isEmpty()) {
+            Spawner parasiteSpawner = new ParasiteSpawner();
+            Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
+            parasiteSpawner.spawnAt(chosenLocation);
+        }
+
     }
 
 }

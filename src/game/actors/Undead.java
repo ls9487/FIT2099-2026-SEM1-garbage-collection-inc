@@ -24,6 +24,8 @@ import game.weapons.BareFist;
  * @author echu0057
  */
 public class Undead extends EclipseActor implements Infectable {
+    private static final int ATTACK_BEHAVIOUR_PRIORITY = 1;
+    private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
 
     /**
      * Constructor for the Undead class. Has 15 hp.
@@ -35,8 +37,8 @@ public class Undead extends EclipseActor implements Infectable {
         super("Undead", 'Ѫ', 15, new BasicInventory());
         this.setIntrinsicWeapon(new BareFist(1, 10));
         this.enableAbility(ActorAbilities.WORKER_HOSTILE);
-        this.addNewBehaviour(1, new AttackBehaviour());
-        this.addNewBehaviour(999, new WanderBehaviour());
+        this.addNewBehaviour(ATTACK_BEHAVIOUR_PRIORITY, new AttackBehaviour());
+        this.addNewBehaviour(WANDER_BEHAVIOUR_PRIORITY, new WanderBehaviour());
     }
 
     /**

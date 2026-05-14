@@ -6,11 +6,7 @@ import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
-import edu.monash.fit2099.engine.items.DropAction;
-import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.ConsumeBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.inventories.BasicInventory;
@@ -22,6 +18,8 @@ import game.inventories.BasicInventory;
  * @author echu0057
  */
 public class Slime extends EclipseActor {
+    private static final int CONSUME_BEHAVIOUR_PRIORITY = 1;
+    private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
 
     /**
      * Constructor for the Slime class. Has 25 hp.
@@ -30,8 +28,8 @@ public class Slime extends EclipseActor {
     public Slime() {
         super("Slime", '⍾', 25, new BasicInventory());
         this.enableAbility(ActorAbilities.DIRECT_CONSUMER);
-        this.addNewBehaviour(1, new ConsumeBehaviour());
-        this.addNewBehaviour(999, new WanderBehaviour());
+        this.addNewBehaviour(CONSUME_BEHAVIOUR_PRIORITY, new ConsumeBehaviour());
+        this.addNewBehaviour(WANDER_BEHAVIOUR_PRIORITY, new WanderBehaviour());
     }
 
     /**
