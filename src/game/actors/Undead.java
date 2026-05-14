@@ -7,10 +7,8 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.behaviours.AttackBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.inventories.BasicInventory;
@@ -25,7 +23,7 @@ import game.weapons.BareFist;
  *
  * @author echu0057
  */
-public class Undead extends EclipseActor implements Infectable, EnvironmentalTriggerer {
+public class Undead extends EclipseActor implements Infectable {
 
     /**
      * Constructor for the Undead class. Has 15 hp.
@@ -86,24 +84,6 @@ public class Undead extends EclipseActor implements Infectable, EnvironmentalTri
     public void infection(Location location) {
         // Damage equal to max hp guarantees killing it.
         this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
-    }
-
-    /**
-     * Upon being spawned, every adjacent actor increases its max health by 1.
-     * @param location The location where the undead was spawned.
-     */
-    @Override
-    public void onSpawnEffect(Location location) {
-        final int BOOST_PER_ACTOR = 1;
-        // Check each adjacent location.
-        for (Exit exit : location.getExits()) {
-            Location destination = exit.getDestination();
-            // Each adjacent actor will boost the max hp (by 1).
-            if (destination.containsAnActor()) {
-                this.modifyStatisticMaximum(ActorStatistics.HEALTH,
-                        StatisticOperations.INCREASE, BOOST_PER_ACTOR);
-            }
-        }
     }
 
 }
