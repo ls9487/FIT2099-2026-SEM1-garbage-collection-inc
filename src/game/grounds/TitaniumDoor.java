@@ -12,6 +12,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 public class TitaniumDoor extends Door {
 
     private static final int DECONTAMINATION_HEAL = 5;
+    private static final int CLEARANCE_LEVEL = 3;
 
     /**
      * Creates a titanium door marked with {@code M} on facility plans.
@@ -27,8 +28,8 @@ public class TitaniumDoor extends Door {
      * @return clearance level three
      */
     @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_3;
+    protected int requiredClearance() {
+        return CLEARANCE_LEVEL;
     }
 
     /**

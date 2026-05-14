@@ -12,6 +12,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 public class AluminiumDoor extends Door {
 
     private static final int SHORT_CIRCUIT_DAMAGE = 2;
+    private static final int CLEARANCE_LEVEL = 1;
 
     /**
      * Creates an aluminium door using the standard facility symbol.
@@ -27,8 +28,8 @@ public class AluminiumDoor extends Door {
      * @return clearance level one
      */
     @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_1;
+    protected int requiredClearance() {
+        return CLEARANCE_LEVEL;
     }
 
     /**

@@ -21,7 +21,7 @@ import java.util.TreeMap;
  *
  * @author echu0057
  */
-public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable, Unlocker
+public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable
 {
 
     private final Map<Integer, Behaviour<Actor, Action>> behaviours;
