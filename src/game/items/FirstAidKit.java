@@ -20,6 +20,7 @@ import game.actors.ActorAbilities;
  * @author echu0057
  */
 public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
+    private static final int BUY_PRICE = 1000;
 
     /**
      * Constructor for the FirstAidKit class. Rather heavy, with a weight of 25 units.
@@ -115,8 +116,8 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
      * @author esoo0013
      */
     @Override
-    public int buyPrice(Actor buyer) {
-        return 1000;
+    public int getBuyPrice() {
+        return BUY_PRICE;
     }
 
     /**
@@ -127,7 +128,7 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
         buyer.getInventory().add(this);
-        return buyer + " buys the First Aid Kit for 1000 credits.";
+        return buyer + " buys the first aid kit for " + getBuyPrice() + " credits.";
     }
 
     /**
