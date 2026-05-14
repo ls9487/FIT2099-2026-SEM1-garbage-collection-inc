@@ -56,6 +56,7 @@ public class Hole extends Ground {
     /**
      * Randomly chooses an actor to be spawned (based on what it can spawn).
      * The actor will try to be spawned directly on this hole (like in A1).
+     * To be used internally within this class only.
      * @param location The location of the hole.
      */
     private void spawn(Location location) {

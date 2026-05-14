@@ -154,8 +154,9 @@ public class ContractedWorker extends EclipseActor implements Infectable {
                 validLocations.add(destination);
             }
         }
-        // There is at least one valid location. Randomly choose and spawn the parasite there.
+
         if (!validLocations.isEmpty()) {
+            // There is at least one valid location. Randomly choose and spawn the parasite there.
             Spawner parasiteSpawner = new ParasiteSpawner();
             Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
             parasiteSpawner.spawnAt(chosenLocation);
