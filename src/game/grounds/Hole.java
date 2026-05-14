@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  *
  * @author echu0057
  */
-public class Hole extends Ground implements Spawner {
+public class Hole extends Ground {
 
     private static final double HOLE_EXPANSION_CHANCE = 0.01;
     // The idea is to keep the default constructors for spawnable creatures in this list.

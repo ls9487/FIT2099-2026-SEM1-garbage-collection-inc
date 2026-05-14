@@ -12,7 +12,6 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.grounds.Spawner;
 import game.items.ItemStatistics;
 import game.statuses.Infectable;
 
@@ -21,7 +20,7 @@ import game.statuses.Infectable;
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends EclipseActor implements Infectable, Spawner {
+public class ContractedWorker extends EclipseActor implements Infectable {
 
     /** Maximum amount of credits a worker can hold. */
     public static final int MAX_CREDITS = 1000;

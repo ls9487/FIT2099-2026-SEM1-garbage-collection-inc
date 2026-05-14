@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  *
  * @author echu0057
  */
-public class Vent extends Ground implements Spawner {
+public class Vent extends Ground {
 
     // Keep the default constructors for spawnable creatures in this list.
     private List<Supplier<Actor>> spawnableActors;

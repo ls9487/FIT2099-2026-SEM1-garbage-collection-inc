@@ -10,7 +10,6 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.ConsumeAction;
 import game.actors.ActorAbilities;
 import game.actors.Parasite;
-import game.grounds.Spawner;
 import game.statuses.Infectable;
 
 /**
@@ -20,8 +19,7 @@ import game.statuses.Infectable;
  *
  * @author echu0057
  */
-public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable, Spawner
-{
+public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable {
 
     /**
      * Constructor for the CookiePack class.
