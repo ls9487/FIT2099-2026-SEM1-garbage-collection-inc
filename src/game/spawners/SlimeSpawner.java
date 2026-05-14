@@ -23,6 +23,7 @@ public class SlimeSpawner implements Spawner {
      * Successful spawning triggers an environmental reaction.
      * @param location The location for the slime to be spawned at.
      */
+    @Override
     public void spawnAt(Location location) {
         Slime spawnedSlime = new Slime();
         // try/catch required by IntelliJ.
