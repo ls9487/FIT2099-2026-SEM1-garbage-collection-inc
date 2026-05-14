@@ -71,9 +71,10 @@ public class ContractedWorker extends EclipseActor implements Infectable {
         // Show the worker's current wallet balance before the menu, so the
         // player can plan purchases against the 1000-credit cap.
         // Placed before isConscious so balance to ALSO prints when the worker is unconscious,
-        // So the player sees their final wallet in the death message
+        // So the player sees their final wallet in the death message.
         display.println(String.format("[%s] Credits: %d / %d",
-                this, this.getCredits(), MAX_CREDITS));
+                this, this.getStatistic(EclipseStatistics.CREDITS),
+                this.getMaximumStatistic(EclipseStatistics.CREDITS)));
 
         // Required and forced if the actor isn't conscious.
         if (!this.isConscious()) {
@@ -162,63 +163,6 @@ public class ContractedWorker extends EclipseActor implements Infectable {
             parasiteSpawner.spawnAt(chosenLocation);
         }
 
-    }
-
-    /**
-     * Returns the worker's current credit balance.
-     * @return current amount of credits owned by the worker.
-     * @author esoo0013
-     */
-    public int getCredits() {
-        return this.getStatistic(EclipseStatistics.CREDITS);
-    }
-
-    /**
-     * Adds credits to the worker.
-     * Values above the maximum cap are automatically clamped by the statistic system.
-     * @param amount Number of credits to add.
-     * @author esoo0013
-     */
-    public void addCredits(int amount) {
-        if (amount <= 0) {
-            return;
-        }
-
-        this.modifyStatistic(
-                EclipseStatistics.CREDITS,
-                StatisticOperations.INCREASE,
-                amount
-        );
-    }
-
-    /**
-     * Removes credits from the worker.
-     * The balance will NEVER go below 0.
-     * @param amount Number of credits to deduct.
-     * @author esoo0013
-     */
-    public void deductCredits(int amount) {
-        if (amount <= 0) {
-            return;
-        }
-
-        this.modifyStatistic(
-                EclipseStatistics.CREDITS,
-                StatisticOperations.DECREASE,
-                amount
-        );
-    }
-
-    /**
-     * Checks whether the worker has enough credits
-     * for a transaction.
-     *
-     * @param amount Required amount.
-     * @return true if the worker can afford it.
-     * @author esoo0013
-     */
-    public boolean canAfford(int amount) {
-        return getCredits() >= amount;
     }
 
 }
