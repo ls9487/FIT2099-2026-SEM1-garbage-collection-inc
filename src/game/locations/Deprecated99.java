@@ -70,7 +70,7 @@ public class Deprecated99 extends GameMap {
         this.addLooseItems();
         this.setHoles();
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
-        this.tubeLocations.add(this.at(6, 2));
+        this.tubeLocations.add(this.at(6, 3));
         this.setSuperComputer();
     }
 
@@ -145,7 +145,7 @@ public class Deprecated99 extends GameMap {
     public List<Location> getTubeLocations() {
         List<Location> tubeLocations = new ArrayList<>();
         for (Location location : this.tubeLocations) {
-            tubeLocations.add(new Location(location.map(), location.x(), location.y()));
+            tubeLocations.add(this.at(location.x(), location.y()));
         }
         return tubeLocations;
     }
