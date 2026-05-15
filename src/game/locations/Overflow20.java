@@ -59,36 +59,42 @@ public class Overflow20 extends GameMap {
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
         ));
-        decorateSpecialTiles(new MagicCircleGroup());
+        MagicCircleGroup circles = new MagicCircleGroup();
+
+        this.setHoles();
+        this.setMagicCircles(circles);
+        this.setAlienCubes();
+
+        // Pre-reserve a tube location inside the starter ship (bridge corridor).
+        this.tubeLocations.add(this.at(6, 3));
     }
 
-    private void decorateSpecialTiles(MagicCircleGroup circles){
+    private void setHoles() {
         List<Supplier<Actor>> spawnableActors = new ArrayList<>();
         spawnableActors.add(Undead::new);
         spawnableActors.add(Slime::new);
 
-        List<Supplier<Actor>> alienCubeSpawnableActors = new ArrayList<>();
-        alienCubeSpawnableActors.add(Undead::new);
+        this.at(28, 9).setGround(new Hole(spawnableActors));
+    }
 
-        List<Supplier<Item>> magicCircleSpawnableItems = new ArrayList<>();
-        magicCircleSpawnableItems.add(Flask::new);
+    private void setMagicCircles(MagicCircleGroup circles) {
+        List<Supplier<Item>> spawnableItems = new ArrayList<>();
+        spawnableItems.add(Flask::new);
 
-        for (int x : this.getXRange()) {
-            for (int y : this.getYRange()) {
-                Location here = this.at(x, y);
-                char displayChar = here.getGround().getDisplayChar();
-                if (displayChar == '◎') {
-                    here.setGround(new MagicCircle(circles, magicCircleSpawnableItems));
-                    circles.register(here);
-                } else if (displayChar == '◈') {
-                    here.addItem(new AlienCube(alienCubeSpawnableActors));
-                } else if (displayChar == 'o') {
-                    here.setGround(new Hole(spawnableActors));
-                } else if (displayChar == 'Φ') {
-                    tubeLocations.add(here);
-                }
-            }
+        int[][] coords = {{31, 5}, {49, 8}, {30, 15}};
+        for (int[] coord : coords) {
+            Location here = this.at(coord[0], coord[1]);
+            here.setGround(new MagicCircle(circles, spawnableItems));
+            circles.register(here);
         }
+    }
+
+    private void setAlienCubes() {
+        List<Supplier<Actor>> spawnableActors = new ArrayList<>();
+        spawnableActors.add(Undead::new);
+
+        this.at(43, 3).addItem(new AlienCube(spawnableActors));
+        this.at(45, 14).addItem(new AlienCube(spawnableActors));
     }
 
     /**
