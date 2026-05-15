@@ -23,6 +23,7 @@ public abstract class State {
 
     public State(StatefulCreature statefulCreature) {
         this.statefulCreature = statefulCreature;
+        behaviours = new TreeMap<>();
     }
 
     /**
