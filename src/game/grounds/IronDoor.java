@@ -1,13 +1,9 @@
 package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.items.ClearanceLevel;
 import game.items.Fire;
-
-import java.util.List;
 
 /**
  * Tier-2 door that overheats neighbouring floor tiles when opened.
@@ -19,6 +15,7 @@ public class IronDoor extends Door {
 
     private static final int FIRE_DURATION = 5;
     private static final int NEARBY_RADIUS = 1;
+    private static final int CLEARANCE_LEVEL = 2;
 
     /**
      * Creates an iron door marked with {@code N} on facility plans.
@@ -38,8 +35,8 @@ public class IronDoor extends Door {
      * @version 1.0
      */
     @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_2;
+    protected int requiredClearance() {
+        return CLEARANCE_LEVEL;
     }
 
     /**

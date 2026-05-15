@@ -1,6 +1,5 @@
 package game.grounds;
 
-import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
@@ -9,8 +8,6 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.TeleportAction;
-import game.items.Flask;
-import game.items.Spawner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +21,7 @@ import java.util.function.Supplier;
  * @author eche0116
  * @version 1.0
  */
-public class MagicCircle extends Ground implements Teleporter, Spawner {
+public class MagicCircle extends Ground implements Teleporter {
 
     private static final Random random = new Random();
     private final MagicCircleGroup group;

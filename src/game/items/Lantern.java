@@ -19,7 +19,13 @@ import java.util.Random;
  * @author echu0057
  */
 public class Lantern extends EclipseItem implements Sellable, Infectable {
+    private static final Random random = new Random();
+    private static final double LEAK_CHANCE = 0.05;
+    private static final double BURN_SELLER_CHANCE = 0.5;
+    private static final double BURN_SURROUNDINGS_CHANCE = 0.25;
     private static final int FIRE_DURATION = 5;
+    private static final int SELL_PRICE_PER_OIL = 5;
+
 
     /**
      * Constructor for the Lantern class.
@@ -39,14 +45,12 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
     @Override
     public void tick(Location currentLocation, Actor actor) {
         // Need to have non-zero durability, and a 5% chance check to leak.
-        if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && Math.random() <= 0.05) {
+        if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && random.nextDouble() <= LEAK_CHANCE) {
             this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
             // Create fire on currentLocation.
             currentLocation.addItem(new Fire(FIRE_DURATION));
         }
     }
-
-    private final Random random = new Random();
 
     /**
      * Five credits per oil unit remaining. It caps at 50 for a full lantern,
@@ -54,8 +58,8 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
-        return 5 * this.getStatistic(ItemStatistics.DURABILITY);
+    public int getSellPrice() {
+        return SELL_PRICE_PER_OIL * this.getStatistic(ItemStatistics.DURABILITY);
     }
 
     /**
@@ -64,14 +68,17 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
      * 25% chance fire flashes onto every adjacent tile.
      * Both can fire on the SAME transaction. The lantern always leaves the
      * inventory at the end of the transaction.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        int price = sellPrice(seller);
-        StringBuilder msg = new StringBuilder(seller + " sells the lantern for " + price + " credits.");
+        StringBuilder msg = new StringBuilder(seller + " sells the lantern for "
+                + getSellPrice() + " credits.");
 
-        if (random.nextDouble() < 0.50) {
+        if (random.nextDouble() < BURN_SELLER_CHANCE) {
             Flammable flammable = seller.asCapability(Flammable.class).orElse(null);
             if (flammable != null) {
                 seller.addStatus(new BurnStatus(3, 2, flammable));
@@ -79,8 +86,9 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
             msg.append(" The fuel sloshes and burns ").append(seller).append(" (2 dmg, 3 turns).");
         }
 
-        if (random.nextDouble() < 0.25) {
-            for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
+        if (random.nextDouble() < BURN_SURROUNDINGS_CHANCE) {
+            // Get the adjacent locations, and set fire to them!
+            for (Location adjacent : map.locationOf(seller).getNearbyLocations(1)) {
                 adjacent.addItem(new Fire(FIRE_DURATION));
             }
             msg.append(" Sparks ignite the surrounding tiles.");

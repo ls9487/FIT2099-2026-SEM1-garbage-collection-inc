@@ -8,20 +8,26 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.displays.Menu;
 import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.grounds.Spawner;
 import game.items.ItemStatistics;
+import game.spawners.ParasiteSpawner;
+import game.spawners.Spawner;
 import game.statuses.Infectable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * This brave soul is capable of performing complex tasks such as picking up trash
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends EclipseActor implements Infectable, Spawner {
+public class ContractedWorker extends EclipseActor implements Infectable {
 
     /** Maximum amount of credits a worker can hold. */
     public static final int MAX_CREDITS = 1000;
@@ -65,9 +71,10 @@ public class ContractedWorker extends EclipseActor implements Infectable, Spawne
         // Show the worker's current wallet balance before the menu, so the
         // player can plan purchases against the 1000-credit cap.
         // Placed before isConscious so balance to ALSO prints when the worker is unconscious,
-        // So the player sees their final wallet in the death message
+        // So the player sees their final wallet in the death message.
         display.println(String.format("[%s] Credits: %d / %d",
-                this, this.getCredits(), MAX_CREDITS));
+                this, this.getStatistic(EclipseStatistics.CREDITS),
+                this.getMaximumStatistic(EclipseStatistics.CREDITS)));
 
         // Required and forced if the actor isn't conscious.
         if (!this.isConscious()) {
@@ -124,8 +131,7 @@ public class ContractedWorker extends EclipseActor implements Infectable, Spawne
         this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
         // If the progress reached 0, spawn a new parasite.
         if (this.getStatistic(EclipseStatistics.INFECTION_PROGRESS) <= 0) {
-            // Spawning logic is handled by Spawner's default implementation.
-            this.spawnActor(new Parasite(), location);
+            this.infectionSpawn(location);
             // Also, reset the infection progress.
             this.modifyStatistic(EclipseStatistics.INFECTION_PROGRESS, StatisticOperations.UPDATE,
                     this.getMaximumStatistic(EclipseStatistics.INFECTION_PROGRESS));
@@ -134,60 +140,29 @@ public class ContractedWorker extends EclipseActor implements Infectable, Spawne
     }
 
     /**
-     * Returns the worker's current credit balance.
-     * @return current amount of credits owned by the worker.
-     * @author esoo0013
+     * The infection can cause the worker to spawn a parasite on a random adjacent location.
+     * To be used internally within this class only.
+     * @param location The location of the worker when the infection spawns a parasite.
      */
-    public int getCredits() {
-        return this.getStatistic(EclipseStatistics.CREDITS);
-    }
-
-    /**
-     * Adds credits to the worker.
-     * Values above the maximum cap are automatically clamped by the statistic system.
-     * @param amount Number of credits to add.
-     * @author esoo0013
-     */
-    public void addCredits(int amount) {
-        if (amount <= 0) {
-            return;
+    private void infectionSpawn(Location location) {
+        final Random random = new Random();
+        // Keep track of the valid adjacent locations around (i.e. no actor occupying).
+        List<Location> validLocations = new ArrayList<>();
+        // Get the valid locations.
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
+            if (!destination.containsAnActor()) {
+                validLocations.add(destination);
+            }
         }
 
-        this.modifyStatistic(
-                EclipseStatistics.CREDITS,
-                StatisticOperations.INCREASE,
-                amount
-        );
-    }
-
-    /**
-     * Removes credits from the worker.
-     * The balance will NEVER go below 0.
-     * @param amount Number of credits to deduct.
-     * @author esoo0013
-     */
-    public void deductCredits(int amount) {
-        if (amount <= 0) {
-            return;
+        if (!validLocations.isEmpty()) {
+            // There is at least one valid location. Randomly choose and spawn the parasite there.
+            Spawner parasiteSpawner = new ParasiteSpawner();
+            Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
+            parasiteSpawner.spawnAt(chosenLocation);
         }
 
-        this.modifyStatistic(
-                EclipseStatistics.CREDITS,
-                StatisticOperations.DECREASE,
-                amount
-        );
-    }
-
-    /**
-     * Checks whether the worker has enough credits
-     * for a transaction.
-     *
-     * @param amount Required amount.
-     * @return true if the worker can afford it.
-     * @author esoo0013
-     */
-    public boolean canAfford(int amount) {
-        return getCredits() >= amount;
     }
 
 }

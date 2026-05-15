@@ -2,7 +2,6 @@ package game.grounds;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.items.ClearanceLevel;
 
 /**
  * Tier-3 door that triggers a brief decontamination heal when opened.
@@ -13,6 +12,7 @@ import game.items.ClearanceLevel;
 public class TitaniumDoor extends Door {
 
     private static final int DECONTAMINATION_HEAL = 5;
+    private static final int CLEARANCE_LEVEL = 3;
 
     /**
      * Creates a titanium door marked with {@code M} on facility plans.
@@ -28,8 +28,8 @@ public class TitaniumDoor extends Door {
      * @return clearance level three
      */
     @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_3;
+    protected int requiredClearance() {
+        return CLEARANCE_LEVEL;
     }
 
     /**

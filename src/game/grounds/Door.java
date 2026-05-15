@@ -6,8 +6,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.UnlockAction;
-import game.actors.Unlocker;
-import game.items.ClearanceLevel;
+import game.items.ItemStatistics;
 import game.statuses.Alarmable;
 
 /**
@@ -42,13 +41,15 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
      * @return true when clearance is met and the door is locked and not alarmed
      */
     public boolean canActorUnlock(Actor actor) {
-        Unlocker unlocker = actor.asCapability(Unlocker.class).orElse(null);
-        if (unlocker == null) {
+        if (isUnlocked || isAlarmed) {
             return false;
-        } else {
-            return unlocker.currentClearanceLevel().ordinal() >= requiredClearance().ordinal() &&
-                    !isUnlocked && !isAlarmed;
         }
+
+        return actor.getInventory().getItems().stream()
+                .anyMatch(item ->
+                        item.hasStatistic(ItemStatistics.CLEARANCE_LEVEL) &&
+                                item.getStatistic(ItemStatistics.CLEARANCE_LEVEL) >= requiredClearance()
+                );
     }
 
     /**
@@ -56,7 +57,7 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
      *
      * @return required clearance level
      */
-    protected abstract ClearanceLevel requiredClearance();
+    protected abstract int requiredClearance();
 
     /**
      * Returns an ActionList that could contain an UnlockAction under certain conditions.

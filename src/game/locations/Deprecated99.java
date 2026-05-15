@@ -15,6 +15,10 @@ import game.items.FloppyDisk;
 import game.items.CrtMonitor;
 import game.items.Alarm;
 import game.grounds.SuperComputer;
+import game.spawners.SlimeSpawner;
+import game.spawners.Spawner;
+import game.spawners.UndeadSpawner;
+
 import java.util.function.Supplier;
 
 //import game.items.FirstAidKit;
@@ -105,15 +109,15 @@ public class Deprecated99 extends GameMap {
      * To be used internally within this class only.
      */
     private void setHoles() {
-        // First, define what actors the holes on this map can spawn.
-        List<Supplier<Actor>> spawnableActors = new ArrayList<>();
-        spawnableActors.add(Undead::new);
-        spawnableActors.add(Slime::new);
+        // First, define the spawners the holes on this map can spawn.
+        List<Spawner> spawners = new ArrayList<>();
+        spawners.add(new UndeadSpawner());
+        spawners.add(new SlimeSpawner());
         // Then, replace the designated locations with holes.
-        this.at(56, 1).setGround(new Hole(spawnableActors));
-        this.at(49, 11).setGround(new Hole(spawnableActors));
-        this.at(33, 17).setGround(new Hole(spawnableActors));
-        this.at(57, 17).setGround(new Hole(spawnableActors));
+        this.at(56, 1).setGround(new Hole(spawners));
+        this.at(49, 11).setGround(new Hole(spawners));
+        this.at(33, 17).setGround(new Hole(spawners));
+        this.at(57, 17).setGround(new Hole(spawners));
     }
 
     /**
