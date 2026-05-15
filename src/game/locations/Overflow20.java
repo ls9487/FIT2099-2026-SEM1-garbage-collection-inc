@@ -13,6 +13,9 @@ import game.grounds.MagicCircle;
 import game.grounds.MagicCircleGroup;
 import game.items.AlienCube;
 import game.items.Flask;
+import game.spawners.SlimeSpawner;
+import game.spawners.Spawner;
+import game.spawners.UndeadSpawner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,11 +73,12 @@ public class Overflow20 extends GameMap {
     }
 
     private void setHoles() {
-        List<Supplier<Actor>> spawnableActors = new ArrayList<>();
-        spawnableActors.add(Undead::new);
-        spawnableActors.add(Slime::new);
+        // First, define the spawners the holes on this map can spawn.
+        List<Spawner> spawners = new ArrayList<>();
+        spawners.add(new UndeadSpawner());
+        spawners.add(new SlimeSpawner());
 
-        this.at(28, 9).setGround(new Hole(spawnableActors));
+        this.at(28, 9).setGround(new Hole(spawners));
     }
 
     private void setMagicCircles(MagicCircleGroup circles) {
