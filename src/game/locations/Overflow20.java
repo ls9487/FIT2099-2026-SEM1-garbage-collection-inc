@@ -6,18 +6,13 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.Parasite;
-import game.actors.Slime;
 import game.actors.Undead;
 import game.grounds.Hole;
 import game.grounds.MagicCircle;
 import game.grounds.MagicCircleGroup;
 import game.items.AlienCube;
 import game.items.Flask;
-import game.spawners.ParasiteSpawner;
-import game.spawners.SlimeSpawner;
-import game.spawners.Spawner;
-import game.spawners.UndeadSpawner;
+import game.spawners.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,10 +59,9 @@ public class Overflow20 extends GameMap {
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
         ));
-        MagicCircleGroup circles = new MagicCircleGroup();
 
         this.setHoles();
-        this.setMagicCircles(circles);
+        this.setMagicCircles();
         this.setAlienCubes();
 
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
@@ -83,24 +77,30 @@ public class Overflow20 extends GameMap {
         this.at(28, 9).setGround(new Hole(spawners));
     }
 
-    private void setMagicCircles(MagicCircleGroup circles) {
+    private void setMagicCircles() {
+        MagicCircleGroup circles = new MagicCircleGroup();
         List<Supplier<Item>> spawnableItems = new ArrayList<>();
         spawnableItems.add(Flask::new);
 
-        int[][] coords = {{31, 5}, {49, 8}, {30, 15}};
-        for (int[] coord : coords) {
-            Location here = this.at(coord[0], coord[1]);
-            here.setGround(new MagicCircle(circles, spawnableItems));
-            circles.register(here);
-        }
+        this.at(31, 5).setGround(new MagicCircle(circles, spawnableItems));
+        circles.register(this.at(31, 5));
+
+        this.at(49, 8).setGround(new MagicCircle(circles, spawnableItems));
+        circles.register(this.at(49, 8));
+
+        this.at(30, 15).setGround(new MagicCircle(circles, spawnableItems));
+        circles.register(this.at(30, 15));
     }
 
     private void setAlienCubes() {
         List<Supplier<Actor>> spawnableActors = new ArrayList<>();
         spawnableActors.add(Undead::new);
 
-        this.at(43, 3).addItem(new AlienCube(spawnableActors));
-        this.at(45, 14).addItem(new AlienCube(spawnableActors));
+        List<Spawner>spawners = new ArrayList<>();
+        spawners.add(new UndeadSpawner());
+
+        this.at(43, 3).addItem(new AlienCube(spawners));
+        this.at(45, 14).addItem(new AlienCube(spawners));
     }
 
     /**
