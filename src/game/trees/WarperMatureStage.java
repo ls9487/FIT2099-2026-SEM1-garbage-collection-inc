@@ -4,7 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.behaviours.TeleportBehaviour;
+import game.behaviours.TreeTeleportBehaviour;
 import game.grounds.Teleporter;
 
 import java.util.TreeMap;
@@ -28,7 +28,7 @@ public class WarperMatureStage implements Stage, Teleporter {
     @Override
     public TreeMap<Integer, Behaviour<Tree, Boolean>> extraBehaviour() {
         TreeMap<Integer, Behaviour<Tree, Boolean>> extraBehaviours = new TreeMap<>();
-        extraBehaviours.put(2, new TeleportBehaviour(this));
+        extraBehaviours.put(2, new TreeTeleportBehaviour(this));
         return extraBehaviours;
     }
 

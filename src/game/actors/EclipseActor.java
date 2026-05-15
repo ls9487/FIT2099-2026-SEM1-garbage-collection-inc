@@ -1,13 +1,18 @@
 package game.actors;
 
 import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.ActionList;
+import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.positions.GameMap;
 import game.behaviours.FollowBehaviour;
 import game.statuses.Alarmable;
 import game.statuses.Flammable;
 import game.statuses.Poisonable;
+import game.statuses.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +26,7 @@ import java.util.TreeMap;
  *
  * @author echu0057
  */
-public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable
+public abstract class EclipseActor extends Actor implements Poisonable, Flammable, Alarmable, Stunnable
 {
 
     private final Map<Integer, Behaviour<Actor, Action>> behaviours;
@@ -71,6 +76,7 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
      * Makes the burning actor take burn damage.
      * @param damage The damage dealt via burn.
      */
+    @Override
     public void burn(int damage) {
         this.hurt(damage);
     }
@@ -79,7 +85,13 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
      * Makes the poisoned actor take poison damage.
      * @param damage The damage dealt via poison.
      */
+    @Override
     public void poison(int damage) {
+        this.hurt(damage);
+    }
+
+    @Override
+    public void stun(int damage) {
         this.hurt(damage);
     }
 
@@ -105,4 +117,26 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
         }
     }
 
+    @Override
+    public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+        // Forced if the actor isn't conscious.
+        if (!this.isConscious()) {
+            this.unconscious(map);
+            return new DoNothingAction();
+        }
+
+        // Handle multi-turn Actions.
+        if (lastAction != null && lastAction.getNextAction() != null)
+            return lastAction.getNextAction();
+
+        // Consult each behaviour for what it can do, and perform the first valid action.
+        for (Behaviour<Actor, Action> behaviour : this.getBehaviourValues()) {
+            Action action = behaviour.operate(this, map.locationOf(this));
+            if (action != null) {
+                return action;
+            }
+        }
+        // No valid action was taken, so just do nothing.
+        return new DoNothingAction();
+    }
 }
