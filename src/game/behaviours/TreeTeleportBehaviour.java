@@ -25,7 +25,7 @@ public class TreeTeleportBehaviour implements Behaviour<Tree, Boolean> {
         List<Actor> nearbyWorkers = new ArrayList<>();
         for (Exit exit : location.getExits()) {
             Location destination = exit.getDestination();
-            if (destination.containsAnActor() && destination.getActor().hasAbility(ActorAbilities.PLAYER)) {
+            if (destination.containsAnActor() && destination.getActor().hasAbility(ActorAbilities.TREE_ACTIVATOR)) {
                 nearbyWorkers.add(destination.getActor());
             }
         }
