@@ -13,7 +13,7 @@ import game.items.Fire;
  */
 public class IronDoor extends Door {
 
-    private static final int FIRE_DURATION = 5;
+    private static final int FIRE_DURATION = 2;
     private static final int NEARBY_RADIUS = 1;
     private static final int SECURITY_LEVEL = 2;
 
