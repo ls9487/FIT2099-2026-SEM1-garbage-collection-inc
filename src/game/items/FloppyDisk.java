@@ -15,17 +15,30 @@ import java.util.Random;
  * @author echu0057
  */
 public class FloppyDisk extends EclipseItem implements Sellable {
-    private static final Random random = new Random();
+
+    private final Random random = new Random();
+
+    /** Credit value paid by the SuperComputer on sale. */
     private static final int SELL_PRICE = 1;
-    private static final int GLITCH_DEDUCTION = 50;
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 1;
+
+    /** Map display symbol for this disk. */
+    private static final char SYMBOL = '⊟';
+
+    /** Chance the SuperComputer glitches and reclaims credits after paying out. */
     private static final double GLITCH_CHANCE = 0.5;
+
+    /** Credits the SuperComputer reclaims on a glitch. */
+    private static final int GLITCH_DEDUCTION = 50;
 
     /**
      * Constructor for the FloppyDisk class.
      * Has a weight of 1 unit.
      */
     public FloppyDisk() {
-        super("Floppy Disk", '⊟', 1);
+        super("Floppy Disk", SYMBOL, WEIGHT);
     }
 
     /**
@@ -51,15 +64,12 @@ public class FloppyDisk extends EclipseItem implements Sellable {
         StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for "
                 + getSellPrice() + " credit.");
 
-        // Check if a glitch happens (50% chance) and pocket 50 credits from the seller.
         if (random.nextDouble() < GLITCH_CHANCE && seller.hasStatistic(EclipseStatistics.CREDITS)) {
-            seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE,
-                    GLITCH_DEDUCTION);
-            msg.append(" But the terminal glitches and pockets some credits?!");
+            seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, GLITCH_DEDUCTION);
+            msg.append(" The terminal glitches and pockets ").append(GLITCH_DEDUCTION).append(" credits.");
         }
 
         seller.getInventory().remove(this);
         return msg.toString();
     }
-
 }

@@ -13,6 +13,12 @@ import game.grounds.MagicCircleGroup;
 import game.items.AlienCube;
 import game.items.Flask;
 import game.spawners.*;
+import game.spawners.ParasiteSpawner;
+import game.spawners.SlimeSpawner;
+import game.spawners.Spawner;
+import game.spawners.UndeadSpawner;
+import game.trees.FleshyTreeSprout;
+import game.trees.WarperTreeSapling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +69,7 @@ public class Overflow20 extends GameMap {
         this.setHoles();
         this.setMagicCircles();
         this.setAlienCubes();
+        this.setTrees();
 
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
         this.tubeLocations.add(this.at(6, 3));
@@ -96,13 +103,20 @@ public class Overflow20 extends GameMap {
         List<Supplier<Actor>> spawnableActors = new ArrayList<>();
         spawnableActors.add(Undead::new);
 
-        List<Spawner>spawners = new ArrayList<>();
+        List<Spawner> spawners = new ArrayList<>();
         spawners.add(new UndeadSpawner());
 
         this.at(43, 3).addItem(new AlienCube(spawners));
         this.at(45, 14).addItem(new AlienCube(spawners));
     }
 
+    private void setTrees() {
+        List<Spawner> fleshyTreeSproutSpawner = new ArrayList<>();
+        fleshyTreeSproutSpawner.add(new SlimeSpawner());
+        this.at(1, 16).setGround(new FleshyTreeSprout(fleshyTreeSproutSpawner));
+
+        this.at(4, 16).setGround(new WarperTreeSapling());
+    }
     /**
      * Locations reserved for installing teleportation tubes after all maps are
      * constructed.

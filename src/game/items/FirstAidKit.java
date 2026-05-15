@@ -20,15 +20,29 @@ import game.actors.ActorAbilities;
  * @author echu0057
  */
 public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
+
+    /** Credit cost charged by the SuperComputer. */
     private static final int BUY_PRICE = 1000;
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 25;
+
+    /** Map display symbol for this kit. */
+    private static final char SYMBOL = '+';
+
+    /** Turns between consecutive uses; the kit starts unusable until ticked down. */
+    private static final int COOLDOWN_TURNS = 20;
+
+    /** Maximum HP gained when the kit is consumed. */
+    private static final int MAX_HP_INCREASE = 1;
 
     /**
      * Constructor for the FirstAidKit class. Rather heavy, with a weight of 25 units.
      * 20 turn cooldown per use, and starts off unusable.
      */
     public FirstAidKit() {
-        super("First Aid Kit", '+', 25);
-        this.addNewStatistic(ItemStatistics.COOLDOWN, new BaseStatistic(20));
+        super("First Aid Kit", SYMBOL, WEIGHT);
+        this.addNewStatistic(ItemStatistics.COOLDOWN, new BaseStatistic(COOLDOWN_TURNS));
     }
 
     /**

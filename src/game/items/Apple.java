@@ -17,15 +17,37 @@ import game.statuses.Poisonable;
  * @author echu0057
  */
 public class Apple extends EclipseItem implements Consumable, Sellable {
+
+    /** HP healed when a sterilised apple is consumed. */
     private static final int HEAL_AMOUNT = 3;
+
+    /** Credit value paid by the SuperComputer on sale. */
     private static final int SELL_PRICE = 1;
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 1;
+
+    /** Map display symbol for this apple. */
+    private static final char SYMBOL = 'ó';
+
+    /** Poison duration when an unsterilised apple is consumed. */
+    private static final int CONSUME_POISON_DURATION = 5;
+
+    /** Poison damage per turn when an unsterilised apple is consumed. */
+    private static final int CONSUME_POISON_DAMAGE = 1;
+
+    /** Poison duration when an unsterilised apple is sold. */
+    private static final int SELL_POISON_DURATION = 2;
+
+    /** Poison damage per turn when an unsterilised apple is sold. */
+    private static final int SELL_POISON_DAMAGE = 2;
 
     /**
      * Constructor for the Apple class.
      * Has a weight of 1 unit.
      */
     public Apple() {
-        super("Apple", 'ó', 1);
+        super("Apple", SYMBOL, WEIGHT);
     }
 
     /**
@@ -77,19 +99,20 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
         }
         // Check if the consumer has the STERILISER ability.
         if (actor.hasAbility(ItemAbilities.STERILISER)) {
-            // Heal for 3 hp.
+            // Heal for HEAL_AMOUNT (3) hp.
             actor.heal(HEAL_AMOUNT);
-            return actor + " eats a sterilised apple, healing them by 3 hp.";
+            return actor + " eats a sterilised apple, healing them by " + HEAL_AMOUNT + " hp.";
 
         } else {
             // Note that Actor doesn't implement Poisonable. Can't change that.
             // Based on the mars example, we can try to use the engine code to convert it.
             Poisonable poisonable = actor.asCapability(Poisonable.class).orElse(null);
             if (poisonable != null) {
-                // Poison the poisonable actor (1 damage, lasts 5 turns).
-                actor.addStatus(new PoisonStatus(5, 1, poisonable));
+                // Poison the poisonable actor.
+                actor.addStatus(new PoisonStatus(CONSUME_POISON_DURATION, CONSUME_POISON_DAMAGE, poisonable));
             }
-            return actor + " was poisoned (1 dmg, 5 turns) from eating the spoiled apple!";
+            return actor + " was poisoned (" + CONSUME_POISON_DAMAGE + " dmg, "
+                    + CONSUME_POISON_DURATION + " turns) from eating the spoiled apple!";
         }
     }
 
@@ -123,9 +146,11 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
             Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
             if (poisonable != null) {
                 // Poison the poisonable actor (2 damage, lasts 2 turns).
-                seller.addStatus(new PoisonStatus(2, 2, poisonable));
+                seller.addStatus(new PoisonStatus(SELL_POISON_DURATION, SELL_POISON_DAMAGE, poisonable));
             }
-            msg.append(seller).append(" is poisoned (2 dmg, 2 turns) from handling the spoiled apple.");
+            msg.append(" ").append(seller).append(" is poisoned (")
+               .append(SELL_POISON_DAMAGE).append(" dmg, ")
+               .append(SELL_POISON_DURATION).append(" turns) from handling the spoiled apple.");
         }
 
         seller.getInventory().remove(this);
