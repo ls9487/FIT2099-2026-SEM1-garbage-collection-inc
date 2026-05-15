@@ -51,10 +51,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('≈', ToxicWaste::new);
         groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue()));
         // Placeholder mappings for special glyphs that are decorated later
-        groundCreator.registerGround('Φ', Floor::new);
-        groundCreator.registerGround('◎', Floor::new);
-        groundCreator.registerGround('◈', Floor::new);
-        groundCreator.registerGround('o', Dirt::new);
+
         // NOTE: We cannot use the default ground creator to create holes,
         // as holes take a parameter of what they can spawn.
 
