@@ -84,7 +84,8 @@ public class TeleportationTube extends Ground implements Teleporter {
         ActionList actions = super.allowableActions(actor, location, direction);
 
         for (Location destination : destinations) {
-            actions.add(new TeleportAction(this, destination));
+            if (!destination.containsAnActor())
+                actions.add(new TeleportAction(this, destination));
         }
         return actions;
     }
