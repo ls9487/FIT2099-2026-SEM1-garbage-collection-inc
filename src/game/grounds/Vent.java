@@ -26,6 +26,10 @@ public class Vent extends Ground {
     private static final Random random = new Random();
     // Keeps a list of spawners so they can be used to spawn creatures.
     private List<Spawner> spawners;
+    private static final int POISON_DAMAGE = 1;
+    private static  int POISON_DURATION = 5;
+    private static final int POISON_RANGE = 1;
+
 
     /**
      * Constructor for the Vent class.
@@ -96,10 +100,6 @@ public class Vent extends Ground {
      * @param location The location of the vent.
      */
     private void poisonAdjacent(Location location) {
-        final int POISON_DAMAGE = 1;
-        final int POISON_DURATION = 5;
-        final int POISON_RANGE = 1;
-
         // Get the adjacent locations.
         List<Location> adjacentLocations = location.getNearbyLocations(POISON_RANGE);
         for (Location adjacentLocation : adjacentLocations) {
