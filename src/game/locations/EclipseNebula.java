@@ -102,8 +102,8 @@ public class EclipseNebula extends World {
          */
          //contractedWorker1.addCredits(1000);
 
-        this.addPlayer(new Muckraker(), moon99DeprecatedMap.at(10, 10));
-        this.addPlayer(new PhantasmWisp(), moon99DeprecatedMap.at(11, 11));
+        moon99DeprecatedMap.at(10, 10).addActor(new Muckraker());
+        moon99DeprecatedMap.at(11, 11).addActor(new PhantasmWisp());
     }
 
     /**
