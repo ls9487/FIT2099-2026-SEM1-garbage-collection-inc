@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  * @author eche0116
  * @version 1.0
  */
-public class MagicCircle extends Ground implements Teleporter, Spawner {
+public class MagicCircle extends Ground implements Teleporter {
 
     private static final Random random = new Random();
     private final MagicCircleGroup group;
