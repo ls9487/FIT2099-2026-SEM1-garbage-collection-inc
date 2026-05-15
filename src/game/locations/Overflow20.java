@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actors.Parasite;
 import game.actors.Slime;
 import game.actors.Undead;
 import game.grounds.Hole;
@@ -13,6 +14,7 @@ import game.grounds.MagicCircle;
 import game.grounds.MagicCircleGroup;
 import game.items.AlienCube;
 import game.items.Flask;
+import game.spawners.ParasiteSpawner;
 import game.spawners.SlimeSpawner;
 import game.spawners.Spawner;
 import game.spawners.UndeadSpawner;
@@ -76,7 +78,7 @@ public class Overflow20 extends GameMap {
         // First, define the spawners the holes on this map can spawn.
         List<Spawner> spawners = new ArrayList<>();
         spawners.add(new UndeadSpawner());
-        spawners.add(new SlimeSpawner());
+        spawners.add(new ParasiteSpawner());
 
         this.at(28, 9).setGround(new Hole(spawners));
     }
