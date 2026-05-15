@@ -27,13 +27,31 @@ import java.util.Random;
  */
 public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable {
 
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 2;
+
+    /** Map display symbol for this pack. */
+    private static final char SYMBOL = '◍';
+
+    /** Cookies in a fresh pack (also the price for a fresh pack and the max HP cost). */
+    private static final int INITIAL_COOKIES = 5;
+
+    /** HP healed when one sterilised cookie is consumed. */
+    private static final int STERILISED_HEAL = 1;
+
+    /** Max-HP reduction when one unsterilised cookie is consumed. */
+    private static final int HEALTH_HIT = 1;
+
+    /** How many cookies are eaten per consume action. */
+    private static final int COOKIES_PER_BITE = 1;
+
     /**
      * Constructor for the CookiePack class.
      * Has a weight of 2 units, and can be eaten 5 times.
      */
     public CookiePack() {
-        super("Cookies", '◍', 2);
-        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(5));
+        super("Cookies", SYMBOL, WEIGHT);
+        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(INITIAL_COOKIES));
     }
 
     /**
@@ -78,7 +96,7 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
     @Override
     public String consumedBy(Actor actor, GameMap map) {
         // Consume one cookie. Remove this if it runs out of cookies.
-        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, COOKIES_PER_BITE);
         if (this.getStatistic(ItemStatistics.DURABILITY) == 0) {
             // Try to remove from actor's inventory. If it returns false (failed),
             // then the item is on the ground, so remove it there.
@@ -89,12 +107,12 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
 
         // Check if the consumer has the STERILISER ability.
         if (actor.hasAbility(ItemAbilities.STERILISER)) {
-            // Heal for 1 hp.
-            actor.heal(1);
-            return actor + " eats a sterilised cookie, healing them by 1 hp.";
+            // Heal for STERILISED_HEAL hp.
+            actor.heal(STERILISED_HEAL);
+            return actor + " eats a sterilised cookie, healing them by " + STERILISED_HEAL + " hp.";
         } else {
-            // Decrease max hp by 1.
-            actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.DECREASE, 1);
+            // Decrease max hp by HEALTH_HIT.
+            actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.DECREASE, HEALTH_HIT);
             return actor + " feels unhealthier from eating the unsterilised cookie!";
         }
     }

@@ -37,6 +37,8 @@ public class PickItemBehaviour implements Behaviour<Actor, Action> {
         for (Item item : location.getItems()) {
             actions.add(new PickUpAction(item));
         }
+
+        if (actions.size() == 0) return null;
         return actions.get(random.nextInt(actions.size()));
     }
 }

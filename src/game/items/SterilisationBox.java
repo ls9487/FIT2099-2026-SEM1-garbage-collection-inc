@@ -17,15 +17,24 @@ import java.util.Random;
  * @author echu0057
  */
 public class SterilisationBox extends EclipseItem implements Buyable {
-    private static final Random random = new Random();
+
+    private final Random random = new Random();
+
+    /** Credit cost charged by the SuperComputer. */
     private static final int BUY_PRICE = 750;
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 7;
+
+    /** Map display symbol for this box. */
+    private static final char SYMBOL = '▣';
 
     /**
      * Constructor for the SterilisationBox class.
      * Has a weight of 7 units, and possesses the STERILISER capability.
      */
     public SterilisationBox() {
-        super("Sterilisation Box", '▣', 7);
+        super("Sterilisation Box", SYMBOL, WEIGHT);
         this.enableAbility(ItemAbilities.STERILISER);
     }
 
