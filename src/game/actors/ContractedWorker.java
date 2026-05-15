@@ -41,6 +41,7 @@ public class ContractedWorker extends EclipseActor implements Infectable {
      */
     public ContractedWorker(String name, char displayChar, int hitPoints, Inventory inventory) {
         super(name, displayChar, hitPoints, inventory);
+        this.enableAbility(ActorAbilities.PLAYER);
         this.enableAbility(ActorAbilities.VENT_ACTIVATOR);
         this.enableAbility(ActorAbilities.SLIME_EFFECT_SUSCEPTIBLE);
         this.enableAbility(ActorAbilities.PARASITE_EFFECT_SUSCEPTIBLE);

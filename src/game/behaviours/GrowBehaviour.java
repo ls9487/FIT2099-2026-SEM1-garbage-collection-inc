@@ -30,7 +30,7 @@ public class GrowBehaviour implements Behaviour<Tree, Boolean> {
             growable.grow(location);
             return Boolean.TRUE;
         } else {
-            tree.modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.UPDATE, 0);
+            tree.modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.INCREASE, -tree.getStatistic(TreeStatistics.GROW_TURNS));
             return Boolean.FALSE;
         }
     }

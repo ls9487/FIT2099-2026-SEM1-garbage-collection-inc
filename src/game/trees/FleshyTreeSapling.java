@@ -25,8 +25,8 @@ public class FleshyTreeSapling extends Tree implements Growable {
 
     @Override
     public void tick(Location location) {
-        super.tick(location);
         modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.INCREASE, 1);
+        super.tick(location);
     }
 
     @Override

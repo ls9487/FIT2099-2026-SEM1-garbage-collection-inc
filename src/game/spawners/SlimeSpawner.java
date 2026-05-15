@@ -10,6 +10,9 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actors.ActorAbilities;
 import game.actors.Slime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * SlimeSpawner is a spawner for the Slime.
  * Give it a location, and it'll try to spawn a Slime there.
@@ -54,14 +57,16 @@ public class SlimeSpawner implements Spawner {
                 Actor affectedActor = destination.getActor();
                 GameMap affectedMap = destination.map();
                 // Go through all items in their inventory.
-                for (Item item : affectedActor.getInventory().getItems()) {
-                    // Note that the list of items is an unmodifiable list.
-                    // So DropActions will be created and executed on the spot.
+                List<Item> itemsToDrop = new ArrayList<>(affectedActor.getInventory().getItems());
+                // Note that the list of items is an unmodifiable list.
+                // So DropActions will be created and executed on the spot.
+                for (Item item : itemsToDrop) {
                     DropAction dropAction = item.getDropAction(affectedActor);
                     if (dropAction != null) {
                         dropAction.execute(affectedActor, affectedMap);
                     }
                 }
+
             }
         }
     }
