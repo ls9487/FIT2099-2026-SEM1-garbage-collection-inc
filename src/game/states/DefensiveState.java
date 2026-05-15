@@ -10,10 +10,11 @@ import game.behaviours.AttackBehaviour;
 
 public class DefensiveState extends State {
 
+    private static final int ATTACK_BEHAVIOUR_PRIORITY = 1;
 
     public DefensiveState(StatefulCreature statefulCreature) {
         super(statefulCreature);
-        addNewBehaviour(1, new AttackBehaviour());
+        addNewBehaviour(ATTACK_BEHAVIOUR_PRIORITY, new AttackBehaviour());
 
     }
 

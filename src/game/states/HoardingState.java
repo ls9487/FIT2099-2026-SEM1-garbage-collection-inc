@@ -1,7 +1,7 @@
 package game.states;
 
 import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.items.DropAction;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -31,8 +31,13 @@ public class HoardingState extends State {
 
     @Override
     public void immediateEffect(Location location) {
+        Display display = new Display();
+
         // drops the least valuable item from inventory
         Item item = getValuableItem(getStatefulCreature(), ValuableItemOperations.LEAST);
-        new DropAction(item).execute(getStatefulCreature(), location.map());
+        getStatefulCreature().getInventory().getItems().remove(item);
+        location.addItem(item);
+
+        display.println(String.format("%s throw %s on ground", getStatefulCreature(), item));
     }
 }

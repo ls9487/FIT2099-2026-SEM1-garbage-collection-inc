@@ -1,6 +1,7 @@
 package game.states;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.StatefulCreature;
@@ -31,6 +32,8 @@ public class ShadowState extends State {
 
     @Override
     public void immediateEffect(Location location) {
+        Display display = new Display();
+
         addNewBehaviour(FOLLOW_BEHAVIOUR_PRIORITY, new FollowBehaviour(nearestWorker(getActorVigilanceRange(), location)));
         // ranged poison for 2 round
         for (Location target : location.getNearbyLocations(getActorVigilanceRange())) {
@@ -39,6 +42,8 @@ public class ShadowState extends State {
                 Poisonable poisonable = actorNearby.asCapability(Poisonable.class).orElse(null);
                 if (poisonable != null) {
                     actorNearby.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE, poisonable));
+                    display.println(String.format("%s is poisoned by %s", actorNearby, getStatefulCreature()));
+
                 }
             }
         }

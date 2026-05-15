@@ -1,6 +1,7 @@
 package game.states;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.StatefulCreature;
@@ -10,10 +11,13 @@ import game.statuses.Stunnable;
 
 public class PanicState extends State {
 
+    private static final int FLEE_BEHAVIOUR_PRIORITY = 1;
+    private static final int STUN_DURATION = 2;
+    private static final int STUN_DAMAGE = 1;
 
     public PanicState(StatefulCreature statefulCreature) {
         super(statefulCreature);
-        addNewBehaviour(1, new FleeBehaviour(getActorVigilanceRange()));
+        addNewBehaviour(FLEE_BEHAVIOUR_PRIORITY, new FleeBehaviour(getActorVigilanceRange()));
 
     }
 
@@ -30,15 +34,18 @@ public class PanicState extends State {
 
     @Override
     public void immediateEffect(Location location) {
+        Display display = new Display();
         // ranged stun
-        for (Location target : location.getNearbyLocations(2)) {
+        for (Location target : location.getNearbyLocations(getActorVigilanceRange())) {
             if (target.containsAnActor()) {
                 Actor actorNearby = target.getActor();
                 Stunnable stunnable = actorNearby.asCapability(Stunnable.class).orElse(null);
                 if (stunnable != null) {
-                    actorNearby.addStatus(new StunStatus(2, 1, stunnable));
+                    actorNearby.addStatus(new StunStatus(STUN_DURATION, STUN_DAMAGE, stunnable));
+                    display.println(String.format("%s is stunned by %s", actorNearby, getStatefulCreature()));
                 }
             }
         }
+
     }
 }

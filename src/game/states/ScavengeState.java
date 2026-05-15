@@ -1,6 +1,7 @@
 package game.states;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -32,10 +33,14 @@ public class ScavengeState extends State {
 
     @Override
     public void immediateEffect(Location location) {
+        Display display = new Display();
+
         // steal nearest player most valuable item
         Actor nearestPlayer = nearestWorker(getActorVigilanceRange(), location);
         Item item = getValuableItem(nearestPlayer, ValuableItemOperations.MOST);
         nearestPlayer.getInventory().remove(item);
         getStatefulCreature().getInventory().add(item);
+
+        display.println(String.format("%s steals %s from %s", getStatefulCreature(), item, nearestPlayer));
     }
 }
