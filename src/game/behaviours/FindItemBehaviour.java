@@ -41,7 +41,7 @@ public class FindItemBehaviour implements Behaviour<Actor, Action> {
         int nearestItemDistance = Integer.MAX_VALUE;
         Location nearestItemLocation = null;
         for (Location target : location.getNearbyLocations(findingRange)) {
-            if (target.getItems().isEmpty() || !target.getItems().getFirst().hasAbility(ItemAbility.PORTABLE)) continue;
+            if (target.getItems().isEmpty() || !target.getItems().get(0).hasAbility(ItemAbility.PORTABLE)) continue;
             int newDistance = distance(location, target);
             if (newDistance < nearestItemDistance) {
                 nearestItemDistance = newDistance;
