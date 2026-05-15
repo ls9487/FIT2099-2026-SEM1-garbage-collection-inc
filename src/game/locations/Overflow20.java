@@ -10,9 +10,9 @@ import game.actors.Undead;
 import game.grounds.Hole;
 import game.grounds.MagicCircle;
 import game.grounds.MagicCircleGroup;
+import game.grounds.Vent;
 import game.items.AlienCube;
 import game.items.Flask;
-import game.spawners.*;
 import game.spawners.ParasiteSpawner;
 import game.spawners.SlimeSpawner;
 import game.spawners.Spawner;
@@ -67,6 +67,7 @@ public class Overflow20 extends GameMap {
         ));
 
         this.setHoles();
+        this.setVents();
         this.setMagicCircles();
         this.setAlienCubes();
         this.setTrees();
@@ -82,6 +83,15 @@ public class Overflow20 extends GameMap {
         spawners.add(new ParasiteSpawner());
 
         this.at(28, 9).setGround(new Hole(spawners));
+    }
+
+    private void setVents() {
+        // Define the spawners the vents on this map can spawn.
+        List<Spawner> spawners = new ArrayList<>();
+        spawners.add(new SlimeSpawner());
+        spawners.add(new ParasiteSpawner());
+
+        this.at(51, 2).setGround(new Vent(spawners));
     }
 
     private void setMagicCircles() {

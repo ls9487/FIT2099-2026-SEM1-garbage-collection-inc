@@ -32,7 +32,7 @@ public class Parasite extends EclipseActor implements Infector {
      */
     public Parasite() {
         super("Parasite", 'x', 30, new BasicInventory());
-        this.addNewBehaviour(INFECT_BEHAVIOUR_PRIORITY, new InfectBehaviour());
+        this.addNewBehaviour(INFECT_BEHAVIOUR_PRIORITY, new InfectBehaviour(this));
         this.addNewBehaviour(WANDER_BEHAVIOUR_PRIORITY, new WanderBehaviour());
     }
 

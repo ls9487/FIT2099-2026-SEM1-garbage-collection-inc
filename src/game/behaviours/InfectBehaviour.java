@@ -3,6 +3,7 @@ package game.behaviours;
 import edu.monash.fit2099.engine.GameEntity;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
@@ -15,22 +16,33 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Behaviour for an infector parasitically infecting whatever it can infect around it.
+ * Behaviour for an actor parasitically infecting whatever it can infect around it.
  *
  * @author echu0057
  */
-public class InfectBehaviour implements Behaviour<Infector, Action> {
+public class InfectBehaviour implements Behaviour<Actor, Action> {
     private final Random random = new Random();
+    private final Infector infector;
+
+    /**
+     * Constructor for the InfectBehaviour class.
+     * Which infector is trying to cause infection.
+     *
+     * @param infector The infector involved in this behaviour.
+     */
+    public InfectBehaviour(Infector infector) {
+        this.infector = infector;
+    }
 
     /**
      * Checks surrounding locations for infectables, generating an InfectAction for each one.
      * Then, randomly chooses one InfectAction (one specific infectable target) and returns it.
-     * @param infector The infector performing the behaviour.
-     * @param location The location of the current infector.
+     * @param actor The actor performing the behaviour.
+     * @param location The location of the current actor.
      * @return An action taken by this behaviour.
      */
     @Override
-    public Action operate(Infector infector, Location location) {
+    public Action operate(Actor actor, Location location) {
         ActionList actions = new ActionList();
         // Keep track of surrounding entities to be processed later.
         List<GameEntity> surroundingEntities = new ArrayList<>();
