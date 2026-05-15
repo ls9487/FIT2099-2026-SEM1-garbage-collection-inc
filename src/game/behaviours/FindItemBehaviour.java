@@ -1,27 +1,21 @@
 package game.behaviours;
 
 import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
+import edu.monash.fit2099.engine.items.ItemAbility;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actions.TeleportAction;
-import game.actors.ActorAbilities;
-import game.grounds.Teleporter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+public class FindItemBehaviour implements Behaviour<Actor, Action> {
+    private final int findingRange;
 
-public class TeleportBehaviour implements Behaviour<Actor, Action> {
-    private static final Random random = new Random();
-    private final int teleportRange;
-    private final Teleporter teleporter;
-
-    public TeleportBehaviour(int teleportRange, Teleporter teleporter) {
-        this.teleportRange = teleportRange;
-        this.teleporter = teleporter;
+    public FindItemBehaviour(int findingRange) {
+        this.findingRange = findingRange;
     }
+
     /**
      * A Behaviour represents a kind of objective that an entity can have.  For example
      * it might want to seek out a particular kind of object, or follow another entity,
@@ -44,35 +38,35 @@ public class TeleportBehaviour implements Behaviour<Actor, Action> {
     public Action operate(Actor actor, Location location) {
         GameMap map = location.map();
 
-        List<Location> enterableTiles = new ArrayList<>();
-        List<Actor> targetedWorkers = new ArrayList<>();
-        for (Location target : location.getNearbyLocations(teleportRange)) {
-            if(target.containsAnActor() && target.getActor().hasAbility(ActorAbilities.PLAYER)) {
-                targetedWorkers.add(target.getActor());
-            }
-
-            if (target.canActorEnter(actor)) enterableTiles.add(target);
-        }
-
-        int nearestWorkerDistance = Integer.MAX_VALUE;
-        Actor nearestWorker = null;
-
-        for (Actor targetedWorker : targetedWorkers) {
-            int newDistance = distance(map.locationOf(targetedWorker), location);
-            if (nearestWorkerDistance > newDistance) {
-                nearestWorkerDistance = newDistance;
-                nearestWorker = targetedWorker;
-                if (nearestWorkerDistance == 1) break;
+        int nearestItemDistance = Integer.MAX_VALUE;
+        Location nearestItemLocation = null;
+        for (Location target : location.getNearbyLocations(findingRange)) {
+            if (target.getItems().isEmpty() || !target.getItems().getFirst().hasAbility(ItemAbility.PORTABLE)) continue;
+            int newDistance = distance(location, target);
+            if (newDistance < nearestItemDistance) {
+                nearestItemDistance = newDistance;
+                nearestItemLocation = target;
             }
         }
 
-        if(!map.contains(nearestWorker) || !map.contains(actor))
-            return null;
+        if (nearestItemLocation == null) return null;
 
-        Location destination = enterableTiles.get(random.nextInt(enterableTiles.size()));
+        Location here = map.locationOf(actor);
 
-        return new TeleportAction(teleporter, destination);
+        int currentDistance = distance(here, nearestItemLocation);
+        for (Exit exit : here.getExits()) {
+            Location destination = exit.getDestination();
+            if (destination.canActorEnter(actor)) {
+                int newDistance = distance(destination, nearestItemLocation);
+                if (newDistance < currentDistance) {
+                    return new MoveActorAction(destination, exit.getName());
+                }
+            }
+        }
+
+        return null;
     }
+
 
     /**
      * Compute the Manhattan distance between two locations.

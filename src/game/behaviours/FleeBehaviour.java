@@ -1,29 +1,26 @@
 package game.behaviours;
 
 import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.MoveActorAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actions.TeleportAction;
 import game.actors.ActorAbilities;
-import game.grounds.Teleporter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-public class TeleportBehaviour implements Behaviour<Actor, Action> {
-    private static final Random random = new Random();
-    private final int teleportRange;
-    private final Teleporter teleporter;
+public class FleeBehaviour implements Behaviour<Actor, Action> {
+    private final int fleeRange;
 
-    public TeleportBehaviour(int teleportRange, Teleporter teleporter) {
-        this.teleportRange = teleportRange;
-        this.teleporter = teleporter;
+    public FleeBehaviour(int fleeRange) {
+        this.fleeRange = fleeRange;
     }
+
     /**
-     * A Behaviour represents a kind of objective that an entity can have.  For example
+     * A Behaviour represents a kind of objective that an entity can have.  For example,
      * it might want to seek out a particular kind of object, or follow another entity,
      * or run away and hide.  Each implementation of Behaviour helps the
      * entity to achieve its objective (returning a result or null if no useful result are available).
@@ -44,14 +41,11 @@ public class TeleportBehaviour implements Behaviour<Actor, Action> {
     public Action operate(Actor actor, Location location) {
         GameMap map = location.map();
 
-        List<Location> enterableTiles = new ArrayList<>();
         List<Actor> targetedWorkers = new ArrayList<>();
-        for (Location target : location.getNearbyLocations(teleportRange)) {
+        for (Location target : location.getNearbyLocations(fleeRange)) {
             if(target.containsAnActor() && target.getActor().hasAbility(ActorAbilities.PLAYER)) {
                 targetedWorkers.add(target.getActor());
             }
-
-            if (target.canActorEnter(actor)) enterableTiles.add(target);
         }
 
         int nearestWorkerDistance = Integer.MAX_VALUE;
@@ -69,9 +63,21 @@ public class TeleportBehaviour implements Behaviour<Actor, Action> {
         if(!map.contains(nearestWorker) || !map.contains(actor))
             return null;
 
-        Location destination = enterableTiles.get(random.nextInt(enterableTiles.size()));
+        Location here = map.locationOf(actor);
+        Location there = map.locationOf(nearestWorker);
 
-        return new TeleportAction(teleporter, destination);
+        int currentDistance = distance(here, there);
+        for (Exit exit : here.getExits()) {
+            Location destination = exit.getDestination();
+            if (destination.canActorEnter(actor)) {
+                int newDistance = distance(destination, there);
+                if (newDistance > currentDistance) {
+                    return new MoveActorAction(destination, exit.getName());
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

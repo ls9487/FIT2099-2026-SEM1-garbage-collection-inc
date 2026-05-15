@@ -3,15 +3,15 @@ package game.locations;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
-import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
+import game.actors.Muckraker;
+import game.actors.PhantasmWisp;
 import game.grounds.AluminiumDoor;
 import game.grounds.Dirt;
 import game.grounds.Floor;
 import game.grounds.IronDoor;
-import game.grounds.MagicCircleGroup;
 import game.grounds.Puddle;
 import game.grounds.TitaniumDoor;
 import game.grounds.ToxicWaste;
@@ -105,6 +105,8 @@ public class EclipseNebula extends World {
          */
          //contractedWorker1.addCredits(1000);
 
+        this.addPlayer(new Muckraker(), moon99DeprecatedMap.at(10, 10));
+        this.addPlayer(new PhantasmWisp(), moon99DeprecatedMap.at(11, 11));
     }
 
     /**
