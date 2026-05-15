@@ -13,19 +13,35 @@ import java.util.Random;
  * @author echu0057
  */
 public class CrtMonitor extends EclipseItem implements Sellable {
-    private static final Random random = new Random();
-    private static final double SHORT_CHANCE = 0.2;
-    private static final int FIRE_DURATION = 5;
-    private static final int SHORT_DAMAGE = 2;
-    private static final int SELL_HEAL = 5;
+
+    /** Credit value paid by the SuperComputer on sale. */
     private static final int SELL_PRICE = 25;
+
+    /** Inventory weight in units (this thing is HEAVY). */
+    private static final int WEIGHT = 30;
+
+    /** Map display symbol for this monitor. */
+    private static final char SYMBOL = '◙';
+
+    /** HP the seller gains from the relief of offloading the monitor. */
+    private static final int SELL_HEAL = 5;
+
+    /** Chance the ancient hardware shorts out during sale. */
+    private static final double SHORT_CHANCE = 0.20;
+
+    /** Damage dealt to the seller when the monitor shorts out. */
+    private static final int SHORT_DAMAGE = 2;
+
+    /** Duration (in turns) of any Fire this monitor spawns. */
+    private static final int FIRE_DURATION = 5;
+    private final Random random = new Random();
 
     /**
      * Constructor for the CrtMonitor class.
      * Has a weight of 30 units, which is heavy!
      */
     public CrtMonitor() {
-        super("CRT Monitor", '◙', 30);
+        super("CRT Monitor", SYMBOL, WEIGHT);
     }
 
     /**
@@ -49,7 +65,6 @@ public class CrtMonitor extends EclipseItem implements Sellable {
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        // Heal the seller.
         seller.heal(SELL_HEAL);
         StringBuilder msg = new StringBuilder(seller + " sells the CRT monitor for "
                 + getSellPrice() + " credits. Offloading it heals " + SELL_HEAL + " hp.");
@@ -61,7 +76,8 @@ public class CrtMonitor extends EclipseItem implements Sellable {
             for (Location adjacent : map.locationOf(seller).getNearbyLocations(1)) {
                 adjacent.addItem(new Fire(FIRE_DURATION));
             }
-            msg.append(" The terminal shorts out, hurting the actor and igniting the area!");
+            msg.append(" The terminal shorts out, dealing ").append(SHORT_DAMAGE)
+               .append(" damage and igniting the area!");
         }
 
         seller.getInventory().remove(this);
