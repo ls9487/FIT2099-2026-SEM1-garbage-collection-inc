@@ -7,6 +7,8 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.statuses.BurnStatus;
 import game.statuses.Flammable;
+import game.statuses.Infectable;
+
 import java.util.Random;
 
 
@@ -37,10 +39,10 @@ public class Lantern extends EclipseItem implements Sellable {
     private static final int LEAK_OIL_COST = 1;
 
     /** Chance the seller catches a burn when the lantern is sold. */
-    private static final double SELLER_BURN_CHANCE = 0.50;
+    private static final double BURN_SELLER_CHANCE = 0.50;
 
     /** Chance fire spawns on every adjacent tile when the lantern is sold. */
-    private static final double ADJACENT_FIRE_CHANCE = 0.25;
+    private static final double BURN_SURROUNDINGS_CHANCE = 0.25;
 
     /** Burn-status duration applied to a torched seller. */
     private static final int SELLER_BURN_DURATION = 3;
@@ -50,7 +52,6 @@ public class Lantern extends EclipseItem implements Sellable {
 
     /** Duration (in turns) of any Fire this lantern spawns. */
     private static final int FIRE_DURATION = 5;
-
     /**
      * Constructor for the Lantern class.
      * Has a weight of 7 units, and an oil fuel (as durability) of 10 units.
@@ -68,8 +69,8 @@ public class Lantern extends EclipseItem implements Sellable {
      */
     @Override
     public void tick(Location currentLocation, Actor actor) {
-        // Need to have non-zero durability, and the leak chance check.
-        if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && Math.random() <= LEAK_CHANCE) {
+        // Need to have non-zero durability, and a 5% chance check to leak.
+        if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && random.nextDouble() <= LEAK_CHANCE) {
             this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, LEAK_OIL_COST);
             // Create fire on currentLocation.
             currentLocation.addItem(new Fire(FIRE_DURATION));
@@ -84,7 +85,7 @@ public class Lantern extends EclipseItem implements Sellable {
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return CREDITS_PER_OIL * this.getStatistic(ItemStatistics.DURABILITY);
     }
 
@@ -94,14 +95,17 @@ public class Lantern extends EclipseItem implements Sellable {
      * 25% chance fire flashes onto every adjacent tile.
      * Both can fire on the SAME transaction. The lantern always leaves the
      * inventory at the end of the transaction.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        int price = sellPrice(seller);
-        StringBuilder msg = new StringBuilder(seller + " sells the lantern for " + price + " credits.");
+        StringBuilder msg = new StringBuilder(seller + " sells the lantern for "
+                + getSellPrice() + " credits.");
 
-        if (random.nextDouble() < SELLER_BURN_CHANCE) {
+        if (random.nextDouble() < BURN_SELLER_CHANCE) {
             Flammable flammable = seller.asCapability(Flammable.class).orElse(null);
             if (flammable != null) {
                 seller.addStatus(new BurnStatus(SELLER_BURN_DURATION, SELLER_BURN_DAMAGE, flammable));
@@ -111,8 +115,9 @@ public class Lantern extends EclipseItem implements Sellable {
                .append(SELLER_BURN_DURATION).append(" turns).");
         }
 
-        if (random.nextDouble() < ADJACENT_FIRE_CHANCE) {
-            for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
+        if (random.nextDouble() < BURN_SURROUNDINGS_CHANCE) {
+            // Get the adjacent locations, and set fire to them!
+            for (Location adjacent : map.locationOf(seller).getNearbyLocations(1)) {
                 adjacent.addItem(new Fire(FIRE_DURATION));
             }
             msg.append(" Sparks ignite the surrounding tiles.");
@@ -121,4 +126,17 @@ public class Lantern extends EclipseItem implements Sellable {
         seller.getInventory().remove(this);
         return msg.toString();
     }
+
+    /**
+     * The infection finds the fuel yummy, draining it by 1 unit per turn.
+     * Note that the "blowing up" doesn't actually affect its surroundings.
+     * @param location The location where the infection tick is happening.
+     */
+    @Override
+    public void infection(Location location) {
+        // Decrease its oil (durability) by 1. No need to check if it's greater than 0 or anything.
+        // Due to how the engine's statistics work, it'll already prevent it going negative.
+        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+    }
+
 }

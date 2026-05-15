@@ -4,7 +4,6 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
-import game.actors.ContractedWorker;
 import game.items.Buyable;
 import game.actors.EclipseStatistics;
 
@@ -36,38 +35,44 @@ public class BuyAction extends Action {
 
     /**
      * Runs the generic purchase flow.
-     *
-     * Affordability and the credit deduction are the action's
-     * responsibility. Item-specific side effects and inventory
-     * placement are delegated to the Buyable.
-     *
+     * Affordability and the credit deduction are the action's responsibility.
+     * Item-specific side effects of being bought and inventory placement are
+     * delegated to the Buyable.
+     * @param buyer The actor buying the buyable.
+     * @param map The map the actor is on.
+     * @return The description of the transaction result.
      * @author esoo0013
      */
     @Override
-    public String execute(Actor actor, GameMap map) {
-
-        // Credits live on the ContractedWorker, not on every actor
-        if (!actor.hasStatistic(EclipseStatistics.CREDITS)) {
-            return actor + " has nowhere to draw credits from.";
+    public String execute(Actor buyer, GameMap map) {
+        // Not all actors have credits. If they don't, then the action will not proceed further.
+        if (!buyer.hasStatistic(EclipseStatistics.CREDITS)) {
+            return buyer + " has nowhere to draw credits from.";
         }
 
-        int price = buyable.buyPrice(actor);
-
+        int price = buyable.getBuyPrice();
         // Let the Buyable decide what happens if the actor cannot afford it
         // e.g FirstAidKit kills the buyer when broke
-        if (actor.getStatistic(EclipseStatistics.CREDITS) < price) {
-            return buyable.cannotAfford(actor, map);
+        if (buyer.getStatistic(EclipseStatistics.CREDITS) < price) {
+            return buyable.cannotAfford(buyer, map);
         }
-        actor.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, price);
 
+        // Deduct the buyer's credits as they can afford it.
+        buyer.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, price);
         // Buyable owns its own purchase side-effects AND its own
         // inventory insertion. The action has no opinion on either
-        return buyable.boughtBy(actor, map);
+        return buyable.boughtBy(buyer, map);
     }
 
+    /**
+     * Describes what this action will do in the menu (buying something, and for how much).
+     * @param buyer The actor performing the action.
+     * @return The description of this action.
+     */
     @Override
-    public String menuDescription(Actor actor) {
+    public String menuDescription(Actor buyer) {
         return String.format("%s buys %s for %d credits",
-                actor, buyable, buyable.buyPrice(actor));
+                buyer, buyable, buyable.getBuyPrice());
     }
+
 }

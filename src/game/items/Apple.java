@@ -18,6 +18,9 @@ import game.statuses.Poisonable;
  */
 public class Apple extends EclipseItem implements Consumable, Sellable {
 
+    /** HP healed when a sterilised apple is consumed. */
+    private static final int HEAL_AMOUNT = 3;
+
     /** Credit value paid by the SuperComputer on sale. */
     private static final int SELL_PRICE = 1;
 
@@ -26,9 +29,6 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
 
     /** Map display symbol for this apple. */
     private static final char SYMBOL = 'ó';
-
-    /** HP healed when a sterilised apple is consumed. */
-    private static final int STERILISED_HEAL = 3;
 
     /** Poison duration when an unsterilised apple is consumed. */
     private static final int CONSUME_POISON_DURATION = 5;
@@ -99,9 +99,9 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
         }
         // Check if the consumer has the STERILISER ability.
         if (actor.hasAbility(ItemAbilities.STERILISER)) {
-            // Heal for STERILISED_HEAL hp.
-            actor.heal(STERILISED_HEAL);
-            return actor + " eats a sterilised apple, healing them by " + STERILISED_HEAL + " hp.";
+            // Heal for HEAL_AMOUNT (3) hp.
+            actor.heal(HEAL_AMOUNT);
+            return actor + " eats a sterilised apple, healing them by " + HEAL_AMOUNT + " hp.";
 
         } else {
             // Note that Actor doesn't implement Poisonable. Can't change that.
@@ -121,7 +121,7 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return SELL_PRICE;
     }
 
@@ -130,17 +130,22 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
      * on the way out and nothing nasty happens. Otherwise the seller catches
      * a 2-turn poison (2 dmg/turn) from handling the spoiled fruit. The apple
      * leaves the inventory either way.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        StringBuilder msg = new StringBuilder(seller + " sells an apple for " + SELL_PRICE + " credit.");
+        StringBuilder msg = new StringBuilder(seller + " sells an apple for "
+                + getSellPrice() + " credit. ");
 
         if (seller.hasAbility(ItemAbilities.STERILISER)) {
-            msg.append(" The apple is neutralised by the Sterilisation Box on its way out.");
+            msg.append("The apple is sterilised on its way out.");
         } else {
             Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
             if (poisonable != null) {
+                // Poison the poisonable actor (2 damage, lasts 2 turns).
                 seller.addStatus(new PoisonStatus(SELL_POISON_DURATION, SELL_POISON_DAMAGE, poisonable));
             }
             msg.append(" ").append(seller).append(" is poisoned (")

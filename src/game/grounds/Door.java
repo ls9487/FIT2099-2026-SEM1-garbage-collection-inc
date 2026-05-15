@@ -6,20 +6,22 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.UnlockAction;
-import game.actors.Unlocker;
+import game.items.ItemStatistics;
 import game.statuses.Alarmable;
 
 /**
  * Abstract secured door that opens only for sufficient clearance and applies
  * tier-specific hazards or benefits when opened.
  *
+ *
  * @author echu0057
- * @version 2.0
+ * @author eche0116
  */
 public abstract class Door extends Ground implements Unlockable, Alarmable {
 
     private boolean isUnlocked;
     private boolean isAlarmed;
+    private int securityLevel;
 
     /**
      * Constructor for the Door class.
@@ -28,10 +30,11 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
      * @param displayChar the display of door in the map
      * @param name the name of the door
      */
-    protected Door(char displayChar, String name) {
+    protected Door(char displayChar, String name, int securityLevel) {
         super(displayChar, name);
         this.isUnlocked = false;
         this.isAlarmed = false;
+        this.securityLevel = securityLevel;
     }
 
     /**
@@ -41,13 +44,15 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
      * @return true when clearance is met and the door is locked and not alarmed
      */
     public boolean canActorUnlock(Actor actor) {
-        Unlocker unlocker = actor.asCapability(Unlocker.class).orElse(null);
-        if (unlocker == null) {
+        if (isUnlocked || isAlarmed) {
             return false;
-        } else {
-            return unlocker.currentClearanceLevel().ordinal() >= requiredClearance().ordinal() &&
-                    !isUnlocked && !isAlarmed;
         }
+
+        return actor.getInventory().getItems().stream()
+                .anyMatch(item ->
+                        item.hasStatistic(ItemStatistics.CLEARANCE_LEVEL) &&
+                                item.getStatistic(ItemStatistics.CLEARANCE_LEVEL) >= getRequiredClearance()
+                );
     }
 
     /**
@@ -55,7 +60,9 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
      *
      * @return required clearance level
      */
-    protected abstract ClearanceLevel requiredClearance();
+    public int getRequiredClearance() {
+        return securityLevel;
+    }
 
     /**
      * Returns an ActionList that could contain an UnlockAction under certain conditions.
@@ -88,6 +95,7 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
     /**
      * Have the actor unlock the door using their card (or other means).
      * Unlocked door stays open so others can traverse them.
+     * Note that unlocking doors have side effects, varying with each type of tier...
      *
      * @param actor The actor unlocking the door.
      * @param map   The map containing the door.

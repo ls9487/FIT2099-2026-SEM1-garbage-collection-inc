@@ -1,0 +1,128 @@
+package game.grounds;
+
+import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.positions.Exit;
+import edu.monash.fit2099.engine.positions.Ground;
+import edu.monash.fit2099.engine.positions.Location;
+import game.actors.ActorAbilities;
+import game.spawners.Spawner;
+import game.statuses.PoisonStatus;
+import game.statuses.Poisonable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Vent represents a vent on some location. Actors cannot enter it.
+ * However, some creatures could emerge from this...
+ * Spawns a creature each turn if an adjacent actor has the ability of activating it.
+ * What creatures it spawns should depend on the moon (GameMap).
+ *
+ * @author echu0057
+ */
+public class Vent extends Ground {
+
+    private static final Random random = new Random();
+    // Keeps a list of spawners so they can be used to spawn creatures.
+    private List<Spawner> spawners;
+
+    /**
+     * Constructor for the Vent class.
+     * @param spawners A list of spawners for actors.
+     */
+    public Vent(List<Spawner> spawners) {
+        super('V', "Vent");
+        this.spawners = spawners;
+    }
+
+    /**
+     * Vent is motion-activated, and only to whatever actors it's sensitive to.
+     * That includes the worker (and actually only the worker for now).
+     * Every tick, if there's a surrounding worker, it'll spawn a creature.
+     * @param location The location of the Ground.
+     */
+    @Override
+    public void tick(Location location) {
+        boolean ventActivated = false;
+        // Check all the surrounding exits.
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
+            // If there's an adjacent actor that can activate the vent,
+            // the vent is activated for this turn.
+            if (destination.containsAnActor() &&
+                    destination.getActor().hasAbility(ActorAbilities.VENT_ACTIVATOR)) {
+                ventActivated = true;
+                break;
+            }
+        }
+        // If activated, try to spawn.
+        if (ventActivated) {
+            this.spawn(location);
+        }
+    }
+
+    /**
+     * Randomly chooses an actor to be spawned (based on what it can spawn).
+     * The actor will be spawned adjacent to the vent.
+     * To be used internally within this class only.
+     * @param location The location of the vent.
+     */
+    private void spawn(Location location) {
+        // Keep track of the valid adjacent locations around (i.e. no actor occupying).
+        List<Location> validLocations = new ArrayList<>();
+        // Get the valid locations.
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
+            if (!destination.containsAnActor()) {
+                validLocations.add(destination);
+            }
+        }
+
+        if (!validLocations.isEmpty()) {
+            // There is at least one valid location. Randomly choose the spawner and location.
+            Spawner chosenSpawner = spawners.get(random.nextInt(spawners.size()));
+            Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
+            chosenSpawner.spawnAt(chosenLocation);
+            // The spawn was done, and we'll need to poison everyone around.
+            this.poisonAdjacent(location);
+        }
+    }
+
+    /**
+     * Upon successful spawning, the vent poisons all actors adjacent to it.
+     * Poison does 1 damage per turn, for 5 turns.
+     * To be used internally within this class only.
+     * @param location The location of the vent.
+     */
+    private void poisonAdjacent(Location location) {
+        final int POISON_DAMAGE = 1;
+        final int POISON_DURATION = 5;
+        final int POISON_RANGE = 1;
+
+        // Get the adjacent locations.
+        List<Location> adjacentLocations = location.getNearbyLocations(POISON_RANGE);
+        for (Location adjacentLocation : adjacentLocations) {
+            if (adjacentLocation.containsAnActor()) {
+                // Actor is present at this adjacent location. Try to poison it.
+                Actor adjacentActor = adjacentLocation.getActor();
+                Poisonable poisonable = adjacentActor.asCapability(Poisonable.class).orElse(null);
+                if (poisonable != null) {
+                    // Poison the poisonable actor.
+                    adjacentActor.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE, poisonable));
+                }
+            }
+        }
+    }
+
+    /**
+     * Actors can't walk over a vent. They just can't.
+     * @param actor The actor to check.
+     * @return false
+     */
+    @Override
+    public boolean canActorEnter(Actor actor) {
+        return false;
+    }
+
+}

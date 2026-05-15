@@ -16,6 +16,8 @@ import java.util.Random;
  */
 public class FloppyDisk extends EclipseItem implements Sellable {
 
+    private final Random random = new Random();
+
     /** Credit value paid by the SuperComputer on sale. */
     private static final int SELL_PRICE = 1;
 
@@ -39,14 +41,12 @@ public class FloppyDisk extends EclipseItem implements Sellable {
         super("Floppy Disk", SYMBOL, WEIGHT);
     }
 
-    private final Random random = new Random();
-
     /**
      * Sells for 1 credit. Although, the SuperComputer MIGHT glitch.
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return SELL_PRICE;
     }
 
@@ -54,12 +54,15 @@ public class FloppyDisk extends EclipseItem implements Sellable {
      * 50% chance the SuperComputer glitches AFTER paying out and snatches
      * 50 credits straight out of the wallet. Worker has been warned.
      * The disk leaves the inventory regardless of whether the glitch fires.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
         StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for "
-                + SELL_PRICE + " credit.");
+                + getSellPrice() + " credit.");
 
         if (random.nextDouble() < GLITCH_CHANCE && seller.hasStatistic(EclipseStatistics.CREDITS)) {
             seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, GLITCH_DEDUCTION);

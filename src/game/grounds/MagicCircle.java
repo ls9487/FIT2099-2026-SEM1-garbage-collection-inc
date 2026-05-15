@@ -1,6 +1,5 @@
 package game.grounds;
 
-import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Item;
@@ -9,12 +8,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.TeleportAction;
-import game.items.Flask;
-import game.items.Spawner;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 /**
@@ -24,7 +21,7 @@ import java.util.function.Supplier;
  * @author eche0116
  * @version 1.0
  */
-public class MagicCircle extends Ground implements Teleporter, Spawner {
+public class MagicCircle extends Ground implements Teleporter {
 
     private static final Random random = new Random();
     private final MagicCircleGroup group;
@@ -62,32 +59,30 @@ public class MagicCircle extends Ground implements Teleporter, Spawner {
         return actions;
     }
 
-    @Override
-    public void spawn(Location arrival) {
-        Actor traveller = arrival.getActor();
-        List<Location> candidates = new ArrayList<>();
-        for (Exit exit : arrival.getExits()) {
-            Location step = exit.getDestination();
-            if (step.getGround().canActorEnter(traveller)) {
-                candidates.add(step);
-            }
-        }
-        if (candidates.isEmpty()) {
-            return;
-        }
-        Item spawnedItem = spawnableItems.get(random.nextInt(spawnableItems.size())).get();
-
-        candidates.get(random.nextInt(candidates.size())).addItem(spawnedItem);
-    }
-
+    /**
+     * Moves the actor to the destination, then finds a random adjacent empty
+     * tile and delegates spawning to the spawner.
+     *
+     * @param actor       the actor being teleported
+     * @param map         the map the actor is currently on
+     * @param destination the target circle tile
+     * @return description of the teleport outcome
+     */
     @Override
     public String teleport(Actor actor, GameMap map, Location destination) {
         destination.map().moveActor(actor, destination);
-        spawn(destination);
-        return String.format("%s teleported to %s by %s.",
-                actor,
-                destination,
-                this
-        );
+
+        List<Location> candidates = new ArrayList<>();
+        for (Exit exit : destination.getExits()) {
+            Location step = exit.getDestination();
+            if (step.getGround().canActorEnter(actor)) {
+                candidates.add(step);
+            }
+        }
+        if (!candidates.isEmpty()) {
+            candidates.get(random.nextInt(candidates.size()))
+                    .addItem(spawnableItems.get(random.nextInt(spawnableItems.size())).get());
+        }
+        return String.format("%s teleported to %s by %s.", actor, destination, this);
     }
 }

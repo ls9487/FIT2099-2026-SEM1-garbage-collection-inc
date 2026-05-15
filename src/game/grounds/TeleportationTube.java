@@ -20,9 +20,10 @@ import java.util.Random;
  * @version 1.0
  */
 public class TeleportationTube extends Ground implements Teleporter {
+    private static final Random random = new Random();
     private static final int FIRE_DURATION = 2;
     private static final int NEARBY_RADIUS = 1;
-    private static final Random random = new Random();
+    private static final double MALFUNCTION_CHANCE = 0.5;
     private final List<Location> destinations;
 
     /**
@@ -37,38 +38,37 @@ public class TeleportationTube extends Ground implements Teleporter {
 
     @Override
     public String teleport(Actor actor, GameMap map, Location destination) {
+        // The actual destination to be teleported to. Assume it's the original for now.
         Location finalDestination = destination;
-        boolean malfunctionsMessage = false;
+        // Keep track whether there was a malfunction (for the string returned later).
+        String malfunctionsMessage = "";
 
-        if (random.nextBoolean()) {
-            malfunctionsMessage = true;
+        if (random.nextDouble() <= MALFUNCTION_CHANCE) {
+            malfunctionsMessage = ".. that doesn't seem right. The teleporter malfunctioned!";
+            // Malfunction happened. Get all locations of the original destination's map.
+            // Then, choose a random location from all locations that the actor can enter.
             List<Location> candidates = new ArrayList<>();
-            for (int y : finalDestination.map().getYRange()) {
-                for (int x : finalDestination.map().getXRange()) {
-                    Location loc = finalDestination.map().at(x, y);
-                    if (!loc.containsAnActor() && loc.getGround().canActorEnter(actor)) {
+            for (int y : destination.map().getYRange()) {
+                for (int x : destination.map().getXRange()) {
+                    Location loc = destination.map().at(x, y);
+                    if (loc.canActorEnter(actor)) {
                         candidates.add(loc);
                     }
                 }
             }
+            // Due to the malfunction, the actual destination has changed.
             finalDestination = candidates.get(random.nextInt(candidates.size()));
         }
 
-        finalDestination.map().moveActor(actor, destination);
+        // Move the actor to the destination using the map's moveActor method.
+        finalDestination.map().moveActor(actor, finalDestination);
+        // Burn the adjacent tiles.
         for (Location location : finalDestination.getNearbyLocations(NEARBY_RADIUS)) {
             location.addItem(new Fire(FIRE_DURATION));
         }
 
-        return String.format("%s teleported to %s by %s.%s",
-                actor,
-                destination,
-                this,
-                malfunctionsMessage ?
-                        String.format(
-                                " But device malfunctioned and randomly teleport %s to %s",
-                                actor,
-                                finalDestination) :
-                        "");
+        return String.format("%s was teleported to %s by %s.%s", actor, finalDestination,
+                this, malfunctionsMessage);
     }
 
     /**

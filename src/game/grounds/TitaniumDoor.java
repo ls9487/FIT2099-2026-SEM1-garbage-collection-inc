@@ -12,23 +12,13 @@ import edu.monash.fit2099.engine.positions.GameMap;
 public class TitaniumDoor extends Door {
 
     private static final int DECONTAMINATION_HEAL = 5;
+    private static final int SECURITY_LEVEL = 3;
 
     /**
-     * Creates a titanium door marked with {@code M} on facility plans.
-     *
+     * Creates a titanium door using the standard facility symbol.
      */
     public TitaniumDoor() {
-        super('M', "Titanium Door");
-    }
-
-    /**
-     * Declares the minimum clearance tier required to unlock this door.
-     *
-     * @return clearance level three
-     */
-    @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_3;
+        super('M', "Titanium Door", SECURITY_LEVEL);
     }
 
     /**
@@ -41,6 +31,8 @@ public class TitaniumDoor extends Door {
     @Override
     protected String unlockSideEffects(Actor actor, GameMap map) {
         actor.heal(DECONTAMINATION_HEAL);
-        return actor + " unlocked the titanium door. Localised decontamination restores " + DECONTAMINATION_HEAL + " health.";
+        return actor + " unlocked the titanium door. Localised decontamination restores "
+                + DECONTAMINATION_HEAL + " health.";
     }
+
 }

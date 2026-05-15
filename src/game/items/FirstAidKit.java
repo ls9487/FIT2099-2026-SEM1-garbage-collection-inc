@@ -22,7 +22,7 @@ import game.actors.ActorAbilities;
 public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
 
     /** Credit cost charged by the SuperComputer. */
-    private static final int PRICE = 1000;
+    private static final int BUY_PRICE = 1000;
 
     /** Inventory weight in units. */
     private static final int WEIGHT = 25;
@@ -96,7 +96,7 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
                     this.getMaximumStatistic(ItemStatistics.COOLDOWN));
             // Increase max hp by 1, heal to full.
             // Note that changing the maximum actually sets the current statistic to its maximum.
-            actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE, MAX_HP_INCREASE);
+            actor.modifyStatisticMaximum(ActorStatistics.HEALTH, StatisticOperations.INCREASE, 1);
 
             return actor + " uses the first aid kit and feels much healthier than before!";
         } else {
@@ -130,8 +130,8 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
      * @author esoo0013
      */
     @Override
-    public int buyPrice(Actor buyer) {
-        return PRICE;
+    public int getBuyPrice() {
+        return BUY_PRICE;
     }
 
     /**
@@ -142,7 +142,7 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
         buyer.getInventory().add(this);
-        return buyer + " buys the First Aid Kit for " + PRICE + " credits.";
+        return buyer + " buys the first aid kit for " + getBuyPrice() + " credits.";
     }
 
     /**

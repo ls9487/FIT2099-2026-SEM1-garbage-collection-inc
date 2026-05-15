@@ -15,11 +15,10 @@ public interface Buyable {
 
     /**
      * What this item costs.
-     * @param buyer The actor trying to buy.
      * @return Credit cost.
      * @author esoo0013
      */
-    int buyPrice(Actor buyer);
+    public int getBuyPrice();
 
     /**
      * Apply the item-specific purchase logic AND place the item into the
@@ -39,17 +38,16 @@ public interface Buyable {
      * @return A full description describing the purchase and its effects.
      * @author esoo0013
      */
-    String boughtBy(Actor buyer, GameMap map);
+    public String boughtBy(Actor buyer, GameMap map);
 
     /**
-     * What happens when the buyer can't afford this item. Default is just a
-     * polite refusal. FirstAidKit overrides this to murder the buyer.
-     * @param buyer The actor who tried and failed.
+     * What happens when the buyer can't afford this item. Maybe nothing (polite refusal),
+     * maybe straight up murdering the buyer (FirstAidKit).
+     * @param buyer The actor who lacks credits.
      * @param map The map the buyer is on.
      * @return A description of the failure.
      * @author esoo0013
      */
-    default String cannotAfford(Actor buyer, GameMap map) {
-        return buyer + " cannot afford this transaction.";
-    }
+    public String cannotAfford(Actor buyer, GameMap map);
+
 }

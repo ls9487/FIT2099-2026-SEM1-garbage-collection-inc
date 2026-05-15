@@ -41,6 +41,18 @@ public class AccessCardL1 extends AccessCard {
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
         buyer.getInventory().add(this);
-        return buyer + " buys an L1 access card for " + PRICE + " credits.";
+        return buyer + " buys an L1 access card for " + getBuyPrice() + " credits.";
     }
+
+    /**
+     * Nothing bad happens. The buyer just can't have the item.
+     * @param buyer The actor who lacks credits.
+     * @param map The map the buyer is on.
+     * @return A description of the failure.
+     */
+    @Override
+    public String cannotAfford(Actor buyer, GameMap map) {
+        return buyer + " cannot afford to buy the L1 access card.";
+    }
+
 }

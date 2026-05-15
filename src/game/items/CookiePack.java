@@ -3,12 +3,20 @@ package game.items;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.ConsumeAction;
 import game.actors.ActorAbilities;
+import game.spawners.ParasiteSpawner;
+import game.spawners.Spawner;
+import game.statuses.Infectable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * CookiePack represents a pack of 5 cookies. Only one can be eaten at a time (by law).
@@ -17,7 +25,7 @@ import game.actors.ActorAbilities;
  *
  * @author echu0057
  */
-public class CookiePack extends EclipseItem implements Consumable, Sellable {
+public class CookiePack extends EclipseItem implements Consumable, Sellable, Infectable {
 
     /** Inventory weight in units. */
     private static final int WEIGHT = 2;
@@ -115,7 +123,7 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable {
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return this.getStatistic(ItemStatistics.DURABILITY);
     }
 
@@ -123,15 +131,59 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable {
      * The "organic processing fee": one HP lost per cookie sold. The whole
      * pack goes at once, so a full pack costs the seller 5 HP immediately,
      * after which the pack leaves the inventory.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        int cookies = this.getStatistic(ItemStatistics.DURABILITY);
-        seller.hurt(cookies);
+        int damage = this.getStatistic(ItemStatistics.DURABILITY);
+        seller.hurt(damage);
         seller.getInventory().remove(this);
-        return seller + " sells the cookie pack for " + cookies + " credits and loses "
-                + cookies + " HP to the organic processing fee.";
+        return seller + " sells the cookie pack for " + getSellPrice() + " credits and loses "
+                + damage + " HP to the organic processing fee.";
+    }
+
+    /**
+     * The infection finds the cookies yummy, depleting it by 1 cookie per turn.
+     * It'll also spawn a new parasite around it as long as there's cookies left!
+     * @param location The location where the infection tick is happening.
+     */
+    @Override
+    public void infection(Location location) {
+        // Check if there's any cookies remaining.
+        if (this.getStatistic(ItemStatistics.DURABILITY) > 0) {
+            // The infection continues to eat those cookies and spawning a parasite...
+            this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+            this.infectionSpawn(location);
+        }
+    }
+
+    /**
+     * The infection causes the cookies to spawn a parasite on a random adjacent location.
+     * To be used internally within this class only.
+     * @param location The location of the cookies when the infection spawns a parasite.
+     */
+    private void infectionSpawn(Location location) {
+        final Random random = new Random();
+        // Keep track of the valid adjacent locations around (i.e. no actor occupying).
+        List<Location> validLocations = new ArrayList<>();
+        // Get the valid locations.
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
+            if (!destination.containsAnActor()) {
+                validLocations.add(destination);
+            }
+        }
+
+        if (!validLocations.isEmpty()) {
+            // There is at least one valid location. Randomly choose and spawn the parasite there.
+            Spawner parasiteSpawner = new ParasiteSpawner();
+            Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
+            parasiteSpawner.spawnAt(chosenLocation);
+        }
+
     }
 
 }

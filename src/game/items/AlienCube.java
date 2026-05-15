@@ -1,14 +1,15 @@
 package game.items;
 
-import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.TeleportAction;
+import game.actors.Undead;
 import game.grounds.Teleporter;
 import game.grounds.ToxicWaste;
+import game.spawners.Spawner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +23,31 @@ import java.util.function.Supplier;
  * @author eche0116
  * @version 1.0
  */
-public class AlienCube extends EclipseItem implements Teleporter, Sellable, Spawner {
+public class AlienCube extends EclipseItem implements Teleporter, Sellable {
 
     private static final int SELL_PRICE = 25;
     private static final int RANDOM_LOCATION_TO_TELEPORT = 3;
     private static final Random random = new Random();
 
-    private final List<Supplier<Actor>> spawnableActors;
+    private final List<Spawner> spawners;
 
     /**
      * constructor.
-     * @param spawnableActors spawnable actors by the alien cube
+     * @param spawners spawnable actors by the alien cube
      */
-    public AlienCube(List<Supplier<Actor>> spawnableActors) {
+    public AlienCube(List<Spawner> spawners) {
         super("Alien Cube", '◈', 1);
-        this.spawnableActors = spawnableActors;
+        this.spawners = spawners;
+    }
+
+    /**
+     * get random spawnable actor from all spawnable actors
+     * @param spawnableActors the spawnable actors to randomly pick 1
+     * @param random used to random pick spawnable actors
+     * @return chosen spawnable actor
+     */
+    private Actor getRamdomSpawnableActor(List<Supplier<Actor>> spawnableActors, Random random) {
+        return spawnableActors.get(random.nextInt(spawnableActors.size())).get();
     }
 
     /**
@@ -100,11 +111,10 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Spaw
     /**
      * the sell price of alien cube
      *
-     * @param seller The actor doing the selling.
      * @return fixed sale price
      */
     @Override
-    public int sellPrice(Actor seller) {
+    public int getSellPrice() {
         return SELL_PRICE;
     }
 
@@ -128,16 +138,14 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Spaw
      *
      * @param spawnLocation the reference location, usually the seller's tile
      */
-    @Override
     public void spawn(Location spawnLocation) {
         List<Location> candidates = new ArrayList<>();
 
         // Choose a random index of the list, create the actor based on it.
-        Actor spawnedActor = getRamdomSpawnableActor(spawnableActors, random);
 
         for (Exit exit : spawnLocation.getExits()) {
             Location destination = exit.getDestination();
-            if (!destination.containsAnActor() && destination.getGround().canActorEnter(spawnedActor)) {
+            if (!destination.containsAnActor() && destination.getGround().canActorEnter(new Undead())) {
                 candidates.add(destination);
             }
         }
@@ -146,10 +154,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Spaw
         }
 
         Location spawnTile = candidates.get(random.nextInt(candidates.size()));
-        try {
-            spawnTile.addActor(spawnedActor);
-        } catch (GameEngineException e) {
-            throw new RuntimeException(e);
-        }
+        Spawner spawner = spawners.get(random.nextInt(spawners.size()));
+        spawner.spawnAt(spawnTile);
     }
 }

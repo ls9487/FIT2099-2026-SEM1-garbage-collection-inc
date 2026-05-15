@@ -15,6 +15,7 @@ public class IronDoor extends Door {
 
     private static final int FIRE_DURATION = 5;
     private static final int NEARBY_RADIUS = 1;
+    private static final int SECURITY_LEVEL = 2;
 
     /**
      * Creates an iron door marked with {@code N} on facility plans.
@@ -23,19 +24,7 @@ public class IronDoor extends Door {
      * @version 1.0
      */
     public IronDoor() {
-        super('N', "Iron Door");
-    }
-
-    /**
-     * Declares the minimum clearance tier required to unlock this door.
-     *
-     * @return clearance level two
-     * @author eche0116
-     * @version 1.0
-     */
-    @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_2;
+        super('N', "Iron Door", SECURITY_LEVEL);
     }
 
     /**
@@ -49,6 +38,7 @@ public class IronDoor extends Door {
      */
     @Override
     protected String unlockSideEffects(Actor actor, GameMap map) {
+        // This will find where the door is at first.
         Location doorLocation = null;
         for (Location location : map.locationOf(actor).getNearbyLocations(NEARBY_RADIUS)) {
             if (location.getGround() == this) {
@@ -56,13 +46,13 @@ public class IronDoor extends Door {
                 break;
             }
         }
+        // Get each adjacent tile and set fire to each of them.
         if (doorLocation != null) {
             for (Location neighbour : doorLocation.getNearbyLocations(NEARBY_RADIUS)) {
-                if (neighbour.getGround().canActorEnter(actor)) {
                     neighbour.addItem(new Fire(FIRE_DURATION));
-                }
             }
         }
-        return actor + " unlocked the iron door. The mechanism overheats, igniting adjacent floor tiles.";
+        return actor + " unlocked the iron door. The mechanism overheats, igniting adjacent tiles.";
     }
+
 }

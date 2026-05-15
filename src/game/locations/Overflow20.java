@@ -6,13 +6,13 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.Slime;
 import game.actors.Undead;
 import game.grounds.Hole;
 import game.grounds.MagicCircle;
 import game.grounds.MagicCircleGroup;
 import game.items.AlienCube;
 import game.items.Flask;
+import game.spawners.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,36 +59,48 @@ public class Overflow20 extends GameMap {
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
         ));
-        decorateSpecialTiles(new MagicCircleGroup());
+
+        this.setHoles();
+        this.setMagicCircles();
+        this.setAlienCubes();
+
+        // Pre-reserve a tube location inside the starter ship (bridge corridor).
+        this.tubeLocations.add(this.at(6, 3));
     }
 
-    private void decorateSpecialTiles(MagicCircleGroup circles){
+    private void setHoles() {
+        // First, define the spawners the holes on this map can spawn.
+        List<Spawner> spawners = new ArrayList<>();
+        spawners.add(new UndeadSpawner());
+        spawners.add(new ParasiteSpawner());
+
+        this.at(28, 9).setGround(new Hole(spawners));
+    }
+
+    private void setMagicCircles() {
+        MagicCircleGroup circles = new MagicCircleGroup();
+        List<Supplier<Item>> spawnableItems = new ArrayList<>();
+        spawnableItems.add(Flask::new);
+
+        this.at(31, 5).setGround(new MagicCircle(circles, spawnableItems));
+        circles.register(this.at(31, 5));
+
+        this.at(49, 8).setGround(new MagicCircle(circles, spawnableItems));
+        circles.register(this.at(49, 8));
+
+        this.at(30, 15).setGround(new MagicCircle(circles, spawnableItems));
+        circles.register(this.at(30, 15));
+    }
+
+    private void setAlienCubes() {
         List<Supplier<Actor>> spawnableActors = new ArrayList<>();
         spawnableActors.add(Undead::new);
-        spawnableActors.add(Slime::new);
 
-        List<Supplier<Actor>> alienCubeSpawnableActors = new ArrayList<>();
-        alienCubeSpawnableActors.add(Undead::new);
+        List<Spawner>spawners = new ArrayList<>();
+        spawners.add(new UndeadSpawner());
 
-        List<Supplier<Item>> magicCircleSpawnableItems = new ArrayList<>();
-        magicCircleSpawnableItems.add(Flask::new);
-
-        for (int x : this.getXRange()) {
-            for (int y : this.getYRange()) {
-                Location here = this.at(x, y);
-                char displayChar = here.getGround().getDisplayChar();
-                if (displayChar == '◎') {
-                    here.setGround(new MagicCircle(circles, magicCircleSpawnableItems));
-                    circles.register(here);
-                } else if (displayChar == '◈') {
-                    here.addItem(new AlienCube(alienCubeSpawnableActors));
-                } else if (displayChar == 'o') {
-                    here.setGround(new Hole(spawnableActors));
-                } else if (displayChar == 'Φ') {
-                    tubeLocations.add(here);
-                }
-            }
-        }
+        this.at(43, 3).addItem(new AlienCube(spawners));
+        this.at(45, 14).addItem(new AlienCube(spawners));
     }
 
     /**

@@ -12,23 +12,13 @@ import edu.monash.fit2099.engine.positions.GameMap;
 public class AluminiumDoor extends Door {
 
     private static final int SHORT_CIRCUIT_DAMAGE = 2;
+    private static final int SECURITY_LEVEL = 1;
 
     /**
      * Creates an aluminium door using the standard facility symbol.
-     *
      */
     public AluminiumDoor() {
-        super('=', "Aluminium Door");
-    }
-
-    /**
-     * Declares the minimum clearance tier required to unlock this door.
-     *
-     * @return clearance level one
-     */
-    @Override
-    protected ClearanceLevel requiredClearance() {
-        return ClearanceLevel.LEVEL_1;
+        super('=', "Aluminium Door", SECURITY_LEVEL);
     }
 
     /**
@@ -43,4 +33,5 @@ public class AluminiumDoor extends Door {
         actor.hurt(SHORT_CIRCUIT_DAMAGE);
         return actor + " unlocked the aluminium door. Faulty wiring shocks them for " + SHORT_CIRCUIT_DAMAGE + " damage.";
     }
+
 }

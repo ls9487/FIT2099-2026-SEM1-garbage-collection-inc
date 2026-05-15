@@ -1,16 +1,15 @@
 package game.grounds;
 
-import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.items.Spawner;
+import game.spawners.Spawner;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Supplier;
 
 /**
  * Hole represents a hole on some location. Actors can't enter it, since they'll fall into it.
@@ -20,40 +19,22 @@ import java.util.function.Supplier;
  *
  * @author echu0057
  */
-public class Hole extends Ground implements Spawner {
+public class Hole extends Ground {
 
-    private final Random random = new Random();
-    // The idea is to keep the default constructors for spawnable creatures in this list.
-    private List<Supplier<Actor>> spawnableActors;
+    private static final Random random = new Random();
+    private static final double HOLE_EXPANSION_CHANCE = 0.01;
+    // Keeps a list of spawners so they can be used to spawn creatures.
+    private List<Spawner> spawners;
 
     /**
      * Constructor for the Hole class.
      * Has a cooldown of 20 turns between spawning creatures.
-     * @param spawnableActors A list of suppliers for actors (i.e. their default constructors).
+     * @param spawners A list of spawners for actors.
      */
-    public Hole(List<Supplier<Actor>> spawnableActors) {
+    public Hole(List<Spawner> spawners) {
         super('o', "Hole");
-        this.spawnableActors = spawnableActors;
+        this.spawners = spawners;
         this.addNewStatistic(GroundStatistics.COOLDOWN, new BaseStatistic(20));
-    }
-
-    /**
-     * Spawns an actor based on what this hole can spawn. Chooses randomly.
-     * To be used internally within this class only.
-     */
-    public void spawn(Location location) {
-        // Make sure the list is non-empty and location is unoccupied. Does nothing if empty.
-        if (!spawnableActors.isEmpty() && !location.containsAnActor()) {
-            // Choose a random index of the list, create the actor based on it.
-            Actor spawnedActor = getRamdomSpawnableActor(spawnableActors, random);
-            // Then, place the actor onto the map.
-            // Because addActor could throw an exception, IntelliJ requires me to do this...
-            try {
-                location.addActor(spawnedActor);
-            } catch (GameEngineException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     /**
@@ -66,9 +47,44 @@ public class Hole extends Ground implements Spawner {
         // Check if it's ready to spawn a creature.
         if (this.getStatistic(GroundStatistics.COOLDOWN) == 0) {
             this.spawn(location);
-            // Reset cooldown.
+            // Regardless of the outcome, reset cooldown.
             this.modifyStatistic(GroundStatistics.COOLDOWN, StatisticOperations.UPDATE,
                     this.getMaximumStatistic(GroundStatistics.COOLDOWN));
+        }
+    }
+
+    /**
+     * Randomly chooses an actor to be spawned (based on what it can spawn).
+     * The actor will try to be spawned directly on this hole (like in A1).
+     * To be used internally within this class only.
+     * @param location The location of the hole.
+     */
+    private void spawn(Location location) {
+        if (!location.containsAnActor()) {
+            // The hole itself is currently unoccupied. Choose a random spawner and make it spawn.
+            Spawner chosenSpawner = spawners.get(random.nextInt(spawners.size()));
+            chosenSpawner.spawnAt(location);
+            // The spawn was done, and we'll need to see if the hole expands.
+            this.expandHole(location);
+        }
+    }
+
+    /**
+     * Upon successful spawning, it has a small chance (1%) to expand.
+     * This converts an adjacent ground into a hole, inherting the same spawnable actors.
+     * To be used internally within this class only.
+     * @param location The location of the original hole.
+     */
+    private void expandHole(Location location) {
+        if (random.nextDouble() <= HOLE_EXPANSION_CHANCE) {
+            final int EXPANSION_RANGE = 1;
+            // Get the adjacent locations (no need to check for anything else).
+            // Then, randomly choose one.
+            List<Location> adjacentLocations = location.getNearbyLocations(EXPANSION_RANGE);
+            Location expandedLocation = adjacentLocations.get(random.nextInt(adjacentLocations.size()));
+            // That location's ground is now a hole with the same spawners. Note the defensive copy.
+            List<Spawner> spawnersCopy = new ArrayList<>(spawners);
+            expandedLocation.setGround(new Hole(spawnersCopy));
         }
     }
 
