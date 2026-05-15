@@ -67,8 +67,8 @@ public class EclipseNebula extends World {
 
         for (Location tubeLocation : moon99DeprecatedMap.getTubeLocations()) {
             List<Location> tubeTeleportableLocation = new ArrayList<>();
-            tubeTeleportableLocation.add(moon99DeprecatedMap.at(7, 2));
-            tubeTeleportableLocation.add(overflow20Map.at(3, 3));
+            tubeTeleportableLocation.add(moon99DeprecatedMap.at(6, 3));
+            tubeTeleportableLocation.add(overflow20Map.at(6, 3));
             tubeLocation.setGround(new TeleportationTube(tubeTeleportableLocation));
         }
 
@@ -76,7 +76,8 @@ public class EclipseNebula extends World {
             List<Location> tubeTeleportableLocation = new ArrayList<>();
             tubeTeleportableLocation.add(overflow20Map.at(10, 15));
             tubeTeleportableLocation.add(overflow20Map.at(30, 4));
-            tubeTeleportableLocation.add(moon99DeprecatedMap.at(7, 2));
+            tubeTeleportableLocation.add(overflow20Map.at(6, 3));
+            tubeTeleportableLocation.add(moon99DeprecatedMap.at(6, 3));
             tubeLocation.setGround(new TeleportationTube(tubeTeleportableLocation));
         }
 
@@ -102,8 +103,8 @@ public class EclipseNebula extends World {
          */
          //contractedWorker1.addCredits(1000);
 
-        this.addPlayer(new Muckraker(), moon99DeprecatedMap.at(10, 10));
-        this.addPlayer(new PhantasmWisp(), moon99DeprecatedMap.at(11, 11));
+        moon99DeprecatedMap.at(10, 10).addActor(new Muckraker());
+        moon99DeprecatedMap.at(11, 11).addActor(new PhantasmWisp());
     }
 
     /**

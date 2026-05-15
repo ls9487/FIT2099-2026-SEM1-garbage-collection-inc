@@ -44,7 +44,6 @@ public class TeleportationTube extends Ground implements Teleporter {
         String malfunctionsMessage = "";
 
         if (random.nextDouble() <= MALFUNCTION_CHANCE) {
-            malfunctionsMessage = ".. that doesn't seem right. The teleporter malfunctioned!";
             // Malfunction happened. Get all locations of the original destination's map.
             // Then, choose a random location from all locations that the actor can enter.
             List<Location> candidates = new ArrayList<>();
@@ -58,6 +57,7 @@ public class TeleportationTube extends Ground implements Teleporter {
             }
             // Due to the malfunction, the actual destination has changed.
             finalDestination = candidates.get(random.nextInt(candidates.size()));
+            malfunctionsMessage = String.format(".. that doesn't seem right. The teleporter malfunctioned! %s was teleported to %s.", actor, finalDestination);
         }
 
         // Move the actor to the destination using the map's moveActor method.
@@ -67,7 +67,7 @@ public class TeleportationTube extends Ground implements Teleporter {
             location.addItem(new Fire(FIRE_DURATION));
         }
 
-        return String.format("%s was teleported to %s by %s.%s", actor, finalDestination,
+        return String.format("%s was teleported to %s by %s.%s", actor, destination,
                 this, malfunctionsMessage);
     }
 
@@ -84,7 +84,8 @@ public class TeleportationTube extends Ground implements Teleporter {
         ActionList actions = super.allowableActions(actor, location, direction);
 
         for (Location destination : destinations) {
-            actions.add(new TeleportAction(this, destination));
+            if (!destination.containsAnActor())
+                actions.add(new TeleportAction(this, destination));
         }
         return actions;
     }
