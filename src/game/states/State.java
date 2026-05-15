@@ -97,9 +97,9 @@ public abstract class State {
             if (!item.hasAbility(ItemAbility.PORTABLE)) continue;
 
             int itemValue = item.asCapability(Sellable.class)
-                    .map(s -> s.sellPrice(actor)) // If sellable, get sell price
+                    .map(Sellable::getSellPrice) // If sellable, get sell price
                     .orElseGet(() -> item.asCapability(Buyable.class)
-                            .map(b -> b.buyPrice(actor)) // Otherwise, if buyable, get buy price
+                            .map(Buyable::getBuyPrice) // Otherwise, if buyable, get buy price
                             .orElse(0)); // Default to 0 if neither
 
             if (valuableItemOperations == ValuableItemOperations.MOST) {
