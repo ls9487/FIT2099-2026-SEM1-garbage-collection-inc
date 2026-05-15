@@ -17,14 +17,47 @@ import java.util.Random;
  * @author echu0057
  */
 public class Lantern extends EclipseItem implements Sellable {
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 7;
+
+    /** Map display symbol for this lantern. */
+    private static final char SYMBOL = '&';
+
+    /** Oil units a fresh lantern holds (stored as DURABILITY). */
+    private static final int INITIAL_OIL = 10;
+
+    /** Credits paid per remaining oil unit on sale. */
+    private static final int CREDITS_PER_OIL = 5;
+
+    /** Per-turn chance, while carried, of leaking fuel onto the carrier's tile. */
+    private static final double LEAK_CHANCE = 0.05;
+
+    /** Oil consumed by a single leak event. */
+    private static final int LEAK_OIL_COST = 1;
+
+    /** Chance the seller catches a burn when the lantern is sold. */
+    private static final double SELLER_BURN_CHANCE = 0.50;
+
+    /** Chance fire spawns on every adjacent tile when the lantern is sold. */
+    private static final double ADJACENT_FIRE_CHANCE = 0.25;
+
+    /** Burn-status duration applied to a torched seller. */
+    private static final int SELLER_BURN_DURATION = 3;
+
+    /** Burn-status damage per turn applied to a torched seller. */
+    private static final int SELLER_BURN_DAMAGE = 2;
+
+    /** Duration (in turns) of any Fire this lantern spawns. */
     private static final int FIRE_DURATION = 5;
+
     /**
      * Constructor for the Lantern class.
      * Has a weight of 7 units, and an oil fuel (as durability) of 10 units.
      */
     public Lantern() {
-        super("Lantern", '&', 7);
-        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(10));
+        super("Lantern", SYMBOL, WEIGHT);
+        this.addNewStatistic(ItemStatistics.DURABILITY, new BaseStatistic(INITIAL_OIL));
     }
 
     /**
@@ -35,9 +68,9 @@ public class Lantern extends EclipseItem implements Sellable {
      */
     @Override
     public void tick(Location currentLocation, Actor actor) {
-        // Need to have non-zero durability, and a 5% chance check to leak.
-        if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && Math.random() <= 0.05) {
-            this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+        // Need to have non-zero durability, and the leak chance check.
+        if (this.getStatistic(ItemStatistics.DURABILITY) > 0 && Math.random() <= LEAK_CHANCE) {
+            this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, LEAK_OIL_COST);
             // Create fire on currentLocation.
             currentLocation.addItem(new Fire(FIRE_DURATION));
         }
@@ -52,7 +85,7 @@ public class Lantern extends EclipseItem implements Sellable {
      */
     @Override
     public int sellPrice(Actor seller) {
-        return 5 * this.getStatistic(ItemStatistics.DURABILITY);
+        return CREDITS_PER_OIL * this.getStatistic(ItemStatistics.DURABILITY);
     }
 
     /**
@@ -68,15 +101,17 @@ public class Lantern extends EclipseItem implements Sellable {
         int price = sellPrice(seller);
         StringBuilder msg = new StringBuilder(seller + " sells the lantern for " + price + " credits.");
 
-        if (random.nextDouble() < 0.50) {
+        if (random.nextDouble() < SELLER_BURN_CHANCE) {
             Flammable flammable = seller.asCapability(Flammable.class).orElse(null);
             if (flammable != null) {
-                seller.addStatus(new BurnStatus(3, 2, flammable));
+                seller.addStatus(new BurnStatus(SELLER_BURN_DURATION, SELLER_BURN_DAMAGE, flammable));
             }
-            msg.append(" The fuel sloshes and burns ").append(seller).append(" (2 dmg, 3 turns).");
+            msg.append(" The fuel sloshes and burns ").append(seller).append(" (")
+               .append(SELLER_BURN_DAMAGE).append(" dmg, ")
+               .append(SELLER_BURN_DURATION).append(" turns).");
         }
 
-        if (random.nextDouble() < 0.25) {
+        if (random.nextDouble() < ADJACENT_FIRE_CHANCE) {
             for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
                 adjacent.addItem(new Fire(FIRE_DURATION));
             }

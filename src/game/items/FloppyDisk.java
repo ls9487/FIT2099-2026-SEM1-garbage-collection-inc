@@ -16,12 +16,27 @@ import java.util.Random;
  */
 public class FloppyDisk extends EclipseItem implements Sellable {
 
+    /** Credit value paid by the SuperComputer on sale. */
+    private static final int SELL_PRICE = 1;
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 1;
+
+    /** Map display symbol for this disk. */
+    private static final char SYMBOL = '⊟';
+
+    /** Chance the SuperComputer glitches and reclaims credits after paying out. */
+    private static final double GLITCH_CHANCE = 0.5;
+
+    /** Credits the SuperComputer reclaims on a glitch. */
+    private static final int GLITCH_DEDUCTION = 50;
+
     /**
      * Constructor for the FloppyDisk class.
      * Has a weight of 1 unit.
      */
     public FloppyDisk() {
-        super("Floppy Disk", '⊟', 1);
+        super("Floppy Disk", SYMBOL, WEIGHT);
     }
 
     private final Random random = new Random();
@@ -32,7 +47,7 @@ public class FloppyDisk extends EclipseItem implements Sellable {
      */
     @Override
     public int sellPrice(Actor seller) {
-        return 1;
+        return SELL_PRICE;
     }
 
     /**
@@ -43,11 +58,12 @@ public class FloppyDisk extends EclipseItem implements Sellable {
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for 1 credit.");
+        StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for "
+                + SELL_PRICE + " credit.");
 
-        if (random.nextDouble() < 0.5 && seller.hasStatistic(EclipseStatistics.CREDITS)) {
-            seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, 50);
-            msg.append(" The terminal glitches and pockets 50 credits.");
+        if (random.nextDouble() < GLITCH_CHANCE && seller.hasStatistic(EclipseStatistics.CREDITS)) {
+            seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, GLITCH_DEDUCTION);
+            msg.append(" The terminal glitches and pockets ").append(GLITCH_DEDUCTION).append(" credits.");
         }
 
         seller.getInventory().remove(this);

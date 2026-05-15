@@ -18,6 +18,15 @@ import java.util.Random;
  */
 public class SterilisationBox extends EclipseItem implements Buyable {
 
+    /** Credit cost charged by the SuperComputer. */
+    private static final int PRICE = 750;
+
+    /** Inventory weight in units. */
+    private static final int WEIGHT = 7;
+
+    /** Map display symbol for this box. */
+    private static final char SYMBOL = '▣';
+
     private final Random random = new Random();
 
     /**
@@ -25,7 +34,7 @@ public class SterilisationBox extends EclipseItem implements Buyable {
      * Has a weight of 7 units, and possesses the STERILISER capability.
      */
     public SterilisationBox() {
-        super("Sterilisation Box", '▣', 7);
+        super("Sterilisation Box", SYMBOL, WEIGHT);
         this.enableAbility(ItemAbilities.STERILISER);
     }
 
@@ -35,7 +44,7 @@ public class SterilisationBox extends EclipseItem implements Buyable {
      */
     @Override
     public int buyPrice(Actor buyer) {
-        return 750;
+        return PRICE;
     }
 
     /**
@@ -52,7 +61,7 @@ public class SterilisationBox extends EclipseItem implements Buyable {
     public String boughtBy(Actor buyer, GameMap map) {
         StringBuilder result = new StringBuilder();
         result.append(buyer).append(" buys ").append(this)
-                .append(" for 750 credits.");
+                .append(" for ").append(PRICE).append(" credits.");
 
         // Box is added FIRST so it is eligible to be the victim, per Ed clarification.
         buyer.getInventory().add(this);
