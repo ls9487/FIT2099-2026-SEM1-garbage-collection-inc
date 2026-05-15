@@ -2,6 +2,8 @@ package game.items;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
+
 import java.util.Random;
 
 /**
@@ -11,8 +13,12 @@ import java.util.Random;
  * @author echu0057
  */
 public class CrtMonitor extends EclipseItem implements Sellable {
+    private static final Random random = new Random();
+    private static final double SHORT_CHANCE = 0.2;
     private static final int FIRE_DURATION = 5;
-    private final Random random = new Random();
+    private static final int SHORT_DAMAGE = 2;
+    private static final int SELL_HEAL = 5;
+    private static final int SELL_PRICE = 25;
 
     /**
      * Constructor for the CrtMonitor class.
@@ -27,8 +33,8 @@ public class CrtMonitor extends EclipseItem implements Sellable {
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
-        return 25;
+    public int getSellPrice() {
+        return SELL_PRICE;
     }
 
     /**
@@ -36,19 +42,26 @@ public class CrtMonitor extends EclipseItem implements Sellable {
      * down 30 units of dead weight. Then there's a 20% chance the ancient
      * hardware shorts out: 2 damage to the seller, fire on every neighbour.
      * The monitor leaves the inventory at the end of the transaction.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        seller.heal(5);
-        StringBuilder msg = new StringBuilder(seller + " sells the CRT monitor for 25 credits. Offloading it heals 5 HP.");
+        // Heal the seller.
+        seller.heal(SELL_HEAL);
+        StringBuilder msg = new StringBuilder(seller + " sells the CRT monitor for "
+                + getSellPrice() + " credits. Offloading it heals " + SELL_HEAL + " hp.");
 
-        if (random.nextDouble() < 0.20) {
-            seller.hurt(2);
-            for (var adjacent : map.locationOf(seller).getNearbyLocations(1)) {
+        // 20% chance for the terminal to short.
+        if (random.nextDouble() < SHORT_CHANCE) {
+            // If it does, deal 2 damage and ignite the surrounding locations.
+            seller.hurt(SHORT_DAMAGE);
+            for (Location adjacent : map.locationOf(seller).getNearbyLocations(1)) {
                 adjacent.addItem(new Fire(FIRE_DURATION));
             }
-            msg.append(" The terminal shorts out, dealing 2 damage and igniting the area.");
+            msg.append(" The terminal shorts out, hurting the actor and igniting the area!");
         }
 
         seller.getInventory().remove(this);

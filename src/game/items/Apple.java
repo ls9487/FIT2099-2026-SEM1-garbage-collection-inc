@@ -17,6 +17,8 @@ import game.statuses.Poisonable;
  * @author echu0057
  */
 public class Apple extends EclipseItem implements Consumable, Sellable {
+    private static final int HEAL_AMOUNT = 3;
+    private static final int SELL_PRICE = 1;
 
     /**
      * Constructor for the Apple class.
@@ -76,7 +78,7 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
         // Check if the consumer has the STERILISER ability.
         if (actor.hasAbility(ItemAbilities.STERILISER)) {
             // Heal for 3 hp.
-            actor.heal(3);
+            actor.heal(HEAL_AMOUNT);
             return actor + " eats a sterilised apple, healing them by 3 hp.";
 
         } else {
@@ -96,8 +98,8 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
      * @author esoo0013
      */
     @Override
-    public int sellPrice(Actor seller) {
-        return 1;
+    public int getSellPrice() {
+        return SELL_PRICE;
     }
 
     /**
@@ -105,20 +107,25 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
      * on the way out and nothing nasty happens. Otherwise the seller catches
      * a 2-turn poison (2 dmg/turn) from handling the spoiled fruit. The apple
      * leaves the inventory either way.
+     * @param seller The actor doing the selling.
+     * @param map The map the seller is on.
+     * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        StringBuilder msg = new StringBuilder(seller + " sells an apple for 1 credit.");
+        StringBuilder msg = new StringBuilder(seller + " sells an apple for "
+                + getSellPrice() + " credit. ");
 
         if (seller.hasAbility(ItemAbilities.STERILISER)) {
-            msg.append(" The apple is neutralised by the Sterilisation Box on its way out.");
+            msg.append("The apple is sterilised on its way out.");
         } else {
             Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
             if (poisonable != null) {
+                // Poison the poisonable actor (2 damage, lasts 2 turns).
                 seller.addStatus(new PoisonStatus(2, 2, poisonable));
             }
-            msg.append(" ").append(seller).append(" is poisoned (2 dmg, 2 turns) from handling the spoiled apple.");
+            msg.append(seller).append(" is poisoned (2 dmg, 2 turns) from handling the spoiled apple.");
         }
 
         seller.getInventory().remove(this);

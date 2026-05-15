@@ -6,11 +6,7 @@ import edu.monash.fit2099.engine.actions.DoNothingAction;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.displays.Display;
-import edu.monash.fit2099.engine.items.DropAction;
-import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
-import edu.monash.fit2099.engine.positions.Location;
 import game.behaviours.ConsumeBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.inventories.BasicInventory;
@@ -21,7 +17,9 @@ import game.inventories.BasicInventory;
  *
  * @author echu0057
  */
-public class Slime extends EclipseActor implements EnvironmentalTriggerer {
+public class Slime extends EclipseActor {
+    private static final int CONSUME_BEHAVIOUR_PRIORITY = 1;
+    private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
 
     /**
      * Constructor for the Slime class. Has 25 hp.
@@ -30,8 +28,8 @@ public class Slime extends EclipseActor implements EnvironmentalTriggerer {
     public Slime() {
         super("Slime", '⍾', 25, new BasicInventory());
         this.enableAbility(ActorAbilities.DIRECT_CONSUMER);
-        this.addNewBehaviour(1, new ConsumeBehaviour());
-        this.addNewBehaviour(999, new WanderBehaviour());
+        this.addNewBehaviour(CONSUME_BEHAVIOUR_PRIORITY, new ConsumeBehaviour());
+        this.addNewBehaviour(WANDER_BEHAVIOUR_PRIORITY, new WanderBehaviour());
     }
 
     /**
@@ -69,34 +67,6 @@ public class Slime extends EclipseActor implements EnvironmentalTriggerer {
         // No valid action was taken, so just do nothing.
         return new DoNothingAction();
 
-    }
-
-    /**
-     * Upon being spawned, for each actor susceptible to this effect (e.g. workers),
-     * force all items in the actor's inventory to drop onto the ground.
-     * @param location The location where the slime was spawned.
-     */
-    @Override
-    public void onSpawnEffect(Location location) {
-        // Check each adjacent location.
-        for (Exit exit : location.getExits()) {
-            Location destination = exit.getDestination();
-            // Check if there's a susceptible actor. If so, have it drop all its items.
-            if (destination.containsAnActor() &&
-                    destination.getActor().hasAbility(ActorAbilities.SLIME_EFFECT_SUSCEPTIBLE)) {
-                Actor affectedActor = destination.getActor();
-                GameMap affectedMap = destination.map();
-                // Go through all items in their inventory.
-                for (Item item : affectedActor.getInventory().getItems()) {
-                    // Note that the list of items is an unmodifiable list.
-                    // So DropActions will be created and executed on the spot.
-                    DropAction dropAction = item.getDropAction(affectedActor);
-                    if (dropAction != null) {
-                        dropAction.execute(affectedActor, affectedMap);
-                    }
-                }
-            }
-        }
     }
 
 }
