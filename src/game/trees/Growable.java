@@ -1,9 +1,7 @@
 package game.trees;
 
-
+import edu.monash.fit2099.engine.positions.Location;
 
 public interface Growable {
-    String grow();
-    Stage getStage();
-    int getTurnsGrown();
+    String grow(Location location);
 }
