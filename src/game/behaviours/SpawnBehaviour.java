@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
+import game.trees.TreeStatistics;
 import game.actors.ActorAbilities;
 import game.spawners.Spawner;
 import game.trees.Tree;
@@ -22,10 +23,12 @@ public class SpawnBehaviour implements Behaviour<Tree, Boolean> {
 
     @Override
     public Boolean operate(Tree entity, Location location) {
+        // Single-thread rule: if grow is possible this turn, don't also spawn
         int numberOfNearbyWorkers = 0;
         Actor worker = null;
 
-        for (Location destination : location.getNearbyLocations(1)) {
+        for (Exit exit : location.getExits()) {
+            Location destination = exit.getDestination();
             if (destination.containsAnActor() && destination.getActor().hasAbility(ActorAbilities.PLAYER)) {
                 numberOfNearbyWorkers++;
                 worker = destination.getActor();
@@ -44,7 +47,7 @@ public class SpawnBehaviour implements Behaviour<Tree, Boolean> {
             }
         }
 
-        for (int i = 0; numberOfNearbyWorkers > i; i++) {
+        for (int i = 0; i < numberOfNearbyWorkers && !spawnableLocations.isEmpty(); i++) {
             int chosenDestinationIndex = random.nextInt(spawnableLocations.size());
             Location destination = spawnableLocations.get(chosenDestinationIndex);
 
