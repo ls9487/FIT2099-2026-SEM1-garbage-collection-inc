@@ -61,10 +61,10 @@ public class ShadowState extends State {
      */
     @Override
     public void immediateEffect(Location location) {
-        Display display = new Display();
-
-        addNewBehaviour(FOLLOW_BEHAVIOUR_PRIORITY, new FollowBehaviour(nearestWorker(getActorVigilanceRange(), location)));
         // ranged poison for 2 round
+        addNewBehaviour(FOLLOW_BEHAVIOUR_PRIORITY, new FollowBehaviour(nearestWorker(getActorVigilanceRange(), location)));
+
+        Display display = new Display();
         for (Location target : location.getNearbyLocations(getActorVigilanceRange())) {
             if (target.containsAnActor()) {
                 Actor actorNearby = target.getActor();
