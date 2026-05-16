@@ -120,6 +120,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
     public String soldBy(Actor seller, GameMap map) {
         Location origin = map.locationOf(seller);
         spawn(origin);
+        seller.getInventory().remove(this);
         return "An Undead claws its way into reality beside " + seller + ".";
     }
 
