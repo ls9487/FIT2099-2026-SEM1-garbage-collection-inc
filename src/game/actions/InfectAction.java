@@ -47,7 +47,7 @@ public class InfectAction extends Action {
             // Infect the target since it can be infected.
             target.addStatus(new InfectStatus(infectable));
             // Cause the infector's effect to itself when it infects something.
-            String infectorResult = infector.infectingSelfEffect();
+            String infectorResult = infector.infectingSelfEffect(map);
 
             return String.format("%s parasitically infects %s! %s",
                     infector, target, infectorResult);

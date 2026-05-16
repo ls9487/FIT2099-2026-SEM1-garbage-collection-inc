@@ -41,16 +41,6 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
     }
 
     /**
-     * get random spawnable actor from all spawnable actors
-     * @param spawnableActors the spawnable actors to randomly pick 1
-     * @param random used to random pick spawnable actors
-     * @return chosen spawnable actor
-     */
-    private Actor getRamdomSpawnableActor(List<Supplier<Actor>> spawnableActors, Random random) {
-        return spawnableActors.get(random.nextInt(spawnableActors.size())).get();
-    }
-
-    /**
      * Offers up to three teleport options within the current map while the cube
      * is carried in the inventory.
      *
@@ -135,26 +125,24 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
 
     /**
      * Spawns a single Undead on a random adjacent empty tile.
-     *
+     * To be used internally within this class only.
      * @param spawnLocation the reference location, usually the seller's tile
      */
-    public void spawn(Location spawnLocation) {
+    private void spawn(Location spawnLocation) {
         List<Location> candidates = new ArrayList<>();
 
-        // Choose a random index of the list, create the actor based on it.
-
+        // Get all the adjacent locations.
         for (Exit exit : spawnLocation.getExits()) {
             Location destination = exit.getDestination();
-            if (!destination.containsAnActor() && destination.getGround().canActorEnter(new Undead())) {
+            if (!destination.containsAnActor()) {
                 candidates.add(destination);
             }
         }
-        if (candidates.isEmpty()) {
-            return;
+        // Then, choose a random location and attempt a spawn on there.
+        if (!candidates.isEmpty()) {
+            Location spawnTile = candidates.get(random.nextInt(candidates.size()));
+            Spawner spawner = spawners.get(random.nextInt(spawners.size()));
+            spawner.spawnAt(spawnTile);
         }
-
-        Location spawnTile = candidates.get(random.nextInt(candidates.size()));
-        Spawner spawner = spawners.get(random.nextInt(spawners.size()));
-        spawner.spawnAt(spawnTile);
     }
 }

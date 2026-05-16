@@ -41,8 +41,8 @@ public class Undead extends EclipseActor implements Infectable {
      */
     @Override
     public void infection(Location location) {
-        // Damage equal to max hp guarantees killing it.
-        this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
+        // Make the undead unconscious (instant kill).
+        this.unconscious(location.map());
     }
 
 }
