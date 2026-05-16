@@ -125,6 +125,11 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
             return new DoNothingAction();
         }
 
+        // if actor is stunned their turns are skipped
+        if (hasStatus(StunStatus.class)) {
+            return new DoNothingAction();
+        }
+
         // Handle multi-turn Actions.
         if (lastAction != null && lastAction.getNextAction() != null)
             return lastAction.getNextAction();
