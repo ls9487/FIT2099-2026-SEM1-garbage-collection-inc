@@ -62,7 +62,8 @@ public class HoardingState extends State {
 
         // drops the least valuable item from inventory
         Item item = getValuableItem(getStatefulCreature(), ValuableItemOperations.LEAST);
-        getStatefulCreature().getInventory().getItems().remove(item);
+        if (item == null) return;
+        getStatefulCreature().getInventory().remove(item);
         location.addItem(item);
 
         display.println(String.format("%s throw %s on ground", getStatefulCreature(), item));

@@ -40,12 +40,15 @@ public class LureState extends State {
      */
     @Override
     public Emotion transition(Actor actor, GameMap map) {
-        if(workerNumber(SURROUNDING, map.locationOf(actor)) == ONE_WORKER) {
-            return Emotion.CAUTION;
-        } else if (workerNumber(getActorVigilanceRange(), map.locationOf(actor)) == ONE_WORKER) {
-            return Emotion.CURIOUS;
-        } else if (workerNumber(getActorVigilanceRange(), map.locationOf(actor)) > ONE_WORKER) {
+        int workersInRange = workerNumber(getActorVigilanceRange(), map.locationOf(actor));
+        int workersAdjacent = workerNumber(SURROUNDING, map.locationOf(actor));
+
+        if (workersInRange > 1) {
             return Emotion.FEARFUL;
+        } else if (workersAdjacent == ONE_WORKER) {
+            return Emotion.CURIOUS;
+        } else if (workersInRange == ONE_WORKER && workersAdjacent == 0) {
+            return Emotion.CAUTION;
         } else {
             return Emotion.MISCHIEVOUS;
         }

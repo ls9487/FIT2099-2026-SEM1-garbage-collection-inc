@@ -64,7 +64,8 @@ public class FleeState extends State {
         // all player within vigilance range forced to drop most valuable item (not locked)
         for (Actor actor : workerTargeted(getActorVigilanceRange(), location)) {
             Item item = getValuableItem(actor, ValuableItemOperations.MOST);
-            actor.getInventory().getItems().remove(item);
+            if (item == null) continue;
+            actor.getInventory().remove(item);
             location.map().locationOf(actor).addItem(item);
             display.println(String.format("%s drops %s's %s", getStatefulCreature(), actor, item));
         }
