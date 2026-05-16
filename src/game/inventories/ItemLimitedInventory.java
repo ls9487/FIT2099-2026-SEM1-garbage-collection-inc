@@ -4,10 +4,20 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
 
+/**
+ * Inventory capped by item count rather than weight.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 public class ItemLimitedInventory extends Inventory {
     private final int itemNumberLimit;
     private int itemNumber;
 
+    /**
+     * constructor
+     * @param itemNumberLimit maximum number of distinct items that may be held
+     */
     public ItemLimitedInventory(int itemNumberLimit) {
         this.itemNumberLimit = itemNumberLimit;
         this.itemNumber = 0;

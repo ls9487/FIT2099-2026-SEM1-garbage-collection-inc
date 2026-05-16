@@ -12,15 +12,29 @@ import game.trees.Tree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+/**
+ * Spawns creatures on adjacent walkable tiles when a worker stands beside the tree.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 public class SpawnBehaviour implements Behaviour<Tree, Boolean> {
     private static final Random random = new Random();
     private List<Spawner> spawners;
 
+    /**
+     * @param spawners pool used to create each spawned actor
+     */
     public SpawnBehaviour(List<Spawner> spawners) {
         this.spawners = spawners;
     }
 
+    /**
+     * Spawns creatures on adjacent walkable tiles when a worker stands beside the tree.
+     * @param entity   the tree performing the behaviour
+     * @param location the tree's tile
+     * @return TRUE when spawns occurred, FALSE when no worker is adjacent, or null if not applicable
+     */
     @Override
     public Boolean operate(Tree entity, Location location) {
         

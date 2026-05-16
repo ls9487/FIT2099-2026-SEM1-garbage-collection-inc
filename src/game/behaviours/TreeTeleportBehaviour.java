@@ -12,14 +12,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Teleports each adjacent worker to a random walkable tile on the map (mature warper tree).
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 public class TreeTeleportBehaviour implements Behaviour<Tree, Boolean> {
     private static final Random random = new Random();
     private final Teleporter teleporter;
 
+    /**
+     * constructor
+     * @param teleporter handler that relocates workers
+     */
     public TreeTeleportBehaviour(Teleporter teleporter) {
         this.teleporter = teleporter;
     }
 
+    /**
+     * Teleports each adjacent worker to a random walkable tile on the map.
+     * @param tree     the tree performing the behaviour
+     * @param location the tree's tile
+     * @return {@link Boolean#TRUE} when at least one worker was teleported, {@link Boolean#FALSE} otherwise
+     */
     @Override
     public Boolean operate(Tree tree, Location location) {
         List<Actor> nearbyWorkers = new ArrayList<>();

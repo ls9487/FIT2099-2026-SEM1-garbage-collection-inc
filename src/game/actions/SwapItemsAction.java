@@ -6,12 +6,24 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 
+/**
+ * Exchanges two portable items between two ground locations.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 public class SwapItemsAction extends Action {
     private Item itemFrom;
     private Location from;
     private Item itemTo;
     private Location to;
 
+    /**
+     * @param itemFrom item taken from
+     * @param from     source tile
+     * @param itemTo   item taken from
+     * @param to       destination tile
+     */
     public SwapItemsAction(Item itemFrom, Location from, Item itemTo, Location to) {
         this.itemFrom = itemFrom;
         this.from = from;
