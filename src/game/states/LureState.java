@@ -43,11 +43,11 @@ public class LureState extends State {
         int workersInRange = workerNumber(getActorVigilanceRange(), map.locationOf(actor));
         int workersAdjacent = workerNumber(SURROUNDING, map.locationOf(actor));
 
-        if (workersInRange > 1) {
+        if (workersInRange > ONE_WORKER) {
             return Emotion.FEARFUL;
         } else if (workersAdjacent == ONE_WORKER) {
             return Emotion.CURIOUS;
-        } else if (workersInRange == ONE_WORKER && workersAdjacent == 0) {
+        } else if (workersInRange == ONE_WORKER && !workerDetection(getActorVigilanceRange(), map.locationOf(actor))) {
             return Emotion.CAUTION;
         } else {
             return Emotion.MISCHIEVOUS;
