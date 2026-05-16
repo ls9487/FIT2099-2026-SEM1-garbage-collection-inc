@@ -1,8 +1,7 @@
 package game.statuses;
 
 /**
- * Flammable is an interface for entities that can be burned.
- * The mars example was used as a reference.
+ * Stunnable is an interface for entities that can be stunned.
  *
  * @author lyan0121
  * @version 1.0
@@ -10,7 +9,7 @@ package game.statuses;
 public interface Stunnable {
 
     /**
-     * This method will handle the logic for being burned, like taking damage.
+     * This method will handle the logic for being stunned, like taking damage.
      */
     public void stun(int damage);
 }
