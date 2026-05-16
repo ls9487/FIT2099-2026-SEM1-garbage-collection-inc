@@ -147,14 +147,13 @@ public class FirstAidKit extends EclipseItem implements Consumable, Buyable {
 
     /**
      * Trying to buy this WITHOUT the funds UPSETS the SuperComputer enough
-     * to kill the worker on the spot. We hurt them by their full current HP
-     * so they basically drop to 0 regardless of how much they had left.
+     * to kill the worker on the spot.
      * @author esoo0013
      */
     @Override
     public String cannotAfford(Actor buyer, GameMap map) {
-        int currentHp = buyer.getStatistic(ActorStatistics.HEALTH);
-        buyer.hurt(currentHp);
+        // Unconscious method to kill the buyer immediately.
+        buyer.unconscious(map);
         return "The Supercomputer is enraged by the audacity. " + buyer + " is killed on the spot.";
     }
 

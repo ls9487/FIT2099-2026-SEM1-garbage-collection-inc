@@ -13,7 +13,6 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
-import game.items.ItemStatistics;
 import game.spawners.ParasiteSpawner;
 import game.spawners.Spawner;
 import game.statuses.Infectable;
@@ -118,18 +117,16 @@ public class ContractedWorker extends EclipseActor implements Infectable {
      */
     @Override
     public void infection(Location location) {
-        final int INFECTION_DAMAGE = 1;
-        final int TICKS_INTERVAL = 5;
-        // Deal damage to the infected worker.
-        this.hurt(INFECTION_DAMAGE);
+        final int infectionDamage = 1;
+        final int ticksInterval = 5;
         // If this worker doesn't have it already, add this statistic to keep track
         // of the ticks left before spawning a parasite.
         if (!this.hasStatistic(EclipseStatistics.INFECTION_PROGRESS)) {
             this.addNewStatistic(EclipseStatistics.INFECTION_PROGRESS,
-                    new BaseStatistic(TICKS_INTERVAL));
+                    new BaseStatistic(ticksInterval));
         }
         // Deal damage to the infected worker and tick down the progress.
-        this.hurt(INFECTION_DAMAGE);
+        this.hurt(infectionDamage);
         this.modifyStatistic(EclipseStatistics.INFECTION_PROGRESS, StatisticOperations.DECREASE, 1);
         // If the progress reached 0, spawn a new parasite.
         if (this.getStatistic(EclipseStatistics.INFECTION_PROGRESS) <= 0) {

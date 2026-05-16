@@ -75,12 +75,13 @@ public class Parasite extends EclipseActor implements Infector {
     /**
      * Kills the parasite immediately when it infects something.
      * Because the parasite lives inside the infected thing now, rather than existing on its own.
+     * @param map The map where the infection took place.
      * @return A String description of what happens to itself, which is dying.
      */
     @Override
-    public String infectingSelfEffect() {
-        // Do damage equal to the parasite's max hp (instantly killing it).
-        this.hurt(this.getMaximumStatistic(ActorStatistics.HEALTH));
+    public String infectingSelfEffect(GameMap map) {
+        // Make the parasite unconscious (instant kill).
+        this.unconscious(map);
         return String.format("%s dies as a result.", this);
     }
 
