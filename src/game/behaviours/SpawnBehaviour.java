@@ -23,13 +23,14 @@ public class SpawnBehaviour implements Behaviour<Tree, Boolean> {
 
     @Override
     public Boolean operate(Tree entity, Location location) {
+        
         // Single-thread rule: if grow is possible this turn, don't also spawn
         int numberOfNearbyWorkers = 0;
         Actor worker = null;
 
-        for (Exit exit : location.getExits()) {
-            Location destination = exit.getDestination();
-            if (destination.containsAnActor() && destination.getActor().hasAbility(ActorAbilities.PLAYER)) {
+        for (Location destination : location.getNearbyLocations(1)) {
+
+            if (destination.containsAnActor() && destination.getActor().hasAbility(ActorAbilities.TREE_ACTIVATOR)) {
                 numberOfNearbyWorkers++;
                 worker = destination.getActor();
             }
