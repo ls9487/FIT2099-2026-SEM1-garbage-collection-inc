@@ -47,7 +47,7 @@ public class LureState extends State {
             return Emotion.FEARFUL;
         } else if (workersAdjacent == ONE_WORKER) {
             return Emotion.CURIOUS;
-        } else if (workersInRange == ONE_WORKER && !workerDetection(getActorVigilanceRange(), map.locationOf(actor))) {
+        } else if (workersInRange == ONE_WORKER && !workerDetection(SURROUNDING, map.locationOf(actor))) {
             return Emotion.CAUTION;
         } else {
             return Emotion.MISCHIEVOUS;
