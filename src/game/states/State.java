@@ -120,8 +120,15 @@ public abstract class State {
     }
 
     protected void dragItemOnGround(int radius, Location location, DragItemOperations dragItemOperations) {
+        // Snapshot all (item, from, to) moves first, then apply — prevents double-pushing
+        // items that land in a tile that is also within the iteration range.
+        List<Item> movedItems = new java.util.ArrayList<>();
+        List<Location> fromLocations = new java.util.ArrayList<>();
+        List<Location> toLocations = new java.util.ArrayList<>();
+
         for (Location here : location.getNearbyLocations(radius)) {
-            for (Item item : here.getItems()) {
+            List<Item> itemsCopy = new java.util.ArrayList<>(here.getItems());
+            for (Item item : itemsCopy) {
                 if (!item.hasAbility(ItemAbility.PORTABLE)) continue;
 
                 int newX = here.x() + Integer.signum(dragItemOperations == DragItemOperations.PUSH ? here.x() - location.x() : location.x() - here.x());
@@ -129,12 +136,16 @@ public abstract class State {
                 if (!location.map().getXRange().contains(newX) || !location.map().getYRange().contains(newY)) {
                     continue;
                 }
-                Location destination = location.map().at(newX, newY);
-                here.removeItem(item);
-                destination.addItem(item);
+                movedItems.add(item);
+                fromLocations.add(here);
+                toLocations.add(location.map().at(newX, newY));
             }
         }
 
+        for (int i = 0; i < movedItems.size(); i++) {
+            fromLocations.get(i).removeItem(movedItems.get(i));
+            toLocations.get(i).addItem(movedItems.get(i));
+        }
     }
     /**
      * Compute the Manhattan distance between two locations.
