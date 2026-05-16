@@ -9,12 +9,21 @@ import game.spawners.Spawner;
 
 import java.util.List;
 
+/**
+ * Initial fleshy tree stage; may grow into a sapling or spawn creatures when workers are adjacent.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 public class FleshyTreeSprout extends Tree implements Growable {
     private static final char DISPLAY_CHAR = 'y';
     private static final String NAME = "Fleshy Tree Sprout";
     private static final int GROW_BEHAVIOUR_PRIORITY = 1;
     private static final int SPAWN_BEHAVIOUR_PRIORITY = 2;
 
+    /**
+     * @param spawners creatures spawned when workers stand beside this sprout
+     */
     public FleshyTreeSprout(List<Spawner> spawners) {
         super(DISPLAY_CHAR, NAME);
         addNewBehaviour(GROW_BEHAVIOUR_PRIORITY, new GrowBehaviour(this));
@@ -24,12 +33,23 @@ public class FleshyTreeSprout extends Tree implements Growable {
         modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.UPDATE, 0);
     }
 
+    /**
+     * Runs behaviours until one returns TRUE
+     *
+     * @param location this tree's tile
+     */
     @Override
     public void tick(Location location) {
-        super.tick(location);
         modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.INCREASE, 1);
+        super.tick(location);
     }
 
+    /**
+     * Replaces this tree's ground at location with the next growth stage.
+     *
+     * @param location tile occupied by this tree
+     * @return description of the growth event
+     */
     @Override
     public String grow(Location location) {
         location.setGround(new FleshyTreeSapling());

@@ -16,11 +16,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+/**
+ * Base class for creature emotional states. Each state owns prioritized behaviours,
+ * worker-detection helpers, and hooks for emotion transitions and transition effects.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 public abstract class State {
     private TreeMap<Integer, Behaviour<Actor, Action>> behaviours;
     private final StatefulCreature statefulCreature;
 
-
+    /**
+     * Creates a state bound to the creature that owns it.
+     *
+     * @param statefulCreature the actor whose emotion this state represents
+     */
     public State(StatefulCreature statefulCreature) {
         this.statefulCreature = statefulCreature;
         behaviours = new TreeMap<>();
@@ -35,33 +46,77 @@ public abstract class State {
         this.behaviours.put(priority, behaviour);
     }
 
+    /**
+     * Returns behaviours for this state in priority order.
+     *
+     * @return unmodifiable view of registered behaviours
+     */
     public List<Behaviour<Actor, Action>> stateBehaviourAction() {
         return new ArrayList<>(behaviours.values());
     }
 
+    /**
+     * getter.
+     * @return true when the owning creature cannot hold more portable items
+     */
     protected boolean isActorInventoryFull() {
         return statefulCreature.isInventoryFull();
     }
 
+    /**
+     * getter.
+     * @return the owning creature's worker-detection radius
+     */
     protected int getActorVigilanceRange() {
         return statefulCreature.getVigilanceRange();
     }
 
+    /**
+     * @return the actor this state belongs to
+     */
     protected Actor getStatefulCreature() {
         return statefulCreature;
     }
 
+    /**
+     * Chooses the emotion to enter after this turn's logic.
+     *
+     * @param actor the creature in this state
+     * @param map   the map the creature occupies
+     * @return the emotion for the next turn
+     */
     public abstract Emotion transition(Actor actor, GameMap map);
+
+    /**
+     * Applies a one-shot effect when entering this state.
+     *
+     * @param location tile occupied by the creature at transition time
+     */
     public abstract void immediateEffect(Location location);
 
+    /**
+     * @param radius   Manhattan distance to search
+     * @param location centre of the search
+     * @return true when at least one worker lies within radius
+     */
     protected boolean workerDetection(int radius, Location location) {
         return workerNumber(radius, location) > 0;
     }
 
+    /**
+     * @param radius   Manhattan distance to search
+     * @param location centre of the search
+     * @return number of workers within radius
+     */
     protected int workerNumber(int radius, Location location) {
         return workerTargeted(radius, location).size();
     }
 
+    /**
+     * @param radius   Manhattan distance to search
+     * @param location centre of the search
+     * @return workers within radius of location
+     */
     protected List<Actor> workerTargeted(int radius, Location location) {
         List<Actor> targetedWorker = new ArrayList<>();
         for (Location target : location.getNearbyLocations(radius)) {
@@ -72,6 +127,11 @@ public abstract class State {
         return targetedWorker;
     }
 
+    /**
+     * @param radius   Manhattan distance to search
+     * @param location centre of the search
+     * @return closest worker within radius, or null if none
+     */
     protected Actor nearestWorker(int radius, Location location) {
         List<Actor> targetedWorkers = workerTargeted(radius, location);
         int nearestWorkerDistance = Integer.MAX_VALUE;
@@ -88,6 +148,13 @@ public abstract class State {
         return nearestWorker;
     }
 
+    /**
+     * Selects the most or least valuable portable item in an actor's inventory.
+     *
+     * @param actor                   inventory owner
+     * @param valuableItemOperations  whether to pick highest or lowest value
+     * @return the chosen item, or null if none qualify
+     */
     protected Item getValuableItem(Actor actor, ValuableItemOperations valuableItemOperations) {
         int bestItemValue =
                 valuableItemOperations == ValuableItemOperations.MOST ?
@@ -119,9 +186,23 @@ public abstract class State {
         return bestItem;
     }
 
+    /**
+     * Shifts portable ground items within radius one tile toward or away from location.
+     *
+     * @param radius              Manhattan distance to affect
+     * @param location            origin used for push/pull direction
+     * @param dragItemOperations  pull toward or push away from location
+     */
     protected void dragItemOnGround(int radius, Location location, DragItemOperations dragItemOperations) {
+        // Snapshot all (item, from, to) moves first, then apply — prevents double-pushing
+        // items that land in a tile that is also within the iteration range.
+        List<Item> movedItems = new java.util.ArrayList<>();
+        List<Location> fromLocations = new java.util.ArrayList<>();
+        List<Location> toLocations = new java.util.ArrayList<>();
+
         for (Location here : location.getNearbyLocations(radius)) {
-            for (Item item : here.getItems()) {
+            List<Item> itemsCopy = new java.util.ArrayList<>(here.getItems());
+            for (Item item : itemsCopy) {
                 if (!item.hasAbility(ItemAbility.PORTABLE)) continue;
 
                 int newX = here.x() + Integer.signum(dragItemOperations == DragItemOperations.PUSH ? here.x() - location.x() : location.x() - here.x());
@@ -129,18 +210,22 @@ public abstract class State {
                 if (!location.map().getXRange().contains(newX) || !location.map().getYRange().contains(newY)) {
                     continue;
                 }
-                Location destination = location.map().at(newX, newY);
-                here.removeItem(item);
-                destination.addItem(item);
+                movedItems.add(item);
+                fromLocations.add(here);
+                toLocations.add(location.map().at(newX, newY));
             }
         }
 
+        for (int i = 0; i < movedItems.size(); i++) {
+            fromLocations.get(i).removeItem(movedItems.get(i));
+            toLocations.get(i).addItem(movedItems.get(i));
+        }
     }
     /**
      * Compute the Manhattan distance between two locations.
      *
      * @param a the first location
-     * @param b the first location
+     * @param b the second location
      * @return the number of steps between a and b if you only move in the four cardinal directions.
      */
     private int distance(Location a, Location b) {

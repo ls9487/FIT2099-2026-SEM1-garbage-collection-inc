@@ -13,32 +13,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Teleports the acting creature to a random walkable tile within range (wisp self-teleport).
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 public class TeleportBehaviour implements Behaviour<Actor, Action> {
     private static final Random random = new Random();
     private final int teleportRange;
     private final Teleporter teleporter;
 
+    /**
+     * constructor
+     * @param teleportRange maximum Chebyshev distance for destination selection
+     * @param teleporter    handler that performs the relocation
+     */
     public TeleportBehaviour(int teleportRange, Teleporter teleporter) {
         this.teleportRange = teleportRange;
         this.teleporter = teleporter;
     }
     /**
-     * A Behaviour represents a kind of objective that an entity can have.  For example
-     * it might want to seek out a particular kind of object, or follow another entity,
-     * or run away and hide.  Each implementation of Behaviour helps the
-     * entity to achieve its objective (returning a result or null if no useful result are available).
-     * method that determines which Behaviour to perform.  This allows the Behaviour's logic
-     * to be reused in other Actors via delegation instead of inheritance.
-     * For example, an Actor(entity T)'s {@code playTurn()} method can use Behaviours to help decide which Action(result R) to
-     * perform next.  It can also simply create Actions itself, and for simpler Actors this is
-     * likely to be sufficient.
-     * Using Behaviours allows us to modularise the code that decides what to do, and that means that it can be
-     * reused if (e.g.) more than one kind of Actor needs to be able to seek, follow, or hide.
+     * Teleports the acting creature to a random walkable tile within range (wisp self-teleport).
      *
-     * @param actor   The entity performing the behaviour
-     * @param location The location of the current entity
-     * @return The result of the behaviour, or null if no valid operation could be performed
-     * @author Riordan D. Alfredo
+     * @param actor    the entity performing the behaviour
+     * @param location the entity's current tile
+     * @return a TeleportAction, or null when no worker or destination exists
      */
     @Override
     public Action operate(Actor actor, Location location) {
@@ -78,7 +78,7 @@ public class TeleportBehaviour implements Behaviour<Actor, Action> {
      * Compute the Manhattan distance between two locations.
      *
      * @param a the first location
-     * @param b the first location
+     * @param b the second location
      * @return the number of steps between a and b if you only move in the four cardinal directions.
      */
     private int distance(Location a, Location b) {

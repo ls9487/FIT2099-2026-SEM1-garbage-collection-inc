@@ -41,7 +41,9 @@ public class ContractedWorker extends EclipseActor implements Infectable {
      */
     public ContractedWorker(String name, char displayChar, int hitPoints, Inventory inventory) {
         super(name, displayChar, hitPoints, inventory);
+        this.enableAbility(ActorAbilities.PLAYER);
         this.enableAbility(ActorAbilities.VENT_ACTIVATOR);
+        this.enableAbility(ActorAbilities.TREE_ACTIVATOR);
         this.enableAbility(ActorAbilities.SLIME_EFFECT_SUSCEPTIBLE);
         this.enableAbility(ActorAbilities.PARASITE_EFFECT_SUSCEPTIBLE);
         // Workers start with 0 credits. The statistic itself enforces the 1000-credit cap.
@@ -128,7 +130,7 @@ public class ContractedWorker extends EclipseActor implements Infectable {
         }
         // Deal damage to the infected worker and tick down the progress.
         this.hurt(INFECTION_DAMAGE);
-        this.modifyStatistic(ItemStatistics.DURABILITY, StatisticOperations.DECREASE, 1);
+        this.modifyStatistic(EclipseStatistics.INFECTION_PROGRESS, StatisticOperations.DECREASE, 1);
         // If the progress reached 0, spawn a new parasite.
         if (this.getStatistic(EclipseStatistics.INFECTION_PROGRESS) <= 0) {
             this.infectionSpawn(location);

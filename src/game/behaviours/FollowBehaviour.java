@@ -56,7 +56,7 @@ public class FollowBehaviour implements Behaviour<Actor, Action> {
      * Compute the Manhattan distance between two locations.
      *
      * @param a the first location
-     * @param b the first location
+     * @param b the second location
      * @return the number of steps between a and b if you only move in the four cardinal directions.
      */
     private int distance(Location a, Location b) {
