@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  * @version 1.0
  */
 public class Overflow20 extends GameMap {
-    private final List<Location> tubeLocations = new ArrayList<>();
+    private final List<Location> tubeLocations;
 
     /**
      * Builds the 20-overflow facility from its ASCII layout and decorates
@@ -65,7 +65,7 @@ public class Overflow20 extends GameMap {
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
         ));
-
+        this.tubeLocations = new ArrayList<>();
         this.setHoles();
         this.setVents();
         this.setMagicCircles();
