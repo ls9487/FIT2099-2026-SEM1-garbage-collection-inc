@@ -12,6 +12,7 @@ import game.actors.Parasite;
  * If successful, it triggers an environmental reaction (adjacent workers take 2 damage).
  */
 public class ParasiteSpawner implements Spawner {
+    private static final int ADJACENT_DAMAGE = 2;
 
     /**
      * Spawns a parasite at the given location.
@@ -40,7 +41,6 @@ public class ParasiteSpawner implements Spawner {
      * @param location The location where the parasite was spawned.
      */
     private void hurtAdjacentActors(Location location) {
-        final int ADJACENT_DAMAGE = 2;
         // Check each adjacent location.
         for (Exit exit : location.getExits()) {
             Location destination = exit.getDestination();
