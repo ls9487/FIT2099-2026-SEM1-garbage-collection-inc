@@ -26,7 +26,7 @@ public class StunStatus implements Status {
     }
     /**
      * Called once per tick to update the status of the current entity.
-     * Whatever the burn does is up to the entity, taking damage for example.
+     * Whatever the stun does is up to the entity, taking damage for example.
      * @param currEntity The entity this status is attached to.
      */
     @Override
