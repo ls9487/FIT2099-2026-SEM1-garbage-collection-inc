@@ -194,7 +194,6 @@ public abstract class State {
      * @param dragItemOperations  pull toward or push away from location
      */
     protected void dragItemOnGround(int radius, Location location, DragItemOperations dragItemOperations) {
-        // Snapshot all (item, from, to) moves first, then apply — prevents double-pushing
         // items that land in a tile that is also within the iteration range.
         List<Item> movedItems = new java.util.ArrayList<>();
         List<Location> fromLocations = new java.util.ArrayList<>();
