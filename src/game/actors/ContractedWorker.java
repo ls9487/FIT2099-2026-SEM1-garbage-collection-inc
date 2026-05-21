@@ -13,6 +13,8 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.atmosphere.AirQualityReport;
+import game.atmosphere.AtmosphereSensitiveActor;
 import game.spawners.ParasiteSpawner;
 import game.spawners.Spawner;
 import game.statuses.Infectable;
@@ -26,7 +28,7 @@ import java.util.Random;
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends EclipseActor implements Infectable {
+public class ContractedWorker extends EclipseActor implements Infectable, AtmosphereSensitiveActor {
 
     /** Maximum amount of credits a worker can hold. */
     public static final int MAX_CREDITS = 1000;
@@ -164,4 +166,43 @@ public class ContractedWorker extends EclipseActor implements Infectable {
 
     }
 
+    //add java-doc later this is for REQ 5 A3
+    @Override
+    public void applyAtmosphere(AirQualityReport report) {
+        int aqi = report.getAqi();
+
+        // Safe air: no effect.
+        if (aqi < 51) {
+            return;
+        }
+
+        // Light pollution: coughing and minor health loss.
+        if (aqi < 151) {
+            this.hurt(1);
+            return;
+        }
+
+        // Moderate pollution: health loss plus a mild poison.
+        if (aqi < 201) {
+            this.hurt(1);
+            this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
+                    this.addStatus(new game.statuses.PoisonStatus(
+                            /* duration */ 1,
+                            /* damagePerTurn */ 1,
+                            poisonable
+                    ))
+            );
+            return;
+        }
+
+        // Severe pollution: heavy health loss, with room to extend to stronger effects later.
+        this.hurt(2);
+        this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
+                this.addStatus(new game.statuses.PoisonStatus(
+                        /* duration */ 1,
+                        /* damagePerTurn */ 1,
+                        poisonable
+                ))
+        );
+    }
 }

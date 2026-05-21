@@ -20,6 +20,10 @@ import game.inventories.WeightLimitedInventory;
 import game.items.Flask;
 import game.grounds.SuperComputer;
 import game.grounds.TeleportationTube;
+import game.atmosphere.AtmosphericApiClient;
+import game.atmosphere.AtmosphericMonitor;
+import game.atmosphere.AtmosphericServicesFactory;
+import game.atmosphere.EnvironmentalMonitorBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +109,21 @@ public class EclipseNebula extends World {
 
         moon99DeprecatedMap.at(10, 10).addActor(new Muckraker());
         moon99DeprecatedMap.at(11, 11).addActor(new PhantasmWisp());
+
+        // Passive atmospheric monitor for A3 REQ5: sits near the SuperComputer
+        // and periodically scans the real-world air quality.
+        AtmosphericServicesFactory servicesFactory = new AtmosphericServicesFactory();
+        EnvironmentalMonitorBehaviour monitorBehaviour = new EnvironmentalMonitorBehaviour(
+                servicesFactory.createParser(),
+                new AtmosphericApiClient(),
+                servicesFactory
+        );
+        Inventory monitorInventory = new WeightLimitedInventory(0);
+        AtmosphericMonitor monitor = new AtmosphericMonitor(
+                monitorInventory,
+                monitorBehaviour
+        );
+        moon99DeprecatedMap.at(6, 5).addActor(monitor);
     }
 
     /**
