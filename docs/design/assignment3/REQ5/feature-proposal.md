@@ -10,7 +10,7 @@
 
 ### The Pitch
 
-The abandoned moon facility's environmental monitoring system remains operational, continuously polling real-world air quality data from Earth's polluted cities. The atmospheric readings (particulate density, toxic gases, and overall air quality) are directly translated into hazardous environmental conditions on the moon. As these pollution metrics fluctuate, the facility's health and economy dynamically adapt to mirror the detected contamination levels.
+The abandoned moon facility's environmental monitoring system remains operational, continuously polling real-world air quality data from Earth's polluted cities. The atmospheric readings (air quality index and dominant pollutants) are directly translated into hazardous environmental conditions on the moon. As these pollution metrics fluctuate, the facility's **health**, **terrain**, **economy**, and even **creatures** dynamically adapt to mirror the detected contamination levels.
 
 ---
 
@@ -33,30 +33,43 @@ The abandoned moon facility's environmental monitoring system remains operationa
 
 - The raw JSON response is parsed into an `AirQualityReport` by a single `PollutionDataParser` implementation, `OpenWeatherPollutionParser`.
   - `OpenWeatherPollutionParser` uses simple string parsing (no JSON library) to extract:
-    - `list[0].main.aqi` as an integer AQI index.
+    - `list[0].main.aqi` as an integer AQI index on the OpenWeather **1	6** scale.
     - `list[0].components.no2` and `list[0].components.so2` to determine the dominant pollutant (`"no2"` or `"so2"`).
   - Temperature, humidity, wind speed, and pressure are currently represented by fixed defaults, as the Air Pollution endpoint does not provide them directly.
 
 - The resulting `AirQualityReport` is passed to one or more `AtmosphericCorruptor` implementations, which translate air quality into concrete game effects:
 
   - **HazardCorruptor**
-    - Iterates over the map and finds any actor implementing the `AtmosphereSensitiveActor` interface.
-    - For each such actor (currently only `ContractedWorker`), calls `applyAtmosphere(report)`.
-    - `ContractedWorker.applyAtmosphere` interprets AQI as:
-      - AQI < 51: no effect.
-      - AQI 51–150: worker loses 1 HP.
-      - AQI 151-200: worker loses 1 HP and takes 1 point of poison damage.
-      - AQI ≥ 201: worker loses 2 HP.
+    - Interprets AQI in three tiers on the 1	6 scale:
+      - **Tier 1 (mild)**: `aqi <= 2` 	6 no atmospheric effects are applied.
+      - **Tier 2 (moderate)**: `aqi == 3` 	6 local damage, poison, and small toxic patches.
+      - **Tier 3 (severe)**: `aqi >= 4` 	6 heavy damage, strong poison, and large-scale terrain corruption.
+    - For AQI 	3, iterates over the map and finds any actor exposing the `AtmosphereSensitiveActor` capability (currently `ContractedWorker` and `Muckraker`). For each such actor, calls `applyAtmosphere(report)` to let the actor handle its own health/status logic.
+    - At **moderate AQI (3)**, after calling `applyAtmosphere` on an atmosphere-sensitive actor, HazardCorruptor also creates small **toxic puddles** around that actor:
+      - It examines the neighbouring tiles around the actor using the engine's `Exit` API.
+      - On neighbouring floor-like tiles, there is a 25% chance per tile to replace the ground with `ToxicWaste`, forming a local contaminated cluster rather than corrupting the entire map.
+    - At **severe AQI (4	6)**, HazardCorruptor applies heavy health and status effects via `applyAtmosphere`, and then performs two large-scale terrain mutations:
+      - **Border ring**: it walks the outer border coordinates of the `GameMap` (top row, bottom row, left and right columns) and replaces the ground with `ToxicWaste`, producing a visible toxic perimeter around the facility.
+      - **Monitor hotspot**: it locates the `AtmosphericMonitor` actor and, for all tiles within Manhattan distance 2 of the monitor, randomly (50% chance) converts walkable tiles into `ToxicWaste`. This makes the probe itself feel like a pollution hotspot.
 
   - **EconomyCorruptor**
-    - Interprets SO_2 as a proxy for economic disruption.
-    - When the dominant pollutant in `AirQualityReport` is `"so2"`, scans the map for `ContractedWorker` instances and reduces their `EclipseStatistics.CREDITS` by 10 (floored at zero) using the existing statistics API.
+    - Interprets sulphur dioxide (SO	8) as a proxy for economic disruption.
+    - When the dominant pollutant in `AirQualityReport` is `"so2"`, it:
+      - Sets a global disruption flag `EconomyCorruptor.ECONOMY_DISRUPTED` to `true`.
+      - Iterates over all tiles in the `GameMap` and, for any actor that tracks `EclipseStatistics.CREDITS`, reduces that statistic by 10 (floored at zero) using the existing statistics API.
+      - If SO	8 is not dominant, the flag is reset to `false` and no credit erosion occurs.
+    - The disruption flag is consumed by the REQ1 shop system:
+      - When `EconomyCorruptor.ECONOMY_DISRUPTED` is `true`, `SellAction` gains a **transaction fizzle** behaviour:
+        - Each sale still removes the item from the seller's inventory (via `Sellable.soldBy`), but there is a 50% chance that the **payout is 0 credits** instead of the usual price.
+        - A message is printed explaining that "the toxic atmosphere corrupts the transaction and no credits are received".
+      - When the flag is `false`, SellAction behaves as in Assignment 2: the seller receives the full sell price and the item is removed normally.
 
 - The atmospheric system is driven by a dedicated monitor actor:
-  - `AtmosphericMonitor` is a stationary `EclipseActor` that represents the facility’s automated probe.
+  - `AtmosphericMonitor` is a stationary `EclipseActor` that represents the facility's automated probe.
   - It owns an `EnvironmentalMonitorBehaviour`, which keeps an internal tick counter.
-  - Every 50 turns, the behaviour returns an `AtmosphericScanAction`; on other turns it returns `null`.
-  - `AtmosphericScanAction` calls the OpenWeather API via `AtmosphericApiClient`, parses the JSON with `OpenWeatherPollutionParser`, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.
+  - To keep testing simple and to make the feature observable in a short demo, the behaviour is configured to trigger a new scan **every turn** (via a `REFRESH_INTERVAL` constant).
+  - When the interval elapses, the behaviour returns an `AtmosphericScanAction` instead of `null`.
+  - `AtmosphericScanAction` calls the OpenWeather API via `AtmosphericApiClient`, parses the JSON with `OpenWeatherPollutionParser`, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`. It also prints the current AQI to the console.
 
 ---
 
@@ -81,150 +94,123 @@ The abandoned moon facility's environmental monitoring system remains operationa
 
 #### Concrete Classes
 
-| Class                     | Type      | Implements            | Summary                                                                                                                                           |
-|---------------------------|-----------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| OpenWeatherPollutionParser| New       | PollutionDataParser   | Parses OpenWeather Air Pollution JSON using simple string searches (no external libs) into an `AirQualityReport` (AQI and dominant pollutant).    |
-| AirQualityReport          | New       | (value object)        | Holds AQI, dominant pollutant, and basic weather fields used by `AtmosphericCorruptor` implementations.                                           |
-| HazardCorruptor           | New       | AtmosphericCorruptor  | Applies AQI-tier damage and poison to actors that implement `AtmosphereSensitiveActor` (currently `ContractedWorker`).                            |
-| EconomyCorruptor          | New       | AtmosphericCorruptor  | Interprets SO_2 as economic disruption and erodes workers’ `EclipseStatistics.CREDITS` when SO_2 dominates.                                       |
-| AtmosphericScanAction     | New       | Action                | Action that calls `AtmosphericApiClient`, parses the response via `PollutionDataParser`, and delegates to all configured `AtmosphericCorruptor`s. |
-| EnvironmentalMonitorBehaviour | New  | Behaviour             | Passive behaviour attached to `AtmosphericMonitor` that automatically returns an `AtmosphericScanAction` every N turns (50).                      |
-| AtmosphericMonitor        | New       | EclipseActor          | Stationary actor representing the facility’s probe; owns an `EnvironmentalMonitorBehaviour` and does not override `playTurn`.                     |
-| AtmosphericServicesFactory| New       | (factory)             | Creates the `OpenWeatherPollutionParser` and the set of `AtmosphericCorruptor`s used by the monitor.                                              |
-
-Existing engine classes referenced (not implemented by me): `GameMap`, `Actor`, `Action`, `Behaviour`, `Inventory`, `EclipseActor`.
-
----
-
-### The Request
-
-Endpoint pattern:
-
-```text
-GET https://api.openweathermap.org/data/2.5/air_pollution
-    ?lat={latitude}
-    &lon={longitude}
-    &appid={OPENWEATHER_API_KEY}
-```
-
-The current implementation of `AtmosphericApiClient`:
-
-- Reads `OPENWEATHER_API_KEY` from the environment.
-- Selects a latitude/longitude pair from a small hard-coded list of polluted cities (for example Delhi at 28.7041, 77.1025).
-- Builds the URL at runtime and issues the HTTP GET.
-
-The URL is not a fixed string in the code and always depends on live game state (the selected city), but remains intentionally simple to satisfy the assignment’s “no external libraries” constraint.
+| Class                        | Type      | Implements                 | Summary                                                                                                                                                    |
+|------------------------------|-----------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| OpenWeatherPollutionParser   | New       | PollutionDataParser        | Parses OpenWeather Air Pollution JSON (via string operations only) into an `AirQualityReport` containing the AQI tier and dominant pollutant.             |
+| AirQualityReport             | New       | (value object)             | Immutable data class that stores the parsed AQI (1	6), dominant pollutant string, and placeholder fields for temperature/humidity/wind.                  |
+| AtmosphericApiClient         | New       | 	6                      | Responsible for calling the external API with a chosen lat/lon and returning the raw JSON string.                                                          |
+| AtmosphericServicesFactory   | New       | 	6                      | Factory that wires together the parser, client, and a list of `AtmosphericCorruptor`s so that `AtmosphericMonitor` does not need to know concrete types.   |
+| AtmosphericMonitor           | New       | EclipseActor               | Stationary actor that represents the facility's environmental probe; owns the `EnvironmentalMonitorBehaviour`.                                             |
+| EnvironmentalMonitorBehaviour| New       | Behaviour<Actor, Action>   | Ticks every turn and periodically returns an `AtmosphericScanAction` that performs API calls and corruption.                                                |
+| AtmosphericScanAction        | New       | Action                     | One-shot action that triggers an API call, parses the JSON, prints AQI, and invokes all registered `AtmosphericCorruptor`s.                                |
+| HazardCorruptor              | New       | AtmosphericCorruptor       | Applies AQI-based health, status, and terrain changes: calls `applyAtmosphere` on `AtmosphereSensitiveActor`s, generates local toxic puddles, a border ring, and a hotspot around the monitor. |
+| EconomyCorruptor             | New       | AtmosphericCorruptor       | Applies SO	8-based economic effects: reduces credits for actors with a credit statistic and toggles a global disruption flag consumed by SellAction.    |
+| ContractedWorker             | Existing  | AtmosphereSensitiveActor   | Player-controlled worker that converts `AirQualityReport` into HP loss and `PoisonStatus` via the engine's capability and status systems.                  |
+| Muckraker                    | Existing  | AtmosphereSensitiveActor   | Stateful scavenger creature that now reacts to atmosphere by leaking `ToxicWaste` and shoving nearby workers when pollution is high.                       |
 
 ---
 
-### The Schema
+### Detailed Behaviour per Class
 
-Expected JSON structure (simplified from the OpenWeather Air Pollution documentation):
+#### ContractedWorker (AtmosphereSensitiveActor)
 
-```json
-{
-  "coord": {
-    "lon": 77.1025,
-    "lat": 28.7041
-  },
-  "list": [
-    {
-      "main": {
-        "aqi": 3
-      },
-      "components": {
-        "co": 201.94,
-        "no": 0.0,
-        "no2": 20.1,
-        "o3": 68.66,
-        "so2": 0.64,
-        "pm2_5": 35.5,
-        "pm10": 54.3
-      },
-      "dt": 1605182400
-    }
-  ]
-}
-```
+The `ContractedWorker` class implements `AtmosphereSensitiveActor` and defines its own reaction to atmospheric conditions in `applyAtmosphere(AirQualityReport)`:
 
-Fields used and their effects (summary):
+- The worker reads `report.getAqi()` on the OpenWeather 1	6 scale and uses three tiers:
+  - **AQI 1	2 (mild)**: no effect.
+  - **AQI 3 (moderate)**:
+    - The worker immediately loses 1 HP.
+    - If the worker has the `Poisonable` capability, a `PoisonStatus` is added with duration 2 turns and 1 damage per turn.
+  - **AQI 4	6 (severe)**:
+    - The worker immediately loses 2 HP.
+    - If `Poisonable`, a stronger `PoisonStatus` is applied with duration 3 turns and 2 damage per turn.
 
-| JSON field                 | Type    | Game effect                                                                                                                                                             |
-|----------------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `list[0].main.aqi`         | int     | Parsed by `OpenWeatherPollutionParser` and stored as AQI in `AirQualityReport`; `HazardCorruptor` uses it to decide how much damage/poison to apply to workers.         |
-| `list[0].components.no2`   | double  | Compared with SO_2; if NO_2 ≥ SO_2, `dominantPollutant` in `AirQualityReport` is set to `"no2"`.                                                                        |
-| `list[0].components.so2`   | double  | Compared with NO_2; if SO_2 > NO_2, `dominantPollutant` in `AirQualityReport` is set to `"so2"`. `EconomyCorruptor` erodes credits when `dominantPollutant` is `"so2"`. |
+This behaviour combines HP loss, status effects, and the engine's capability system. The worker itself does **not** mutate terrain or credits; those responsibilities are delegated to the corruptors.
 
-Other components (CO, O₃, PM_(2*5), PM_10) are present in the JSON and are not currently used in gameplay. They remain available for future extensions without changing the public interfaces.
+#### HazardCorruptor (AtmosphericCorruptor)
+
+`HazardCorruptor` is responsible for turning an `AirQualityReport` into health, status, and terrain changes:
+
+- Reads the AQI tier from `report.getAqi()`.
+- For `aqi <= 2`, it returns without applying any effects.
+- For `aqi >= 3`, it:
+  - Iterates over every tile in the `GameMap`.
+  - For each tile containing an actor, attempts to view it as an `AtmosphereSensitiveActor` using the engine's capability API.
+  - If successful, calls `applyAtmosphere(report)` on that actor, leveraging whatever logic the actor has implemented.
+- For **AQI 3 (moderate)**, after delegating to `applyAtmosphere`, the corruptor also spawns **local toxic puddles**:
+  - Around each atmosphere-sensitive actor, it examines the adjacent tiles via `Exit`s.
+  - On neighbouring tiles without actors, there is a 25% chance per tile to set the ground to `ToxicWaste`.
+- For **AQI 4	6 (severe)**, in addition to the above it mutates the wider terrain:
+  - Creates a **border ring** by setting the ground on the outermost rows and columns of the map to `ToxicWaste`.
+  - Creates a **monitor hotspot** by locating the `AtmosphericMonitor` actor and, for tiles within Manhattan distance 2 that do not contain actors, converting some of them (50% chance) into `ToxicWaste`.
+
+This makes `HazardCorruptor` a complex implementation that combines:
+
+- Whole-map iteration.
+- Delegation to multiple `AtmosphereSensitiveActor` implementations.
+- Distance-based AoE terrain changes (adjacent tiles and radius 2).
+- A permanent structural change (toxic perimeter) visible in the ASCII map.
+
+#### EconomyCorruptor (AtmosphericCorruptor)
+
+`EconomyCorruptor` turns SO	8 readings into economic effects:
+
+- Reads the dominant pollutant from `AirQualityReport`.
+- If the dominant pollutant is not `"so2"`, it sets `EconomyCorruptor.ECONOMY_DISRUPTED = false` and returns.
+- If SO	8 is dominant, it:
+  - Sets `EconomyCorruptor.ECONOMY_DISRUPTED = true`.
+  - Iterates over all tiles in the map.
+  - For each actor that has an `EclipseStatistics.CREDITS` statistic, reads their current credits and updates the statistic to `max(0, credits 	10)` using the engine's statistics API.
+
+The disruption flag is then consumed by the REQ1 shop system:
+
+- In `SellAction.execute`:
+  - If the seller does not track credits, the action returns early as in Assignment 2.
+  - Otherwise, it reads the `sellPrice` from the `Sellable`.
+  - When `EconomyCorruptor.ECONOMY_DISRUPTED` is true and the price is positive, there is a 50% chance that the sale **"glitches"**:
+    - The `Sellable` still performs its `soldBy` logic (inventory removal and any side effects).
+    - The seller does **not** receive any credits for the sale.
+    - A descriptive message explains that the toxic atmosphere has corrupted the transaction.
+  - If the glitch does not trigger (or the flag is false), the seller receives the full price and the sale proceeds normally.
+
+This ties the atmospheric system directly into REQ1's shop actions, and goes beyond a simple "credits -10" by sometimes invalidating entire transactions.
+
+#### Muckraker (AtmosphereSensitiveActor)
+
+`Muckraker` is an existing stateful scavenger creature (`StatefulCreature`) that reacts to nearby workers by changing emotion states. It has been extended to implement `AtmosphereSensitiveActor` and now uses `applyAtmosphere` to become an environmental hazard under bad air:
+
+- For **AQI 1	2 (mild)**: `applyAtmosphere` returns without changes.
+- For **AQI 3 (moderate)**:
+  - The Muckraker leaks a small amount of `ToxicWaste` onto its current tile by replacing the ground with `ToxicWaste`.
+- For **AQI 4	6 (severe)**:
+  - The tile under the Muckraker is again converted to `ToxicWaste`, creating a moving source of contamination as it roams.
+  - The Muckraker also interacts with nearby workers:
+    - For each adjacent tile containing a `ContractedWorker`, there is a chance to "shove" the worker one tile further away into a free neighbouring tile.
+    - This uses the engine's `Exit` graph to find candidate destinations and moves the worker actor while keeping damage at 0 (a disruption, not an attack).
+
+This behaviour:
+
+- Reuses the same AQI tiers as the worker and HazardCorruptor.
+- Adds a second `AtmosphereSensitiveActor` implementation with different, non-economic effects.
+- Couples atmosphere to enemy behaviour and terrain without duplicating the credit logic in `EconomyCorruptor`.
 
 ---
 
-### SOLID Principles Applied
+### Why This Satisfies the "Complex" Requirement
 
-- **Single Responsibility**
-  - `OpenWeatherPollutionParser` only parses JSON into `AirQualityReport`. It does not modify the game world.
-  - `AtmosphericCorruptor` implementations (`HazardCorruptor`, `EconomyCorruptor`) only mutate the `GameMap` and actors based on an `AirQualityReport`. They do not perform parsing or HTTP calls.
-  - `AtmosphericApiClient` only handles HTTP and query construction.
+The REQ5 implementation is intentionally spread across multiple interacting classes rather than a single "god" class:
 
-- **Open and Closed**
-  - Adding support for new atmospheric parameters (for example additional pollutants or different economic rules) can be done by adding new `PollutionDataParser` or `AtmosphericCorruptor` implementations. Existing code that depends on these interfaces does not need to change.
+- `HazardCorruptor` combines map-wide iteration, distance-based AoE, and persistent terrain mutation.
+- `ContractedWorker` converts abstract AQI data into concrete HP and poison status effects based on engine capabilities.
+- `EconomyCorruptor` and `SellAction` translate gas composition into both background credit erosion and probabilistic transaction failure within the existing shop system.
+- `Muckraker` shows that multiple actors can independently implement `AtmosphereSensitiveActor`, each with different behaviours (worker: HP/status; Muckraker: terrain and movement effects).
 
-- **Liskov Substitution**
-  - Any `AtmosphericCorruptor` can be injected into `EnvironmentalMonitorBehaviour`. The behaviour always calls `corrupt(map, report)` without caring which concrete implementation it receives.
-  - Any actor that implements `AtmosphereSensitiveActor` can participate in hazard effects, not just `ContractedWorker`.
+Together, these behaviours:
 
-- **Interface Segregation**
-  - High-level code depends on two small interfaces, `PollutionDataParser` and `AtmosphericCorruptor`, instead of a large combined interface. Parsing and corruption responsibilities are kept separate.
-  - `AtmosphereSensitiveActor` is a focused interface for actors that care about air quality.
+- Use the external API data in meaningful ways.
+- Spawn and manipulate terrain (`ToxicWaste`).
+- Apply status effects (`PoisonStatus`).
+- Modify statistics and shop behaviour (`EclipseStatistics.CREDITS`, `SellAction`).
+- Respond to both AQI tiers and dominant pollutants.
 
-- **Dependency Inversion**
-  - `AtmosphericScanAction` and `EnvironmentalMonitorBehaviour` depend on `PollutionDataParser` and `AtmosphericCorruptor` abstractions, not on concrete classes.
-  - `AtmosphericServicesFactory` selects and instantiates concrete parsers and corruptors, then injects them into high-level classes.
-
----
-
-### Security Notes
-
-- The OpenWeather API key is stored only in the `OPENWEATHER_API_KEY` environment variable.
-- In Java the key is accessed with `System.getenv("OPENWEATHER_API_KEY")`.
-- The key is never hard coded or committed to Git.
-- A short note in the README explains how to set the environment variable.
-
----
-
-### README Setup Instructions (Summary)
-
-- Register a free API key at the OpenWeather website.
-- Set `OPENWEATHER_API_KEY` before running the game:
-  - macOS and Linux: `export OPENWEATHER_API_KEY=your_key_here`
-  - Windows Command Prompt: `set OPENWEATHER_API_KEY=your_key_here`
-  - IntelliJ: Run → Edit Configurations → Environment variables → `OPENWEATHER_API_KEY=your_key_here`
-- Run the game as usual (for example via IntelliJ or `./gradlew run`).
-- Unit tests that depend on `AirQualityReport` can use stub `PollutionDataParser` implementations instead of real HTTP calls.
-
----
-
-### Unit Testing Notes
-
-- **OpenWeatherPollutionParser**
-  - Tested with synthetic JSON strings to ensure:
-    - AQI is parsed correctly from the `main.aqi` field.
-    - The dominant pollutant is correctly chosen between NO_2 and SO_2 based on their numeric values.
-    - Reasonable defaults are applied when fields are missing or malformed.
-
-- **HazardCorruptor**
-  - Tested with mock or stub actors that implement `AtmosphereSensitiveActor` (for example a test double for `ContractedWorker`):
-    - Given different AQI values in `AirQualityReport`, tests assert that `applyAtmosphere` is called and that the correct damage/poison behaviour occurs.
-
-- **EconomyCorruptor**
-  - Tested with a small synthetic `GameMap` and a `ContractedWorker`:
-    - When `dominantPollutant` is `"so2"`, tests assert that the worker’s `EclipseStatistics.CREDITS` statistic is reduced by 10 and never below zero.
-    - When `dominantPollutant` is `"no2"`, tests assert that credits are unchanged.
-
-- **AtmosphericScanAction and EnvironmentalMonitorBehaviour**
-  - Integration-tested using a stub `PollutionDataParser` that returns a fixed `AirQualityReport` and a mock `AtmosphericCorruptor` that records calls.
-  - Tests verify that:
-    - After the configured tick interval, the behaviour returns an `AtmosphericScanAction`.
-    - Executing the action results in `corrupt(map, report)` being called on each corruptor.
-```
-
+This goes well beyond simple numeric tweaks and clearly meets the "complex implementation" expectations for REQ5.
