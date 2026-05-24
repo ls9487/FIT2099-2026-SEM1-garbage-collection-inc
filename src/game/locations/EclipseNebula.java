@@ -105,7 +105,10 @@ public class EclipseNebula extends World {
          *
          * Comment it out again for normal gameplay/evaluation (start as a broke).
          */
-         //contractedWorker1.addCredits(1000);
+         //contractedWorker1.getEclipseStatistics.CREDITS(1000);
+
+         // Give Bob a CrtMonitor to sell.
+         //contractedWorker1.getInventory().add(new FloppyDisk());
 
         moon99DeprecatedMap.at(10, 10).addActor(new Muckraker());
         moon99DeprecatedMap.at(11, 11).addActor(new PhantasmWisp());
@@ -123,7 +126,7 @@ public class EclipseNebula extends World {
                 monitorInventory,
                 monitorBehaviour
         );
-        moon99DeprecatedMap.at(5, 2).addActor(monitor);
+        moon99DeprecatedMap.at(15, 2).addActor(monitor);
     }
 
     /**

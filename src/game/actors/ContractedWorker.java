@@ -166,28 +166,24 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
 
     }
 
-    //add java-doc later this is for REQ 5 A3
+    // Applies A3:REQ5 toxic atmosphere effects to the worker.
     @Override
-    public void applyAtmosphere(AirQualityReport report) {
+    public void applyAtmosphere(AirQualityReport report, Location here) {
         int aqi = report.getAqi();
 
-        // Safe air: no effect.
-        if (aqi < 51) {
+        // Mild or safe air quality: no effect.
+        if (aqi <= 2) {
             return;
         }
 
-        // Light pollution: coughing and minor health loss.
-        if (aqi < 151) {
+        // Moderate pollution: light damage and a short poison.
+        if (aqi == 3) {
             this.hurt(1);
-            return;
-        }
-
-        // Moderate pollution: health loss plus a mild poison.
-        if (aqi < 201) {
-            this.hurt(1);
+            System.out.println("[Toxic Atmosphere] AQI " + aqi
+                    + " : " + this + " chokes on foul air, losing 1 HP and gaining poison!");
             this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
                     this.addStatus(new game.statuses.PoisonStatus(
-                            /* duration */ 1,
+                            /* duration */ 2,
                             /* damagePerTurn */ 1,
                             poisonable
                     ))
@@ -195,12 +191,15 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
             return;
         }
 
-        // Severe pollution: heavy health loss, with room to extend to stronger effects later.
+        // Severe pollution (aqi >= 4): heavier damage and stronger poison.
+        // Duration & intensity (3 turns, 2 dmg/turn).
         this.hurt(2);
+        System.out.println("[Toxic Atmosphere] AQI " + aqi
+                + " : " + this + " is overwhelmed by toxic fumes! -2 HP and severe poison applied!");
         this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
                 this.addStatus(new game.statuses.PoisonStatus(
-                        /* duration */ 1,
-                        /* damagePerTurn */ 1,
+                        /* duration */ 3,
+                        /* damagePerTurn */ 2,
                         poisonable
                 ))
         );
