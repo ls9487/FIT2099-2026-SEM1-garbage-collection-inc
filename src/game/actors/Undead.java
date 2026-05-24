@@ -1,6 +1,5 @@
 package game.actors;
 
-import edu.monash.fit2099.engine.actors.ActorStatistics;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.atmosphere.AirQualityReport;
