@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="5J5_xBy0OTJ2AKbwHfnI">
-    <mxGraphModel dx="2088" dy="546" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1458" dy="273" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -47,7 +47,7 @@
           <mxGeometry height="60" width="135" x="860" y="1140" as="geometry" />
         </mxCell>
         <mxCell id="mP8ANg7mBZNSiZqqSplp-21" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="WarperTreeSapling" vertex="1">
-          <mxGeometry height="60" width="120" x="1051.63" y="1140" as="geometry" />
+          <mxGeometry height="60" width="131.63" x="1040" y="1140" as="geometry" />
         </mxCell>
         <mxCell id="mP8ANg7mBZNSiZqqSplp-22" parent="1" style="shape=folder;fontStyle=1;tabWidth=140;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;labelInHeader=1;container=0;collapsible=0;whiteSpace=wrap;strokeWidth=2;opacity=30;fillColor=light-dark(#978F9A,#978F9A);perimeterSpacing=0;" value="java.util" vertex="1">
           <mxGeometry height="170" width="390" x="2644" y="1050" as="geometry" />
@@ -110,7 +110,7 @@
         <mxCell id="mP8ANg7mBZNSiZqqSplp-124" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="BasicInventory" vertex="1">
           <mxGeometry height="60" width="150" x="1250" y="2080" as="geometry" />
         </mxCell>
-        <mxCell id="mP8ANg7mBZNSiZqqSplp-129" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="WonderBehaviour" vertex="1">
+        <mxCell id="mP8ANg7mBZNSiZqqSplp-129" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="WanderBehaviour" vertex="1">
           <mxGeometry height="60" width="140" x="1820" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="mP8ANg7mBZNSiZqqSplp-143" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="AttackBehaviour" vertex="1">
@@ -676,7 +676,8 @@
             <Array as="points">
               <mxPoint x="160" y="1945" />
               <mxPoint x="160" y="1370" />
-              <mxPoint x="1092" y="1370" />
+              <mxPoint x="1085" y="1370" />
+              <mxPoint x="1085" y="1200" />
             </Array>
             <mxPoint x="335" y="1955" as="sourcePoint" />
             <mxPoint x="735" y="1210" as="targetPoint" />
@@ -714,7 +715,7 @@
         <mxCell id="mP8ANg7mBZNSiZqqSplp-255" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="IndustrialFan" vertex="1">
           <mxGeometry height="60" width="120" x="2195" y="1710" as="geometry" />
         </mxCell>
-        <mxCell id="mP8ANg7mBZNSiZqqSplp-256" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="AlienArtfiact" vertex="1">
+        <mxCell id="mP8ANg7mBZNSiZqqSplp-256" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="AlienArtifact" vertex="1">
           <mxGeometry height="60" width="120" x="2195" y="1530" as="geometry" />
         </mxCell>
         <mxCell id="mP8ANg7mBZNSiZqqSplp-259" edge="1" parent="1" source="mP8ANg7mBZNSiZqqSplp-9" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;strokeWidth=1;dashPattern=8 8;edgeStyle=orthogonalEdgeStyle;fillColor=#ffe6cc;strokeColor=#00994D;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="mP8ANg7mBZNSiZqqSplp-255" value="">
@@ -939,7 +940,7 @@
         </mxCell>
         <mxCell id="Eg0iFKlazSwAi3EjNQNZ-38" connectable="0" parent="Eg0iFKlazSwAi3EjNQNZ-37" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" value="1" vertex="1">
           <mxGeometry relative="1" x="-0.9729" as="geometry">
-            <mxPoint x="8" y="-6" as="offset" />
+            <mxPoint x="21" y="-10" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="Eg0iFKlazSwAi3EjNQNZ-39" parent="1" style="html=1;whiteSpace=wrap;fontSize=14;fillStyle=auto;fillColor=none;" value="FancyMessage" vertex="1">
