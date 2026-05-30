@@ -27,8 +27,9 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
      * Constructor for the Door class.
      * Starts off locked and must be unlocked for actors to pass through.
      *
-     * @param displayChar the display of door in the map
-     * @param name the name of the door
+     * @param displayChar   the display of door in the map
+     * @param name          the name of the door
+     * @param securityLevel minimum access-card level required to unlock
      */
     protected Door(char displayChar, String name, int securityLevel) {
         super(displayChar, name);

@@ -17,17 +17,22 @@ public class StunStatus implements Status {
 
     /**
      * Constructor for the StunStatus class.
-     * @param duration The number of ticks the stun lasts.
+     *
+     * @param duration   the number of ticks the stun lasts
+     * @param intensity  damage applied each tick while stunned
+     * @param stunnable  entity that receives stun damage
      */
     public StunStatus(int duration, int intensity, Stunnable stunnable) {
         this.duration = duration;
         this.intensity = intensity;
         this.stunnable = stunnable;
     }
+
     /**
      * Called once per tick to update the status of the current entity.
      * Whatever the stun does is up to the entity, taking damage for example.
-     * @param currEntity The entity this status is attached to.
+     * @param currEntity the entity this status is attached to
+     * @param location   the entity's current tile
      */
     @Override
     public void tickStatus(GameEntity currEntity, Location location) {

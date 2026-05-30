@@ -8,6 +8,12 @@ import game.inventories.BasicInventory;
 import game.statuses.Infectable;
 import game.weapons.BareFist;
 
+/**
+ * Hostile creature that scavenges depositable scrap until infected, then attacks workers.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 public class ScrapSnatcher extends EclipseActor implements Infectable {
     private static final int HIT_POINTS = 25;
     private static final char DISPLAY_CHAR= 's';
@@ -15,8 +21,9 @@ public class ScrapSnatcher extends EclipseActor implements Infectable {
     private static final int ATTACK_BEHAVIOUR_PRIORITY = 1;
     private static final int SNATCH_BEHAVIOUR_PRIORITY = 50;
     private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
+
     /**
-     * Constructor for the EclipseActor class.
+     * Creates a scrap snatcher with wander and snatch behaviours.
      */
     public ScrapSnatcher() {
         super(NAME, DISPLAY_CHAR, HIT_POINTS, new BasicInventory());
@@ -25,9 +32,9 @@ public class ScrapSnatcher extends EclipseActor implements Infectable {
     }
 
     /**
-     * The infection causes the undead to kaboom and instantly die.
-     * Note that the "blowing up" doesn't actually affect its surroundings.
-     * @param location The location where the infection tick is happening.
+     * Replaces snatch behaviour with attack behaviour and marks the snatcher worker-hostile.
+     *
+     * @param location the tile where the infection is applied
      */
     @Override
     public void infection(Location location) {

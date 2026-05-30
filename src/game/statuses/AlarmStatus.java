@@ -30,7 +30,8 @@ public class AlarmStatus implements Status {
     /**
      * Called once per tick to update the status of the current entity.
      * Whatever the alarmed state does, whether it's with the guilty actor, is up to the entity.
-     * @param currEntity The entity this status is attached to.
+     * @param currEntity the entity this status is attached to
+     * @param location   the entity's current tile
      */
     public void tickStatus(GameEntity currEntity, Location location) {
         if (alarmable != null) {

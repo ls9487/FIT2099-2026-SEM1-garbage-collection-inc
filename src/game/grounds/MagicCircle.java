@@ -30,7 +30,8 @@ public class MagicCircle extends Ground implements Teleporter {
     /**
      * Creates a circle belonging to a shared teleport network.
      *
-     * @param group  peer registry
+     * @param group           peer registry for linked circles
+     * @param spawnableItems  item suppliers dropped beside the arrival tile
      */
     public MagicCircle(MagicCircleGroup group, List<Supplier<Item>> spawnableItems) {
         super('◎', "Magic Circle");

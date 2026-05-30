@@ -14,6 +14,9 @@ import edu.monash.fit2099.engine.positions.Location;
 public class ToxicWaste extends Ground {
     private static final int DAMAGE_PER_TURN = 1;
 
+    /**
+     * Creates a toxic waste tile that damages actors standing on it each turn.
+     */
     public ToxicWaste() {
         super('≈', "Toxic Waste");
     }
