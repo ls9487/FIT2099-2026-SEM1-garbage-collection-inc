@@ -60,12 +60,12 @@ The Muckraker is a scavenging creature that changes its emotional state based on
 | Defensive | Inventory not full AND enemy present | Panic (FEARFUL) |
 
 **Rules compliance:**
-- 4 states implemented
-- Deterministic transitions based on conditions (no randomness)
-- Each state transitions to at least 2 other states (or stays)
-- Conditions involve complex logic (inventory status + enemy detection)
-- Immediate effects on state change (stealing, stunning, pulling items, dropping)
-- New behaviours: PickupBehaviour, FleeBehaviour
+- 4 states implemented 
+- Deterministic transitions based on conditions (no randomness) 
+- Each state transitions to at least 2 other states (or stays) 
+- Conditions involve complex logic (inventory status + enemy detection) 
+- Immediate effects on state change (stealing, stunning, pulling items, dropping) 
+- New behaviours: PickupBehaviour, FleeBehaviour 
 
 ---
 
@@ -101,9 +101,9 @@ The Phantasm Wisp is a mischievous ethereal creature that reacts to player proxi
 - 4 states implemented
 - Deterministic transitions based on player count and adjacency
 - Each state transitions to at least 2 other states (or stays)
-- Conditions involve complex logic (player count, adjacency, following)
-- Immediate effects (push items, poison, fire, drop items)
-- New behaviours: SwapItemsBehaviour, TeleportBehaviour
+- Conditions involve complex logic (player count, adjacency, following) 
+- Immediate effects (push items, poison, fire, drop items) 
+- New behaviours: SwapItemsBehaviour, TeleportBehaviour 
 
 ---
 
@@ -125,6 +125,7 @@ The Phantasm Wisp is a mischievous ethereal creature that reacts to player proxi
 
 - Muckraker transitions have been tested with various inventory states and workers
 - Stun effect on Panic entry lasts exactly 2 ticks
+- Item pulling on Defensive entry works within vigilanceRange
 
 ## REQ 5: A.P.I : Toxic Atmosphere (HD Requirement)
 
