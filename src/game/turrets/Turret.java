@@ -1,5 +1,6 @@
 package game.turrets;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
@@ -22,9 +23,9 @@ public abstract class Turret extends Ground
      * Constructor for the Turret class.
      * All turrets have an ammunition statistic.
      * Also, to prevent wasting ammo, all turrets have a 3-turn delay between firing projectiles.
-     *
      * @param displayChar The display char of the turret on the map.
      * @param name The name of the turret.
+     * @param ammunition How much ammo the turret can hold.
      */
     protected Turret(char displayChar, String name, int ammunition) {
         super(displayChar, name);
@@ -58,6 +59,16 @@ public abstract class Turret extends Ground
     public boolean isReady() {
         return this.getStatistic(GroundStatistics.AMMUNITION) > 0
                 && this.getStatistic(GroundStatistics.COOLDOWN) <= 0;
+    }
+
+    /**
+     * Actors can't walk onto the same tile as a turret. For fear of getting shot.
+     * @param actor The actor to check.
+     * @return false
+     */
+    @Override
+    public boolean canActorEnter(Actor actor) {
+        return false;
     }
 
 }
