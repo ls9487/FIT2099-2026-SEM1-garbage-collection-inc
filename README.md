@@ -138,7 +138,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 - The request is dynamic: `AtmosphericApiClient` derives latitude and longitude from the monitor's current map coordinates, so the query changes with game state.
 - The JSON response is parsed into an `AirQualityReport` by `PollutionDataParser` implementations created through `AtmosphericServicesFactory`.
 - `OpenWeatherPollutionParser` extracts the AQI and dominant pollutant (`NO_2` or `SO_2`), while `FallbackPollutionParser` returns a safe report when no API key is configured.
-- `HazardCorruptor` applies tiered atmosphere effects: at AQI 3 it creates local `ToxicWaste` patches around affected actors, and at AQI 4-5 it creates a toxic border ring plus a hotspot around the atmospheric anchor.
+- `HazardCorruptor` applies tiered atmosphere effects: at AQI 3 it creates random local  ToxicWaste  patches around affected actors, and at AQI 4-5 it creates a toxic border ring plus a hotspot around the atmospheric anchor.
 - `EconomyCorruptor` reacts to dominant `SO_2` by reducing credits across the map and enabling a 50% transaction failure effect in `SellAction`.
 - `PollutantSpawnCorruptor` reacts to severe AQI by locating the `AtmosphericAnchor` and spawning a new `Undead` on a valid adjacent tile.
 - `ContractedWorker`, `Muckraker`, and `Undead` implement `AtmosphereSensitiveActor` so each actor responds differently to the same `AirQualityReport`.
