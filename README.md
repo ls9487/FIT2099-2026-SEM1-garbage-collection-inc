@@ -152,7 +152,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
   - `OpenWeatherPollutionParser` is the main parser and extracts:
     - `list[0].main.aqi` as an integer AQI index on the OpenWeather 1-5 scale.
     - `list[0].components.no_2` and `list[0].components.so_2` to determine the dominant pollutant (`"no_2"` or `"so_2"`).
-  - `FallbackPollutionParser` is selected only when `OPENWEATHER_API_KEY` is absent or blank, ensuring the feature remains executable without exposing secrets while safely disabling atmospheric corruption.
+  - `FallbackPollutionParser` is selected only when `OPENWEATHER_API_KEY` is absent or blank. By default it returns a safe fallback report so the feature remains executable without exposing secrets, and it can also be used locally with the commented demo presets to simulate REQ 5 corruption scenarios during testing or presentation.
 - The resulting `AirQualityReport` is passed to one or more `AtmosphericCorruptor` implementations, which translate air quality into concrete game effects. These effects fall into two categories:
   - **Probability-based world effects**: random map-level effects whose chance is explicitly encoded in the code, such as local toxic spread, hotspot corruption, and disrupted shop payouts.
   - **Guaranteed actor effects**: deterministic reactions that always happen once an actor is processed at the relevant AQI tier, such as direct HP loss, poison, tile corruption, or adjacent damage applied by `AtmosphereSensitiveActor` implementations.

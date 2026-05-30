@@ -39,12 +39,14 @@ public class FallbackPollutionParser implements PollutionDataParser {
     private static final String SO2_POLLUTANT = "so2";
 
     /**
-     * Ignores the supplied JSON and returns a fixed safe report.
-     * This guarantees that missing or empty API responses never trigger
-     * atmospheric hazards.
+     * Ignores the supplied JSON and returns the currently selected fallback
+     * report.
+     * This defaults to a safe AQI-1 result, but the commented demo presets
+     * below can be toggled locally to simulate moderate, severe, or
+     * economy-disruption scenarios when no real API key is available.
      *
      * @param json ignored : may be null or empty
-     * @return an {@link AirQualityReport} with AQI 1 and no dominant pollutant
+     * @return the active fallback {@link AirQualityReport} preset
      */
     @Override
     public AirQualityReport parse(String json) {
