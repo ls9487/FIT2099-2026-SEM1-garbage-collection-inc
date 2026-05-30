@@ -1,23 +1,20 @@
-/**
- * Behaviour that periodically triggers an {@link AtmosphericScanAction}.
- * <p>
- * This is the "set and forget" part of the feature. Once wired to an
- * AtmosphericMonitor actor, it keeps its own internal tick counter and every
- * N turns asks the monitor to scan the atmosphere again.
- * </p>
- *
- * @author esoo0013
- */
 package game.atmosphere;
 
-import edu.monash.fit2099.engine.actions.Action;
-import edu.monash.fit2099.engine.actors.Actor;
-import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.positions.Location;
 
 import java.util.List;
 
-public class EnvironmentalMonitorBehaviour implements Behaviour<Actor, Action> {
+/**
+ * Behaviour class that periodically triggers an {@link AtmosphericScanAction}.
+ * <p>
+ * This is the automatic scanning part of the REQ5 feature. Once attached to an
+ * {@link AtmosphericMonitor}, it keeps its own internal tick counter and runs a
+ * full atmospheric scan at a fixed interval.
+ * </p>
+ *
+ * @author esoo0013
+ */
+public class EnvironmentalMonitorBehaviour {
 
     private static final int REFRESH_INTERVAL = 1;
 
@@ -27,6 +24,13 @@ public class EnvironmentalMonitorBehaviour implements Behaviour<Actor, Action> {
 
     private int ticks = 0;
 
+    /**
+     * Constructor.
+     *
+     * @param parser the parser used to convert raw JSON into an air quality report
+     * @param apiClient the API client used to fetch live air pollution data
+     * @param factory the factory used to create the atmosphere corruptors
+     */
     public EnvironmentalMonitorBehaviour(PollutionDataParser parser,
                                          AtmosphericApiClient apiClient,
                                          AtmosphericServicesFactory factory) {
@@ -35,15 +39,19 @@ public class EnvironmentalMonitorBehaviour implements Behaviour<Actor, Action> {
         this.factory = factory;
     }
 
-    @Override
-    public Action operate(Actor actor, Location location) {
-        // Only trigger a scan every REFRESH_INTERVAL turns.
+    /**
+     * Runs the monitor behaviour for one tick.
+     *
+     * @param anchor the atmospheric anchor that owns this behaviour
+     * @param location the current location of the atmospheric monitor
+     */
+    public void operate(AtmosphericAnchor anchor, Location location) {
         ticks++;
         if (ticks % REFRESH_INTERVAL != 0) {
-            return null;
+            return;
         }
 
         List<AtmosphericCorruptor> corruptors = factory.createCorruptors();
-        return new AtmosphericScanAction(parser, corruptors, apiClient);
+        new AtmosphericScanAction(parser, corruptors, apiClient).execute(anchor, location.map());
     }
 }

@@ -17,7 +17,6 @@ import java.util.List;
  *
  * @author esoo0013
  */
-
 public class AtmosphericScanAction extends Action {
 
     private final PollutionDataParser parser;
@@ -40,15 +39,14 @@ public class AtmosphericScanAction extends Action {
     }
 
     /**
-     * Executes the atmospheric scan.
+     * Executes the atmospheric scan using the supplied atmospheric anchor.
      *
-     * @param actor the actor performing the scan
-     * @param map the map the actor is on
+     * @param anchor the atmospheric anchor that acts as the scan source
+     * @param map the map containing the atmospheric monitor
      * @return a summary string showing the AQI tier and dominant pollutant
      */
-    @Override
-    public String execute(Actor actor, GameMap map) {
-        String json = apiClient.fetch(actor, map);
+    public String execute(AtmosphericAnchor anchor, GameMap map) {
+        String json = apiClient.fetch(anchor, map);
         AirQualityReport report = parser.parse(json);
 
         for (AtmosphericCorruptor corruptor : corruptors) {
@@ -67,8 +65,28 @@ public class AtmosphericScanAction extends Action {
                 report.getAqi(), tier, report.getDominantPollutant().toUpperCase());
     }
 
+    /**
+     * Unused menu description retained because this class extends Action.
+     *
+     * @param actor the actor requesting the menu description
+     * @return a generic description string
+     */
     @Override
     public String menuDescription(Actor actor) {
         return actor + " scans the atmosphere";
+    }
+
+    /**
+     * Unsupported actor-based execute method.
+     *
+     * @param actor the actor performing the action
+     * @param map the map the actor is on
+     * @return the actor-based scan result
+     */
+    @Override
+    public String execute(Actor actor, GameMap map) {
+        throw new UnsupportedOperationException(
+                "Use execute(AtmosphericAnchor, GameMap) for atmospheric monitor scans."
+        );
     }
 }

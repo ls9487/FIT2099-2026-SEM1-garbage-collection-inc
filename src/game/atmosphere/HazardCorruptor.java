@@ -22,10 +22,16 @@ import java.util.Random;
  * polymorphism by letting each affected actor define its own reaction through
  * the {@link AtmosphereSensitiveActor} abstraction.
  *
- * @author lyan0121
- * @version 1.0
+ * @author esoo0013
  */
 public class HazardCorruptor implements AtmosphericCorruptor {
+
+    private static final int SAFE_AQI_THRESHOLD = 2;
+    private static final int MODERATE_AQI = 3;
+    private static final int SEVERE_AQI_THRESHOLD = 4;
+    private static final int LOCAL_WASTE_SPREAD_CHANCE_DIVISOR = 4;
+    private static final int LOCAL_WASTE_SPREAD_TRIGGER = 0;
+    private static final int HOTSPOT_RADIUS = 2;
 
     private final Random random = new Random();
 
@@ -45,7 +51,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
     public void corrupt(GameMap map, AirQualityReport report) {
         int aqi = report.getAqi();
 
-        if (aqi <= 2) {
+        if (aqi <= SAFE_AQI_THRESHOLD) {
             return;
         }
 
@@ -60,14 +66,14 @@ public class HazardCorruptor implements AtmosphericCorruptor {
                 actor.asCapability(AtmosphereSensitiveActor.class).ifPresent(sensitive -> {
                     sensitive.applyAtmosphere(report, location);
 
-                    if (aqi == 3) {
+                    if (aqi == MODERATE_AQI) {
                         spreadLocalWaste(location);
                     }
                 });
             }
         }
 
-        if (aqi >= 4) {
+        if (aqi >= SEVERE_AQI_THRESHOLD) {
             createBorderWasteRing(map);
             createAnchorHotspot(map);
         }
@@ -88,7 +94,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
                 continue;
             }
 
-            if (random.nextInt(4) == 0) {
+            if (random.nextInt(LOCAL_WASTE_SPREAD_CHANCE_DIVISOR) == LOCAL_WASTE_SPREAD_TRIGGER) {
                 dest.setGround(new ToxicWaste());
             }
         }
@@ -118,7 +124,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
     }
 
     /**
-     * Locates an actor marked as an {@link AtmosphericMonitor} and creates a
+     * Locates a ground marked as an {@link AtmosphericAnchor} and creates a
      * concentrated hotspot of {@link ToxicWaste} within Manhattan distance 2.
      *
      * Only empty tiles may be corrupted. If no atmospheric anchor exists on the
@@ -133,12 +139,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
         for (int y : map.getYRange()) {
             for (int x : map.getXRange()) {
                 Location here = map.at(x, y);
-                Actor actor = here.getActor();
-                if (actor == null) {
-                    continue;
-                }
-
-                if (actor.asCapability(AtmosphericAnchor.class).isPresent()) {
+                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
                     anchorLocation = here;
                     break outer;
                 }
@@ -155,7 +156,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
         for (int y : map.getYRange()) {
             for (int x : map.getXRange()) {
                 int manhattan = Math.abs(x - centreX) + Math.abs(y - centreY);
-                if (manhattan > 2) {
+                if (manhattan > HOTSPOT_RADIUS) {
                     continue;
                 }
 

@@ -1,6 +1,5 @@
 package game.atmosphere;
 
-import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 
@@ -31,11 +30,11 @@ public class AtmosphericApiClient {
      * Representative city coordinates used as atmospheric profiles.
      */
     private static final double[][] CITY_COORDS = {
-            {39.9042, 116.4074},  // Beijing
-            {28.7041, 77.1025},   // Delhi
-            {34.0522, -118.2437}, // Los Angeles
-            {-6.2088, 106.8456},  // Jakarta
-            {19.0760, 72.8777}    // Mumbai
+            {39.9042, 116.4074},
+            {28.7041, 77.1025},
+            {34.0522, -118.2437},
+            {-6.2088, 106.8456},
+            {19.0760, 72.8777}
     };
 
     private final HttpClient httpClient;
@@ -63,11 +62,11 @@ public class AtmosphericApiClient {
      * If the API key is missing, blank, or the request fails, this method
      * returns an empty JSON object string so the game can fail softly.
      *
-     * @param actor the actor performing the scan
-     * @param map the map the actor is currently on
+     * @param anchor the atmospheric anchor that identifies the monitor system
+     * @param map the map containing the atmospheric monitor
      * @return the raw JSON API response, or "{}" if the request cannot be completed
      */
-    public String fetch(Actor actor, GameMap map) {
+    public String fetch(AtmosphericAnchor anchor, GameMap map) {
         String apiKey = System.getenv("OPENWEATHER_API_KEY");
         if (apiKey == null) {
             return "{}";
@@ -75,11 +74,14 @@ public class AtmosphericApiClient {
 
         apiKey = apiKey.trim();
         if (apiKey.isEmpty()) {
-            // Fail soft if the key is effectively blank so the game can still run.
             return "{}";
         }
 
-        Location location = map.locationOf(actor);
+        Location location = findAnchorLocation(map);
+        if (location == null) {
+            return "{}";
+        }
+
         int x = location.x();
         int y = location.y();
 
@@ -104,5 +106,23 @@ public class AtmosphericApiClient {
         } catch (IOException | InterruptedException e) {
             return "{}";
         }
+    }
+
+    /**
+     * Finds the map location of the atmospheric anchor.
+     *
+     * @param map the map to search
+     * @return the anchor location, or null if no anchor exists on the map
+     */
+    private Location findAnchorLocation(GameMap map) {
+        for (int y : map.getYRange()) {
+            for (int x : map.getXRange()) {
+                Location here = map.at(x, y);
+                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
+                    return here;
+                }
+            }
+        }
+        return null;
     }
 }

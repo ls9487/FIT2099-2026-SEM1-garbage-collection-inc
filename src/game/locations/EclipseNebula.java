@@ -121,12 +121,8 @@ public class EclipseNebula extends World {
                 new AtmosphericApiClient(),
                 servicesFactory
         );
-        Inventory monitorInventory = new WeightLimitedInventory(0);
-        AtmosphericMonitor monitor = new AtmosphericMonitor(
-                monitorInventory,
-                monitorBehaviour
-        );
-        moon99DeprecatedMap.at(15, 2).addActor(monitor);
+        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorBehaviour);
+        moon99DeprecatedMap.at(15, 2).setGround(monitor);
     }
 
     /**

@@ -72,7 +72,7 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
     }
 
     /**
-     * Scans the map for a location containing an AtmosphericMonitor.
+     * Scans the map for a location containing an atmospheric anchor.
      *
      * @param map the map to search
      * @return the monitor location, or {@code null} if none exists on this map
@@ -81,7 +81,7 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
         for (int y : map.getYRange()) {
             for (int x : map.getXRange()) {
                 Location here = map.at(x, y);
-                if (here.getActorAs(AtmosphericAnchor.class) != null) {
+                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
                     return here;
                 }
             }
