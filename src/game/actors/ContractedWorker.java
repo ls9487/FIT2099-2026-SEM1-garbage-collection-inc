@@ -33,6 +33,30 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
     /** Maximum amount of credits a worker can hold. */
     public static final int MAX_CREDITS = 1000;
 
+    /** Highest AQI value that still counts as safe for the worker. */
+    private static final int SAFE_AQI_THRESHOLD = 2;
+
+    /** Exact AQI tier that triggers the worker's moderate toxic-air effects. */
+    private static final int MODERATE_AQI = 3;
+
+    /** Immediate HP loss applied to the worker under moderate toxic air. */
+    private static final int MODERATE_ATMOSPHERE_DAMAGE = 1;
+
+    /** Poison duration applied to the worker under moderate toxic air. */
+    private static final int MODERATE_POISON_DURATION = 2;
+
+    /** Per-turn poison damage applied under moderate toxic air. */
+    private static final int MODERATE_POISON_DAMAGE = 1;
+
+    /** Immediate HP loss applied to the worker under severe toxic air. */
+    private static final int SEVERE_ATMOSPHERE_DAMAGE = 2;
+
+    /** Poison duration applied to the worker under severe toxic air. */
+    private static final int SEVERE_POISON_DURATION = 3;
+
+    /** Per-turn poison damage applied under severe toxic air. */
+    private static final int SEVERE_POISON_DAMAGE = 2;
+
     /**
      * Constructor for the ContractedWorker class.
      * @param name The name of the worker.
@@ -192,14 +216,14 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
         }
 
         // Severe pollution (aqi >= 4): heavier damage and stronger poison.
-        // Duration & intensity (3 turns, 2 dmg/turn).
-        this.hurt(2);
+        // Duration & intensity use the named severe-effect constants.
+        this.hurt(SEVERE_ATMOSPHERE_DAMAGE);
         System.out.println("[Toxic Atmosphere] AQI " + aqi
                 + " : " + this + " is overwhelmed by toxic fumes! -2 HP and severe poison applied!");
         this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
                 this.addStatus(new game.statuses.PoisonStatus(
-                        /* duration */ 3,
-                        /* damagePerTurn */ 2,
+                        /* duration */ SEVERE_POISON_DURATION,
+                        /* damagePerTurn */ SEVERE_POISON_DAMAGE,
                         poisonable
                 ))
         );
