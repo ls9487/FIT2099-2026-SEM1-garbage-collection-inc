@@ -36,6 +36,8 @@ import java.util.Random;
  */
 public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
 
+    private static final int SEVERE_AQI_THRESHOLD = 4;
+
     private final Random random = new Random();
 
     /**
@@ -47,7 +49,7 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
      */
     @Override
     public void corrupt(GameMap map, AirQualityReport report) {
-        if (report.getAqi() < 4) {
+        if (report.getAqi() < SEVERE_AQI_THRESHOLD) {
             return;
         }
 

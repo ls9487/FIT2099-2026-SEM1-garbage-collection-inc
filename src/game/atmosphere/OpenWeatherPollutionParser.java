@@ -8,17 +8,21 @@ package game.atmosphere;
  */
 public class OpenWeatherPollutionParser implements PollutionDataParser {
 
+    private static final int DEFAULT_SAFE_AQI = 1;
+    private static final double DEFAULT_COMPONENT_LEVEL = 0.0;
+    private static final String UNKNOWN_POLLUTANT = "unknown";
+
     @Override
     public AirQualityReport parse(String json) {
         if (json == null || json.isEmpty()) {
-            return new AirQualityReport(1, "unknown");
+            return new AirQualityReport(DEFAULT_SAFE_AQI, UNKNOWN_POLLUTANT);
         }
 
         // Default to AQI 1 (safe) when a field is missing so the game does
         // not apply effects when the API returns an empty or malformed payload.
-        int aqi = extractInt(json, "\"aqi\":", 1);
-        double no2 = extractDouble(json, "\"no2\":", 0.0);
-        double so2 = extractDouble(json, "\"so2\":", 0.0);
+        int aqi = extractInt(json, "\"aqi\":", DEFAULT_SAFE_AQI);
+        double no2 = extractDouble(json, "\"no2\":", DEFAULT_COMPONENT_LEVEL);
+        double so2 = extractDouble(json, "\"so2\":", DEFAULT_COMPONENT_LEVEL);
         String dominant = no2 >= so2 ? "no2" : "so2";
 
         return new AirQualityReport(aqi, dominant);

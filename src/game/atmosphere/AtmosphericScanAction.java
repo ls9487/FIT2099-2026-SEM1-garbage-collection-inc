@@ -19,6 +19,9 @@ import java.util.List;
  */
 public class AtmosphericScanAction extends Action {
 
+    private static final int SAFE_AQI_THRESHOLD = 2;
+    private static final int MODERATE_AQI = 3;
+
     private final PollutionDataParser parser;
     private final List<AtmosphericCorruptor> corruptors;
     private final AtmosphericApiClient apiClient;
@@ -54,9 +57,9 @@ public class AtmosphericScanAction extends Action {
         }
 
         String tier;
-        if (report.getAqi() <= 2) {
+        if (report.getAqi() <= SAFE_AQI_THRESHOLD) {
             tier = "Safe : no effects";
-        } else if (report.getAqi() == 3) {
+        } else if (report.getAqi() == MODERATE_AQI) {
             tier = "Moderate : local contamination spreading";
         } else {
             tier = "SEVERE : facility-wide toxic event!";
