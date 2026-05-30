@@ -13,12 +13,8 @@ import game.grounds.MagicCircleGroup;
 import game.grounds.Vent;
 import game.items.AlienCube;
 import game.items.Flask;
-import game.spawners.ParasiteSpawner;
-import game.spawners.SlimeSpawner;
-import game.spawners.Spawner;
-import game.spawners.UndeadSpawner;
-import game.trees.FleshyTreeSprout;
-import game.trees.WarperTreeSapling;
+import game.spawners.*;
+import game.trees.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +38,7 @@ public class Overflow20 extends GameMap {
      * @param groundCreator engine ground factory
      * @throws GameEngineException when the map cannot be created
      */
-    public Overflow20(GroundCreator groundCreator) throws GameEngineException {
+    public Overflow20(GroundCreator groundCreator, List<Supplier<Item>> depositable) throws GameEngineException {
         super("20-Overflow", groundCreator, Arrays.asList(
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 "...#######...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈##################≈≈≈≈≈≈≈",
@@ -66,8 +62,8 @@ public class Overflow20 extends GameMap {
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈"
         ));
         this.tubeLocations = new ArrayList<>();
-        this.setHoles();
-        this.setVents();
+        this.setHoles(depositable);
+        this.setVents(depositable);
         this.setMagicCircles();
         this.setAlienCubes();
         this.setTrees();
@@ -76,7 +72,7 @@ public class Overflow20 extends GameMap {
         this.tubeLocations.add(this.at(6, 3));
     }
 
-    private void setHoles() {
+    private void setHoles(List<Supplier<Item>> depositable) {
         // First, define the spawners the holes on this map can spawn.
         List<Spawner> spawners = new ArrayList<>();
         spawners.add(new UndeadSpawner());
@@ -85,11 +81,12 @@ public class Overflow20 extends GameMap {
         this.at(28, 9).setGround(new Hole(spawners));
     }
 
-    private void setVents() {
+    private void setVents(List<Supplier<Item>> depositable) {
         // Define the spawners the vents on this map can spawn.
         List<Spawner> spawners = new ArrayList<>();
         spawners.add(new SlimeSpawner());
         spawners.add(new ParasiteSpawner());
+        spawners.add(new ScrapSnatcherSpawner(depositable));
 
         this.at(51, 2).setGround(new Vent(spawners));
     }
@@ -121,11 +118,15 @@ public class Overflow20 extends GameMap {
     }
 
     private void setTrees() {
-        List<Spawner> fleshyTreeSproutSpawner = new ArrayList<>();
-        fleshyTreeSproutSpawner.add(new SlimeSpawner());
-        this.at(1, 16).setGround(new FleshyTreeSprout(fleshyTreeSproutSpawner));
+        List<Spawner> fleshyTreeSproutSpawners = new ArrayList<>();
+        fleshyTreeSproutSpawners.add(new SlimeSpawner());
 
-        this.at(4, 16).setGround(new WarperTreeSapling());
+        List<Spawner> fleshyTreeMatureSpawners = new ArrayList<>();
+        fleshyTreeMatureSpawners.add(new UndeadSpawner());
+
+        this.at(1, 16).setGround(new FleshyTreeSprout(fleshyTreeSproutSpawners, new FleshyTreeSapling(new FleshyTreeMature(fleshyTreeMatureSpawners))));
+
+        this.at(4, 16).setGround(new WarperTreeSapling(new WarperTreeMature()));
     }
     /**
      * Locations reserved for installing teleportation tubes after all maps are

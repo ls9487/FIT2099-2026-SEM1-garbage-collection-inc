@@ -18,7 +18,9 @@ public class Fire extends EclipseItem {
 
     /**
      * Constructor for the Fire class. This should stay on the ground.
-     * Weightless and non-portable. Burns for x turns.
+     * Weightless and non-portable. Burns for the given number of turns.
+     *
+     * @param duration number of turns before the fire extinguishes
      */
     public Fire(int duration) {
         super("Fire", '^', 0);
