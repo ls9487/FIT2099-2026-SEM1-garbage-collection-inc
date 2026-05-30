@@ -21,6 +21,10 @@ import game.inventories.WeightLimitedInventory;
 import game.items.Flask;
 import game.grounds.SuperComputer;
 import game.grounds.TeleportationTube;
+import game.atmosphere.AtmosphericApiClient;
+import game.atmosphere.AtmosphericMonitor;
+import game.atmosphere.AtmosphericServicesFactory;
+import game.atmosphere.EnvironmentalMonitorBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,15 +98,15 @@ public class EclipseNebula extends World {
 
         // BEHOLD, LOCAL MULTIPLAYER!!! ...comment some guys out for easier testing.
         ContractedWorker contractedWorker1 = initialiseNewWorker("#1 Bob", 'ඞ', 10);
-        ContractedWorker contractedWorker2 = initialiseNewWorker("#2 Tom", 'ඞ', 10);
-        ContractedWorker contractedWorker3 = initialiseNewWorker("#3 Sarah", 'ඞ', 10);
-        ContractedWorker contractedWorker4 = initialiseNewWorker("#4 Julie", 'ඞ', 10);
-        ContractedWorker contractedWorker5 = initialiseNewWorker("#5 Rick", 'ඞ', 10);
+        //ContractedWorker contractedWorker2 = initialiseNewWorker("#2 Tom", 'ඞ', 10);
+        //ContractedWorker contractedWorker3 = initialiseNewWorker("#3 Sarah", 'ඞ', 10);
+        //ContractedWorker contractedWorker4 = initialiseNewWorker("#4 Julie", 'ඞ', 10);
+        //ContractedWorker contractedWorker5 = initialiseNewWorker("#5 Rick", 'ඞ', 10);
         this.addPlayer(contractedWorker1, moon99DeprecatedMap.at(6, 2));
-        this.addPlayer(contractedWorker2, moon99DeprecatedMap.at(7, 2));
-        this.addPlayer(contractedWorker3, moon99DeprecatedMap.at(8, 2));
-        this.addPlayer(contractedWorker4, moon99DeprecatedMap.at(6, 4));
-        this.addPlayer(contractedWorker5, moon99DeprecatedMap.at(8, 4));
+        //this.addPlayer(contractedWorker2, moon99DeprecatedMap.at(7, 2));
+        //this.addPlayer(contractedWorker3, moon99DeprecatedMap.at(8, 2));
+        //this.addPlayer(contractedWorker4, moon99DeprecatedMap.at(6, 4));
+        //this.addPlayer(contractedWorker5, moon99DeprecatedMap.at(8, 4));
 
         /*
          * TESTING HELPER for any REQ involving credit amount:
@@ -112,10 +116,24 @@ public class EclipseNebula extends World {
          *
          * Comment it out again for normal gameplay/evaluation (start as a broke).
          */
-         //contractedWorker1.addCredits(1000);
+         //contractedWorker1.getEclipseStatistics.CREDITS(1000);
+
+         // Give Bob a CrtMonitor to sell.
+         //contractedWorker1.getInventory().add(new FloppyDisk());
 
         moon99DeprecatedMap.at(10, 10).addActor(new Muckraker());
         moon99DeprecatedMap.at(11, 11).addActor(new PhantasmWisp());
+
+        // Passive atmospheric monitor for A3 REQ5: sits near the SuperComputer
+        // and periodically scans the real-world air quality.
+        AtmosphericServicesFactory servicesFactory = new AtmosphericServicesFactory();
+        EnvironmentalMonitorBehaviour monitorBehaviour = new EnvironmentalMonitorBehaviour(
+                servicesFactory.createParser(),
+                new AtmosphericApiClient(),
+                servicesFactory
+        );
+        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorBehaviour);
+        moon99DeprecatedMap.at(15, 2).setGround(monitor);
     }
 
     /**
