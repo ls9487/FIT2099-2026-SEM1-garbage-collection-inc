@@ -15,17 +15,27 @@ public class WarperTreeSapling extends Tree implements Growable {
     private static final char DISPLAY_CHAR = 'w';
     private static final String NAME = "Warper Tree Sapling";
     private static final int GROW_BEHAVIOUR_PRIORITY = 1;
+    private Tree nextStage;
+    /**
+     * Creates a sapling with default growth statistics.
+     */
+    public WarperTreeSapling(Tree nextStage) {
+        super(DISPLAY_CHAR, NAME);
+        addNewBehaviour(GROW_BEHAVIOUR_PRIORITY, new GrowBehaviour(this));
+        addNewStatistic(TreeStatistics.GROW_CHANCE, new BaseStatistic(25));
+        addNewStatistic(TreeStatistics.GROW_TURNS, new BaseStatistic(20));
+        modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.UPDATE, 0);
+        this.nextStage = nextStage;
+    }
 
     /**
      * Creates a sapling with default growth statistics.
      */
     public WarperTreeSapling() {
         super(DISPLAY_CHAR, NAME);
-        addNewBehaviour(GROW_BEHAVIOUR_PRIORITY, new GrowBehaviour(this));
-        addNewStatistic(TreeStatistics.GROW_CHANCE, new BaseStatistic(25));
-        addNewStatistic(TreeStatistics.GROW_TURNS, new BaseStatistic(20));
-        modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.UPDATE, 0);
     }
+
+
 
     /**
      * Runs behaviours until one returns TRUE
@@ -34,7 +44,9 @@ public class WarperTreeSapling extends Tree implements Growable {
      */
     @Override
     public void tick(Location location) {
-        modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.INCREASE, 1);
+        if (hasStatistic(TreeStatistics.GROW_TURNS)) {
+            modifyStatistic(TreeStatistics.GROW_TURNS, StatisticOperations.INCREASE, 1);
+        }
         super.tick(location);
     }
 
@@ -46,7 +58,7 @@ public class WarperTreeSapling extends Tree implements Growable {
      */
     @Override
     public String grow(Location location) {
-        location.setGround(new WarperTreeMature());
+        location.setGround(nextStage);
         return String.format("%s grows to %s", this, location.getGround());
     }
 }

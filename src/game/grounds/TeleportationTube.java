@@ -36,6 +36,15 @@ public class TeleportationTube extends Ground implements Teleporter {
         this.destinations = destinations;
     }
 
+    /**
+     * Teleports the actor to a destination, possibly malfunctioning to a random tile,
+     * and scatters fire on adjacent tiles at the arrival site.
+     *
+     * @param actor       the actor being teleported
+     * @param map         the map the actor occupies before teleporting
+     * @param destination the intended arrival tile
+     * @return a message describing the teleport outcome
+     */
     @Override
     public String teleport(Actor actor, GameMap map, Location destination) {
         // The actual destination to be teleported to. Assume it's the original for now.

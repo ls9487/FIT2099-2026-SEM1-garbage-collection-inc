@@ -16,6 +16,11 @@ public class WeightLimitedInventory extends Inventory {
     private int weightLimit;
     private int weight;
 
+    /**
+     * Creates an inventory that rejects items exceeding the weight cap.
+     *
+     * @param weightLimit maximum total weight of carried items
+     */
     public WeightLimitedInventory(int weightLimit) {
         this.weightLimit = weightLimit;
         this.weight = 0;

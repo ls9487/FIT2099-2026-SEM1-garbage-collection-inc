@@ -1,0 +1,86 @@
+REQ 4 Plan - GLORY TO THE MILITARY INDUSTRIAL COMPLEX
+
+----- PART 1 -----
+New abstract class: Projectile
+
+Projectile extends Item.
+Stores a final destination and velocity.
+Tick method will be overridden to make the projectile move towards the final destination (how many tiles per turn is based on the velocity).
+
+Upon reaching the final destination OR hitting an actor OR hitting a ground that blocks projectiles (walls, doors), the projectile stops there and its effect is activated (we'll call this the hit effect).
+
+Concrete classes:
+1) FireBullet
+Just an incendiary bullet that should light up the target on impact. But due to low oxygen levels on moons, the igniter doesn't work half the time. There also isn't enough fuel to create a lasting fire on the ground.
+
+Velocity of 3 tiles per turn.
+Hit effect:
+-Deals 2 damage to the target actor if hit.
+-50% chance to inflict burn (1 dmg, 3 turns).
+
+2) SiphonBullet
+A type of bullet that uses weird science to draw life force from targets near the impact point, transferring it to someone. Targets standing farther away will be affected less.
+
+Velocity of 3 tiles per turn.
+References an actor as the "source".
+Hit effect:
+-Deals 3 damage to the target actor if hit on the same tile.
+-Deals 1 damage to each actor adjacent to the impact point. 
+-Source will be healed by total damage dealt (note: if a target has 2 hp and gets hit, the source actor still heals by 3 hp).
+
+3) NuclearMissile
+Wait, what.
+Anyways, the company has authorized the use of extremely low-yield nuclear missiles to (somehow) help with the workers' operations. Anything more than that is forbidden since it'll probably really hurt their bottom line via disappearing an entire moon.
+Still, these things are dangerous if not carefully handled! Nuclear blasts are unpredictably destructive here, but you can expect long-lasting fires and significant permanent damage to the terrain.
+(Please don't use this to bust open a door.)
+
+Velocity of 1 tile per turn.
+Hit effect (9x9 area of effect):
+Ground zero (where the projectile landed):
+-500 damage to actor
+-Fire, 20 duration
+-Ground becomes toxic waste
+Other tiles:
+-5 damage to actor
+-Fire, random 5-10 duration
+-50% chance ground becomes toxic waste
+
+----- PART 2 -----
+New abstract class: Turret
+
+Turret extends Ground.
+Turrets are structures designed by the company with the intention of assisting workers' operations. These have been programmed to detect targets (non-workers) and fire projectiles at them.
+
+Turrets have a limited number of projectiles they can fire. They do not despawn when running out of ammo.
+Also, actors cannot walk onto turrets. (Projectiles can pass through turrets since projectiles originate from them)
+
+Concrete classes:
+1) GunTurret
+
+Detection radius of 7.
+15 bullets (FireBullet).
+Random target.
+
+This will likely be placed outside the ship in case there's any lifeforms that aren't so welcoming of the ship landing on their moon.
+
+2) SiphonTurret
+
+REQUIRES "registering" a worker (well, any actor with a certain ability) as the source for drained health to be directed towards, before projectiles can be fired. Any worker that enters its registration range is automatically registered.
+Registration radius of 2.
+Deals 3 damage to the worker being registered (be careful for this might accidentally kill someone).
+Random target.
+
+Detection radius of 5.
+10 bullets (SiphonBullet).
+Random target.
+
+NOTE: Registering and firing can happen on the same turn.
+
+3) NuclearPad
+
+REQUIRES a worker standing adjacent to it for at least 3 consecutive turns to "arm" the missile, allowing it to fire. Stepping out of the adjacent tiles will reset this timer.
+It'd be really bad if the nuclear pad acted on its own.
+
+Detection radius of 10.
+1 missile (NuclearMissile).
+Random target.

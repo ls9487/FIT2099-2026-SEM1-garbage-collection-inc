@@ -1,11 +1,9 @@
 package game.locations;
 
-import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
-import game.actors.Slime;
-import game.actors.Undead;
 import game.grounds.Hole;
 import game.items.AccessCardL1;
 import game.items.Apple;
@@ -15,9 +13,11 @@ import game.items.FloppyDisk;
 import game.items.CrtMonitor;
 import game.items.Alarm;
 import game.grounds.SuperComputer;
+import game.spawners.ScrapSnatcherSpawner;
 import game.spawners.SlimeSpawner;
 import game.spawners.Spawner;
 import game.spawners.UndeadSpawner;
+import game.trees.*;
 
 import java.util.function.Supplier;
 
@@ -43,7 +43,7 @@ public class Deprecated99 extends GameMap {
      * @param groundCreator The ground creator object.
      * @throws Exception in case if anything goes wrong...
      */
-    public Deprecated99(GroundCreator groundCreator) throws Exception {
+    public Deprecated99(GroundCreator groundCreator, List<Supplier<Item>> depositable) throws Exception {
         super("99-Deprecated", groundCreator, Arrays.asList(
                 "....................########################################",
                 "...#######..........#__________________#___________________#",
@@ -68,10 +68,11 @@ public class Deprecated99 extends GameMap {
         );
         this.tubeLocations = new ArrayList<>();
         this.addLooseItems();
-        this.setHoles();
+        this.setHoles(depositable);
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
         this.tubeLocations.add(this.at(6, 3));
         this.setSuperComputer();
+        this.setTrees(depositable);
     }
 
     /**
@@ -108,11 +109,14 @@ public class Deprecated99 extends GameMap {
      * Replace designated spots with holes in the ground, along with the creatures spawned from it.
      * To be used internally within this class only.
      */
-    private void setHoles() {
+    private void setHoles(List<Supplier<Item>> depositable) {
         // First, define the spawners the holes on this map can spawn.
+
         List<Spawner> spawners = new ArrayList<>();
         spawners.add(new UndeadSpawner());
         spawners.add(new SlimeSpawner());
+        spawners.add(new ScrapSnatcherSpawner(depositable));
+
         // Then, replace the designated locations with holes.
         this.at(56, 1).setGround(new Hole(spawners));
         this.at(49, 11).setGround(new Hole(spawners));
@@ -148,6 +152,16 @@ public class Deprecated99 extends GameMap {
             tubeLocations.add(this.at(location.x(), location.y()));
         }
         return tubeLocations;
+    }
+
+    private void setTrees(List<Supplier<Item>> depositable) {
+        List<Spawner> fleshyTreeSproutSpawners = new ArrayList<>();
+        fleshyTreeSproutSpawners.add(new UndeadSpawner());
+
+        List<Spawner> fleshyTreeMatureSpawners = new ArrayList<>();
+        fleshyTreeMatureSpawners.add(new ScrapSnatcherSpawner(depositable));
+
+        this.at(1, 16).setGround(new FleshyTreeSprout(fleshyTreeSproutSpawners, new FleshyTreeMature(fleshyTreeMatureSpawners, new FleshyTreeMonolith())));
     }
 }
 

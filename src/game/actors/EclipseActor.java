@@ -66,6 +66,8 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
      * Return an unmodifiable collection of the behaviours' values.
      * The ordering will start from the lowest to highest priority (due to TreeMap).
      * Subclasses may need to use this to access behaviour values, since behaviours is private.
+     *
+     * @return behaviours ordered from lowest to highest priority
      */
     protected Collection<Behaviour<Actor, Action>> getBehaviourValues() {
         // Note that Map.values() returns a Collection type, hence unmodifiableCollection.
@@ -90,6 +92,11 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
         this.hurt(damage);
     }
 
+    /**
+     * Applies stun damage to this actor.
+     *
+     * @param damage hit points lost while stunned
+     */
     @Override
     public void stun(int damage) {
         this.hurt(damage);
@@ -117,6 +124,15 @@ public abstract class EclipseActor extends Actor implements Poisonable, Flammabl
         }
     }
 
+    /**
+     * Resolves unconsciousness, stun, multi-turn actions, then the first valid behaviour action.
+     *
+     * @param actions    allowable actions for this turn
+     * @param lastAction the action from the previous turn, if any
+     * @param map        the map this actor occupies
+     * @param display    display used for output
+     * @return the action performed this turn
+     */
     @Override
     public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
         // Forced if the actor isn't conscious.

@@ -13,8 +13,10 @@ public interface Consumable {
 
     /**
      * This method lets the actor consume this consumable.
-     * @param actor The actor consuming this consumable.
-     * @return A string description of the result of consuming this consumable.
+     *
+     * @param actor the actor consuming this consumable
+     * @param map   the map the actor occupies
+     * @return a string description of the result of consuming this consumable
      */
     public String consumedBy(Actor actor, GameMap map);
 

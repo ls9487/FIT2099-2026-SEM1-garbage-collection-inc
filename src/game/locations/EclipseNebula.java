@@ -2,6 +2,7 @@ package game.locations;
 
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.positions.World;
@@ -27,6 +28,7 @@ import game.atmosphere.EnvironmentalMonitorBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This class handles the miracle of creation, translating a bunch of periods
@@ -34,6 +36,11 @@ import java.util.List;
  */
 public class EclipseNebula extends World {
 
+    /**
+     * Creates the game world bound to the given display.
+     *
+     * @param display display used for game output
+     */
     public EclipseNebula(Display display) {
         super(display);
     }
@@ -59,10 +66,14 @@ public class EclipseNebula extends World {
         // NOTE: We cannot use the default ground creator to create holes,
         // as holes take a parameter of what they can spawn.
 
+        List<Supplier<Item>> depositable = new ArrayList<>();
+        depositable.add(AluminiumScrap::new);
+        depositable.add(IndustrialFan::new);
+        depositable.add(AlienArtifact::new);
 
         // Produce the maps...
-        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator);
-        Overflow20 overflow20Map = new Overflow20(groundCreator);
+        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator, depositable);
+        Overflow20 overflow20Map = new Overflow20(groundCreator, depositable);
         this.addGameMap(moon99DeprecatedMap);
         this.addGameMap(overflow20Map);
 
@@ -128,9 +139,10 @@ public class EclipseNebula extends World {
     /**
      * This method handles creating a new worker, with its own separate weighted inventory. Starts with a flask.
      * This exists because I don't want to keep creating new inventories per worker.
-     * @param name The name of the worker.
-     * @param displayChar The display character of the worker.
-     * @param hitPoints The health value of the worker.
+     * @param name        the name of the worker
+     * @param displayChar the display character of the worker
+     * @param hitPoints   the health value of the worker
+     * @return a new contracted worker with a weighted inventory and starter flask
      */
     public ContractedWorker initialiseNewWorker(String name, char displayChar, int hitPoints) {
         // Inventory is weighted, with a limit of 50.
