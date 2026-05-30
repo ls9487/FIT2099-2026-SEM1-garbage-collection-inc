@@ -37,20 +37,22 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
     - `list[0].components.no_2` and `list[0].components.so_2` to determine the dominant pollutant (`"no_2"` or `"so_2"`).
   - `FallbackPollutionParser` is selected only when `OPENWEATHER_API_KEY` is absent or blank, ensuring the feature remains executable without exposing secrets while safely disabling atmospheric corruption.
 
-- The resulting `AirQualityReport` is passed to one or more `AtmosphericCorruptor` implementations, which translate air quality into concrete game effects:
+- The resulting `AirQualityReport` is passed to one or more `AtmosphericCorruptor` implementations, which translate air quality into concrete game effects. These effects fall into two categories:
+  - **Probability-based world effects**: random map-level effects whose chance is explicitly encoded in the code (for example, local toxic spread, hotspot corruption, and disrupted shop payouts).
+  - **Guaranteed actor effects**: deterministic reactions that always happen once an actor is processed at the relevant AQI tier (for example, direct HP loss, poison, tile corruption, or adjacent damage applied by `AtmosphereSensitiveActor` implementations).
 
   - **HazardCorruptor**
     - Interprets AQI in three tiers on the 1-5 scale:
       - **Tier 1 (mild)**: `aqi <= 2` - no atmospheric effects are applied.
-      - **Tier 2 (moderate)**: `aqi == 3` - local damage, poison, and small toxic patches.
-      - **Tier 3 (severe)**: `aqi >= 4` - heavy damage, strong poison, and large-scale terrain corruption.
-    - For AQI >= 3, it iterates over the map and finds any actor exposing the `AtmosphereSensitiveActor` capability (currently `ContractedWorker`, `Muckraker`, and `Undead`). For each such actor, it calls `applyAtmosphere(report, here)` so the actor can apply its own complex health, terrain, movement, or area effects.
+      - **Tier 2 (moderate)**: `aqi == 3` - guaranteed actor-specific effects plus small probabilistic toxic patches.
+      - **Tier 3 (severe)**: `aqi >= 4` - guaranteed heavier actor-specific effects plus large-scale terrain corruption.
+    - For AQI >= 3, it iterates over the map and finds any actor exposing the `AtmosphereSensitiveActor` capability (currently `ContractedWorker`, `Muckraker`, and `Undead`). For each such actor, it calls `applyAtmosphere(report, here)` so the actor can apply its own guaranteed health, terrain, movement, or area effects according to its own implementation.
     - At **moderate AQI (3)**, after calling `applyAtmosphere` on an atmosphere-sensitive actor, HazardCorruptor also creates small **toxic puddles** around that actor:
       - It examines the neighbouring tiles around the actor using the engine's `Exit` API.
-      - On neighbouring floor-like tiles, there is a 25% chance per tile to replace the ground with `ToxicWaste`, forming a local contaminated cluster rather than corrupting the entire map.
-    - At **severe AQI (4-5)**, HazardCorruptor applies heavy health and status effects via `applyAtmosphere`, and then performs two large-scale terrain mutations:
+      - On neighbouring eligible empty tiles, there is a **25% chance per tile** to replace the ground with `ToxicWaste`, forming a local contaminated cluster rather than corrupting the entire map.
+    - At **severe AQI (4-5)**, HazardCorruptor applies heavier guaranteed actor-specific effects via `applyAtmosphere`, and then performs two large-scale terrain mutations:
       - **Border ring**: it walks the outer border coordinates of the `GameMap` (top row, bottom row, left and right columns) and replaces the ground with `ToxicWaste`, producing a visible toxic perimeter around the facility.
-      - **Monitor hotspot**: it locates the atmospheric anchor near the monitor and, for all tiles within Manhattan distance 2 of that anchor, randomly (50% chance) converts walkable empty tiles into `ToxicWaste`. This makes the probe itself feel like a pollution hotspot.
+      - **Monitor hotspot**: it locates the atmospheric anchor near the monitor and, for all eligible empty tiles within Manhattan distance 2 of that anchor, applies a **50% chance per tile** to convert the ground into `ToxicWaste`. This makes the probe itself feel like a pollution hotspot.
 
   - **EconomyCorruptor**
     - Interprets sulphur dioxide (SO_2) as a proxy for economic disruption.
@@ -60,9 +62,10 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
       - If SO_2 is not dominant, the flag is reset to `false` and no credit erosion occurs.
     - The disruption flag is consumed by the REQ1 shop system:
       - When `EconomyCorruptor.ECONOMY_DISRUPTED` is `true`, `SellAction` gains a **transaction fizzle** behaviour:
-        - Each sale still removes the item from the seller's inventory (via `Sellable.soldBy`), but there is a 50% chance that the **payout is 0 credits** instead of the usual price.
+        - Each sale still removes the item from the seller's inventory (via `Sellable.soldBy`), but there is a **50% chance** that the **payout is 0 credits** instead of the usual price.
         - A message is printed explaining that "the toxic atmosphere corrupts the transaction and no credits are received".
-      - When the flag is `false`, SellAction behaves as in Assignment 2: the seller receives the full sell price and the item is removed normally.
+      - When the flag is `false`, SellAction behaves as in REQ1 with normal payouts.
+Assignment 2: the seller receives the full sell price and the item is removed normally.
 
 - The atmospheric system is driven by a dedicated monitor actor:
   - `AtmosphericMonitor` is a stationary `EclipseActor` that represents the facility's automated probe.
