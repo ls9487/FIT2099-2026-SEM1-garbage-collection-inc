@@ -8,4 +8,6 @@ package game.grounds;
  */
 public enum GroundStatistics {
     COOLDOWN,
+    AMMUNITION,
+    ARMING_COOLDOWN
 }
