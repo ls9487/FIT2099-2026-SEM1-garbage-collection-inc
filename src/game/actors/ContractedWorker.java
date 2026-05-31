@@ -13,6 +13,8 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.atmosphere.AirQualityReport;
+import game.atmosphere.AtmosphereSensitiveActor;
 import game.spawners.ParasiteSpawner;
 import game.spawners.Spawner;
 import game.statuses.Infectable;
@@ -26,10 +28,34 @@ import java.util.Random;
  * off the floor, swiping plastic cards at stubborn doors, and drinking mystery
  * fluids to stay alive.
  */
-public class ContractedWorker extends EclipseActor implements Infectable {
+public class ContractedWorker extends EclipseActor implements Infectable, AtmosphereSensitiveActor {
 
     /** Maximum amount of credits a worker can hold. */
     public static final int MAX_CREDITS = 1000;
+
+    /** Highest AQI value that still counts as safe for the worker. */
+    private static final int SAFE_AQI_THRESHOLD = 2;
+
+    /** Exact AQI tier that triggers the worker's moderate toxic-air effects. */
+    private static final int MODERATE_AQI = 3;
+
+    /** Immediate HP loss applied to the worker under moderate toxic air. */
+    private static final int MODERATE_ATMOSPHERE_DAMAGE = 1;
+
+    /** Poison duration applied to the worker under moderate toxic air. */
+    private static final int MODERATE_POISON_DURATION = 2;
+
+    /** Per-turn poison damage applied under moderate toxic air. */
+    private static final int MODERATE_POISON_DAMAGE = 1;
+
+    /** Immediate HP loss applied to the worker under severe toxic air. */
+    private static final int SEVERE_ATMOSPHERE_DAMAGE = 2;
+
+    /** Poison duration applied to the worker under severe toxic air. */
+    private static final int SEVERE_POISON_DURATION = 3;
+
+    /** Per-turn poison damage applied under severe toxic air. */
+    private static final int SEVERE_POISON_DAMAGE = 2;
 
     /**
      * Constructor for the ContractedWorker class.
@@ -164,4 +190,42 @@ public class ContractedWorker extends EclipseActor implements Infectable {
 
     }
 
+    // Applies A3:REQ5 toxic atmosphere effects to the worker.
+    @Override
+    public void applyAtmosphere(AirQualityReport report, Location here) {
+        int aqi = report.getAqi();
+
+        // Mild or safe air quality: no effect.
+        if (aqi <= 2) {
+            return;
+        }
+
+        // Moderate pollution: light damage and a short poison.
+        if (aqi == 3) {
+            this.hurt(1);
+            System.out.println("[Toxic Atmosphere] AQI " + aqi
+                    + " : " + this + " chokes on foul air, losing 1 HP and gaining poison!");
+            this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
+                    this.addStatus(new game.statuses.PoisonStatus(
+                            /* duration */ 2,
+                            /* damagePerTurn */ 1,
+                            poisonable
+                    ))
+            );
+            return;
+        }
+
+        // Severe pollution (aqi >= 4): heavier damage and stronger poison.
+        // Duration & intensity use the named severe-effect constants.
+        this.hurt(SEVERE_ATMOSPHERE_DAMAGE);
+        System.out.println("[Toxic Atmosphere] AQI " + aqi
+                + " : " + this + " is overwhelmed by toxic fumes! -2 HP and severe poison applied!");
+        this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
+                this.addStatus(new game.statuses.PoisonStatus(
+                        /* duration */ SEVERE_POISON_DURATION,
+                        /* damagePerTurn */ SEVERE_POISON_DAMAGE,
+                        poisonable
+                ))
+        );
+    }
 }

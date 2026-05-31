@@ -9,7 +9,9 @@ package game.statuses;
 public interface Stunnable {
 
     /**
-     * This method will handle the logic for being stunned, like taking damage.
+     * Handles the logic for being stunned, such as taking damage.
+     *
+     * @param damage hit points lost while stunned
      */
     public void stun(int damage);
 }

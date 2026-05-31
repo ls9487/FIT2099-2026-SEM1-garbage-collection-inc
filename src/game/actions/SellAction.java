@@ -46,6 +46,21 @@ public class SellAction extends Action {
         }
         // Give the credits to the seller since they're selling it.
         int price = sellable.getSellPrice();
+
+        // If the economy is disrupted by toxic air, there is a chance that the
+        // SuperComputer fails to process the transaction.
+        if (game.atmosphere.EconomyCorruptor.ECONOMY_DISRUPTED && price > 0) {
+            // 50% chance that the sale "glitches" and yields no payout.
+            if (new java.util.Random().nextBoolean()) {
+                // Still let the item handle its own removal/side-effects so the
+                // world state progresses, but give no credits.
+                sellable.soldBy(seller, map);
+                return seller + " attempts to sell " + sellable
+                        + ", but the toxic atmosphere corrupts the transaction and no credits are received.";
+            }
+        }
+
+        // Normal sale path: give credits to the seller since they're selling it.
         seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.INCREASE, price);
         // Let the sellable handle their side-effects and inventory removal.
         return sellable.soldBy(seller, map);
