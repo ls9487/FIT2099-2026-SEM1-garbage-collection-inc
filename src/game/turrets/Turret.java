@@ -19,8 +19,7 @@ import java.util.Random;
  *
  * @author echu0057
  */
-public abstract class Turret extends Ground
-{
+public abstract class Turret extends Ground {
 
     private static final Random random = new Random();
     private static final int FIRING_DELAY = 3;
