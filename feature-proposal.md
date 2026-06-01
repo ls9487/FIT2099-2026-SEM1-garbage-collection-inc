@@ -192,14 +192,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 
 ### The Mechanics
 
-- The game queries the **OpenWeather Air Pollution API** at runtime, using an API key stored in an environment variable:
-
-  ```text
-  GET https://api.openweathermap.org/data/2.5/air_pollution
-      ?lat={latitude}
-      &lon={longitude}
-      &appid={OPENWEATHER_API_KEY}
-  ```
+- The game queries the **OpenWeather Air Pollution API** at runtime, using an API key stored in an environment variable.
 
 - The API key is read via `System.getenv("OPENWEATHER_API_KEY")` and is never committed to the repository.
 
@@ -210,8 +203,8 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 - The raw JSON response is parsed into an `AirQualityReport` by the parser strategy supplied by `AtmosphericServicesFactory`.
   - `OpenWeatherPollutionParser` is the main parser and extracts:
     - `list[0].main.aqi` as an integer AQI index on the OpenWeather **1-5** scale.
-    - `list[0].components.no_2` and `list[0].components.so_2` to determine the dominant pollutant (`"no_2"` or `"so_2"`).
-  - `FallbackPollutionParser` is selected only when `OPENWEATHER_API_KEY` is absent or blank, ensuring the feature remains executable without exposing secrets while safely disabling atmospheric corruption.
+    - `list[0].components.no2` and `list[0].components.so2` to determine the dominant pollutant (`"no2"` or `"so2"`).
+  - `FallbackPollutionParser` is selected only when `OPENWEATHER_API_KEY` is absent or blank, ensuring the feature remains executable without exposing secrets while safely returning a benign fallback report that disables atmospheric corruption.
 
 - The resulting `AirQualityReport` is passed to one or more `AtmosphericCorruptor` implementations, which translate air quality into concrete game effects. These effects fall into two categories:
   - **Probability-based world effects**: random map-level effects whose chance is explicitly encoded in the code, such as local toxic spread, hotspot corruption, and disrupted shop payouts.
@@ -231,8 +224,8 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
     - **Monitor hotspot**: it locates the atmospheric anchor near the monitor and, for all eligible empty tiles within Manhattan distance 2 of that anchor, applies a **50% chance per tile** to convert the ground into `ToxicWaste`.
 
 - **EconomyCorruptor**
-  - Interprets sulphur dioxide (`SO_2`) as a proxy for economic disruption.
-  - When the dominant pollutant in `AirQualityReport` is `"so_2"`, it:
+  - Interprets sulphur dioxide (`SO2`) as a proxy for economic disruption.
+  - When the dominant pollutant in `AirQualityReport` is `"so2"`, it:
     - Sets a global disruption flag `EconomyCorruptor.ECONOMY_DISRUPTED` to `true`.
     - Iterates over all tiles in the `GameMap` and, for any actor that tracks `EclipseStatistics.CREDITS`, reduces that statistic by 10 with a floor at 0.
   - The disruption flag is consumed by the REQ1 shop system:
@@ -293,7 +286,7 @@ For REQ5, the feature is structured around **two primary gameplay abstractions t
 | EnvironmentalMonitorBehaviour | New      | -                                       | Triggers periodic atmospheric scans and coordinates the API pipeline through abstractions. |
 | AtmosphericScanAction         | New      | Action                                  | Fetches JSON, parses it, prints an AQI summary, and invokes all registered `AtmosphericCorruptor`s. |
 | HazardCorruptor               | New      | AtmosphericCorruptor                    | Calls `applyAtmosphere` on all `AtmosphereSensitiveActor`s; at moderate AQI spreads local toxic puddles; at severe AQI creates a border ring and monitor hotspot. |
-| EconomyCorruptor              | New      | AtmosphericCorruptor                    | `SO_2`-driven: reduces credits for tracked actors and toggles a disruption flag consumed by `SellAction` to probabilistically void transactions. |
+| EconomyCorruptor              | New      | AtmosphericCorruptor                    | `SO2`-driven: reduces credits for tracked actors and toggles a disruption flag consumed by `SellAction` to probabilistically void transactions. |
 | PollutantSpawnCorruptor       | New      | AtmosphericCorruptor                    | At severe AQI, locates the `AtmosphericAnchor` and spawns one `Undead` on a valid adjacent empty tile. |
 | ContractedWorker              | Existing | AtmosphereSensitiveActor                | Worker that converts AQI into HP loss and poison. |
 | Muckraker                     | Existing | AtmosphereSensitiveActor                | Scavenger that leaks `ToxicWaste` at moderate AQI and shoves adjacent actors at severe AQI. |
@@ -323,14 +316,26 @@ Example JSON structure expected by the game:
         "aqi": 4
       },
       "components": {
-        "no_2": 18.7,
-        "so_2": 42.1
+        "no2": 18.7,
+        "so2": 42.1
       }
     }
   ]
 }
 ```
 
-The game reads `list[0].main.aqi` and compares `components.no_2` and `components.so_2` to determine the dominant pollutant.
+The game reads `list[0].main.aqi` and compares `components.no2` and `components.so2` to determine the dominant pollutant.
 
+### API Key Setup
 
+To run this feature with the real OpenWeather Air Pollution API, the marker or teammate must first create their own API key.
+
+1. Go to [OpenWeather sign in](https://home.openweathermap.org/users/sign_in). If you do not already have an account, create one first.
+2. After logging in, open the [API keys page](https://home.openweathermap.org/api_keys).
+3. In the key creation section, enter a label such as `eclipse-nebula-req5` or any other name you prefer, then generate the key.
+4. Copy the generated API key and store it locally as an environment variable named `OPENWEATHER_API_KEY`.
+5. Run the game from the same environment so `System.getenv("OPENWEATHER_API_KEY")` can read the key at runtime.
+
+**Security note:** The API key must never be committed to GitLab or hardcoded in the source code.
+
+**Activation note:** A newly generated OpenWeather API key may take some time to activate, so if the request initially returns an authorization error, wait a while and try again.

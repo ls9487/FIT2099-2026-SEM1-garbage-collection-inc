@@ -135,7 +135,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 
 ### Mechanics
 
-- The system queries the OpenWeather Air Pollution API at runtime using an API key stored in `OPENWEATHER_API_KEY`.
+- The system queries the OpenWeather Air Pollution API at runtime using an API key supplied through the `OPENWEATHER_API_KEY` environment variable.
 - The API request can be described as:
 
   ```text
@@ -277,7 +277,11 @@ $env:OPENWEATHER_API_KEY="your_api_key_here"
 
 ### IntelliJ IDEA
 
-Open **Run > Edit Configurations...** and add `OPENWEATHER_API_KEY=your_api_key_here` to the environment variables field for the game run configuration.
+Open **Run > Edit Configurations...** and add the following to the environment variables field for your game run configuration:
+
+```text
+OPENWEATHER_API_KEY=your_api_key_here
+```
 
 ## How to run the project
 
