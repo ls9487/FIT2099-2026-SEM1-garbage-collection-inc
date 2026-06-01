@@ -31,6 +31,7 @@ public class PlasmaCutter extends EclipseItem implements Buyable {
      */
     public PlasmaCutter() {
         super("Plasma Cutter", '>', WEIGHT);
+        this.enableAbility(ItemAbilities.CUTTER);
     }
 
     /**
