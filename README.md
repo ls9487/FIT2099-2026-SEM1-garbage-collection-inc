@@ -277,7 +277,11 @@ $env:OPENWEATHER_API_KEY="your_api_key_here"
 
 ### IntelliJ IDEA
 
-Open **Run > Edit Configurations...** and add `OPENWEATHER_API_KEY=your_api_key_here` to the environment variables field for the game run configuration.
+Open **Run > Edit Configurations...** and add the following to the environment variables field for your game run configuration:
+
+```text
+OPENWEATHER_API_KEY=your_api_key_here
+```
 
 ## How to run the project
 

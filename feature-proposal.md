@@ -339,4 +339,3 @@ To run this feature with the real OpenWeather Air Pollution API, the marker or t
 **Security note:** The API key must never be committed to GitLab or hardcoded in the source code.
 
 **Activation note:** A newly generated OpenWeather API key may take some time to activate, so if the request initially returns an authorization error, wait a while and try again.
-
