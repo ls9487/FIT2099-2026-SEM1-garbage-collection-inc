@@ -135,7 +135,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 
 ### Mechanics
 
-- The system queries the OpenWeather Air Pollution API at runtime using an API key stored in `OPENWEATHER_API_KEY`.
+- The system queries the OpenWeather Air Pollution API at runtime using an API key supplied through the `OPENWEATHER_API_KEY` environment variable.
 - The API request can be described as:
 
   ```text
