@@ -13,6 +13,7 @@ import game.grounds.MagicCircleGroup;
 import game.grounds.Vent;
 import game.items.AlienCube;
 import game.items.Flask;
+import game.items.IndustrialFan;
 import game.spawners.*;
 import game.trees.*;
 
@@ -82,13 +83,14 @@ public class Overflow20 extends GameMap {
     }
 
     private void setVents(List<Supplier<Item>> depositable) {
-        // Define the spawners the vents on this map can spawn.
-        List<Spawner> spawners = new ArrayList<>();
-        spawners.add(new SlimeSpawner());
-        spawners.add(new ParasiteSpawner());
-        spawners.add(new ScrapSnatcherSpawner(depositable));
+        // Existing tick spawners — unchanged
+        List<Spawner> tickSpawners = new ArrayList<>();
+        tickSpawners.add(new SlimeSpawner());
+        tickSpawners.add(new ParasiteSpawner());
+        tickSpawners.add(new ScrapSnatcherSpawner(depositable));
 
-        this.at(51, 2).setGround(new Vent(spawners));
+        Location superComputerLocation = this.at(3, 2); // Overflow20 SC location
+        this.at(51, 2).setGround(new Vent(tickSpawners, superComputerLocation));
     }
 
     private void setMagicCircles() {
