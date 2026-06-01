@@ -5,11 +5,14 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.CutAction;
 import game.actions.TeleportAction;
 import game.actors.Undead;
 import game.grounds.Teleporter;
 import game.grounds.ToxicWaste;
 import game.spawners.Spawner;
+import game.statuses.PoisonStatus;
+import game.statuses.Poisonable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +26,13 @@ import java.util.function.Supplier;
  * @author eche0116
  * @version 1.0
  */
-public class AlienCube extends EclipseItem implements Teleporter, Sellable {
+public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cuttable {
 
     private static final int SELL_PRICE = 25;
     private static final int RANDOM_LOCATION_TO_TELEPORT = 3;
+    private static final int POISON_DURATION = 5;
+    private static final int POISON_DAMAGE = 1;
+    private static final int WEIGHT = 1;
     private static final Random random = new Random();
 
     private final List<Spawner> spawners;
@@ -36,7 +42,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
      * @param spawners spawnable actors by the alien cube
      */
     public AlienCube(List<Spawner> spawners) {
-        super("Alien Cube", '◈', 1);
+        super("Alien Cube", '◈', WEIGHT);
         this.spawners = spawners;
     }
 
@@ -73,6 +79,14 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
         for (Location destination : destinations) {
             actions.add(new TeleportAction(this, destination));
         }
+
+        // CutAction if worker holds a PlasmaCutter (has same logic through all cuttable items)
+        boolean hasPlasmaCutter = owner.getInventory().getItems().stream()
+                .anyMatch(item -> item.hasAbility(ItemAbilities.CUTTER));
+        if (hasPlasmaCutter) {
+            actions.add(new CutAction(this));
+        }
+
         return actions;
     }
 
@@ -145,5 +159,35 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
             Spawner spawner = spawners.get(random.nextInt(spawners.size()));
             spawner.spawnAt(spawnTile);
         }
+    }
+
+    /**
+     * Cuts the Alien Cube while it is in the worker's inventory.
+     * Drops an Alien Artifact at the worker's current location,
+     * poisons the worker, and removes the cube from inventory.
+     *
+     * @param actor The actor performing the cut.
+     * @param map   The map the actor is on.
+     * @return A description of what happened.
+     */
+    @Override
+    public String cutBy(Actor actor, GameMap map) {
+        // Drop Alien Artifact at actor's current location
+        map.locationOf(actor).addItem(new AlienArtifact());
+
+        // Poison the worker — 1 damage per turn for 5 turns
+        Poisonable poisonable = actor.asCapability(Poisonable.class).orElse(null);
+        String poisonMsg = "";
+        if (poisonable != null) {
+            actor.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE, poisonable));
+            poisonMsg = String.format(" The alien matter seeps into %s's skin — poisoned for 5 turns!", actor);
+        }
+
+        // Remove the cube from inventory — it's destroyed
+        actor.getInventory().remove(this);
+
+        return String.format(
+                "%s cuts open the Alien Cube — an Alien Artifact spills out!%s",
+                actor, poisonMsg);
     }
 }
