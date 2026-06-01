@@ -5,7 +5,12 @@ import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.actors.ActorAbilities;
 import game.grounds.GroundStatistics;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Turret is an abstract base class representing a grounded structure designed by the company with
@@ -17,6 +22,7 @@ import game.grounds.GroundStatistics;
 public abstract class Turret extends Ground
 {
 
+    private static final Random random = new Random();
     private static final int FIRING_DELAY = 3;
 
     /**
@@ -27,20 +33,64 @@ public abstract class Turret extends Ground
      * @param name The name of the turret.
      * @param ammunition How much ammo the turret can hold.
      */
-    protected Turret(char displayChar, String name, int ammunition) {
+    protected Turret(char displayChar, String name, int ammunition, int detectionRadius) {
         super(displayChar, name);
-        // Ammunition and delay as statistics (starts off at max due to how the engine works).
+        // Ammunition, radius and delay as statistics (starts off at max due to how the engine works).
         this.addNewStatistic(GroundStatistics.AMMUNITION, new BaseStatistic(ammunition));
+        this.addNewStatistic(GroundStatistics.DETECTION_RADIUS, new BaseStatistic(detectionRadius));
         this.addNewStatistic(GroundStatistics.COOLDOWN, new BaseStatistic(FIRING_DELAY));
     }
 
     /**
-     * Turrets may react to nearby actors and start blasting.
+     * Turrets may react to nearby actors to start blasting.
      * @param location The location of the turret.
      */
     @Override
     public void tick(Location location) {
-        // To be implemented. Handle the cooldown and firing.
+        // Reduce the firing cooldown by 1 each turn (statistics, won't go negative).
+        this.modifyStatistic(GroundStatistics.COOLDOWN, StatisticOperations.DECREASE, 1);
+        // Check if the turret is ready to fire.
+        if (this.isReady()) {
+            // If ready, get a target destination and fire a projectile if it's not null.
+            Location targetDestination = this.getTargetDestination(location);
+            if (targetDestination != null) {
+                this.fireProjectileAt(targetDestination);
+                // Since the projectile was fired, decrement ammo and reset cooldown.
+                this.modifyStatistic(GroundStatistics.AMMUNITION, StatisticOperations.DECREASE, 1);
+                this.modifyStatistic(GroundStatistics.COOLDOWN, StatisticOperations.UPDATE,
+                        this.getMaximumStatistic(GroundStatistics.COOLDOWN));
+            }
+        }
+    }
+
+    /**
+     * Gets a target Actor's location based on the location of the turret and its detection radius.
+     * Target actor's location is randomly chosen if there's multiple.
+     * Ignores workers (actors with the PLAYER ability).
+     * Feel free to override if a type of turret wants to have a different target priority.
+     * @param location The given location of the turret.
+     * @return The chosen target actor's location.
+     */
+    protected Location getTargetDestination(Location location) {
+        // Store the nearby actors' locations in a list here, to be used later.
+        List<Location> targetLocations = new ArrayList<>();
+        // Get the nearby locations (based on detection radius).
+        List<Location> nearbyLocations = location.getNearbyLocations(
+                this.getStatistic(GroundStatistics.DETECTION_RADIUS));
+        // Go through each nearby location and add any actor's location there to the list.
+        // If the actor has the PLAYER ability it will be ignored.
+        for (Location nearbyLocation : nearbyLocations) {
+            if (nearbyLocation.containsAnActor() &&
+                    !nearbyLocation.getActor().hasAbility(ActorAbilities.PLAYER)) {
+                targetLocations.add(nearbyLocation);
+            }
+        }
+        // Randomly choose one target's location, or return null if there's no one nearby.
+        if (!targetLocations.isEmpty()) {
+            return targetLocations.get(random.nextInt(targetLocations.size()));
+        } else {
+            return null;
+        }
     }
 
     /**
