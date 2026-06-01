@@ -18,6 +18,8 @@ import game.grounds.TitaniumDoor;
 import game.grounds.ToxicWaste;
 import game.grounds.Wall;
 import game.inventories.WeightLimitedInventory;
+import game.items.AlienArtifact;
+import game.items.AluminiumScrap;
 import game.items.Flask;
 import game.grounds.SuperComputer;
 import game.grounds.TeleportationTube;
@@ -68,7 +70,7 @@ public class EclipseNebula extends World {
 
         List<Supplier<Item>> depositable = new ArrayList<>();
         depositable.add(AluminiumScrap::new);
-        depositable.add(IndustrialFan::new);
+//        depositable.add(IndustrialFan::new);
         depositable.add(AlienArtifact::new);
 
         // Produce the maps...
