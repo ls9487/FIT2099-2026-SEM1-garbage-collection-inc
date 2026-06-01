@@ -11,4 +11,5 @@ public enum ItemAbilities
 {
     UNLOCKER,
     STERILISER,
+    CUTTER
 }
