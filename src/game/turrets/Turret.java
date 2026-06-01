@@ -121,4 +121,15 @@ public abstract class Turret extends Ground
         return false;
     }
 
+    /**
+     * Returns a string description of the turret, with its name and ammo.
+     * @return The description of the turret (name and ammo count).
+     */
+    @Override
+    public String toString() {
+        return String.format("%s [Ammo: %d / %d]", super.toString(),
+                this.getStatistic(GroundStatistics.AMMUNITION),
+                this.getMaximumStatistic(GroundStatistics.AMMUNITION));
+    }
+
 }
