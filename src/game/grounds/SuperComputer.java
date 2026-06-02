@@ -31,6 +31,16 @@ import java.util.function.Supplier;
  */
 public class SuperComputer extends Ground {
 
+    private static boolean economyDisrupted = false;
+
+    public static void setEconomyDisrupted(boolean disrupted) {
+        economyDisrupted = disrupted;
+    }
+
+    public static boolean isEconomyDisrupted() {
+        return economyDisrupted;
+    }
+
     /**
      * Factories for every item this terminal offers for purchase.
      * Stored as Suppliers so each call to allowableActions produces a fresh item instance

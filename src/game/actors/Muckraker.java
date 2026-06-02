@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.atmosphere.AirQualityReport;
 import game.atmosphere.AtmosphereSensitiveActor;
+import game.atmosphere.AtmosphericScanner;
 import game.grounds.ToxicWaste;
 import game.inventories.ItemLimitedInventory;
 import game.states.*;
@@ -85,13 +86,13 @@ public class Muckraker extends StatefulCreature implements AtmosphereSensitiveAc
     public void applyAtmosphere(AirQualityReport report, Location here) {
         int aqi = report.getAqi();
 
-        if (aqi <= 2) {
+        if (aqi <= AtmosphericScanner.SAFE_AQI_THRESHOLD) {
             return;
         }
 
         here.setGround(new ToxicWaste());
 
-        if (aqi == 3) {
+        if (aqi == AtmosphericScanner.MODERATE_AQI) {
             return;
         }
 

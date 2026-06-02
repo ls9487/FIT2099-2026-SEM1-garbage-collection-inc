@@ -129,12 +129,12 @@ public class EclipseNebula extends World {
         // Passive atmospheric monitor for A3 REQ5: sits near the SuperComputer
         // and periodically scans the real-world air quality.
         AtmosphericServicesFactory servicesFactory = new AtmosphericServicesFactory();
-        EnvironmentalMonitorController monitorBehaviour = new EnvironmentalMonitorController(
+        EnvironmentalMonitorController monitorController = new EnvironmentalMonitorController(
                 servicesFactory.createParser(),
                 new AtmosphericApiClient(),
                 servicesFactory
         );
-        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorBehaviour);
+        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorController);
         moon99DeprecatedMap.at(15, 2).setGround(monitor);
     }
 

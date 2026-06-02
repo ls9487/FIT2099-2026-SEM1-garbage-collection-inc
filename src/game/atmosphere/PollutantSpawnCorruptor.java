@@ -48,17 +48,16 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
      * @param report the current atmospheric conditions
      */
     @Override
-    public void corrupt(GameMap map, AirQualityReport report) {
+    public void corrupt(GameMap map, AirQualityReport report, Location anchorLocation) {
         if (report.getAqi() < SEVERE_AQI_THRESHOLD) {
             return;
         }
 
-        Location monitorLocation = findMonitor(map);
-        if (monitorLocation == null) {
+        if (anchorLocation == null) {
             return;
         }
 
-        List<Location> candidates = collectEmptyNeighbours(monitorLocation);
+        List<Location> candidates = collectEmptyNeighbours(anchorLocation);
         if (candidates.isEmpty()) {
             return;
         }
@@ -71,24 +70,6 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
         } catch (GameEngineException e) {
             // Destination became occupied between the check and the spawn; skip.
         }
-    }
-
-    /**
-     * Scans the map for a location containing an atmospheric anchor.
-     *
-     * @param map the map to search
-     * @return the monitor location, or {@code null} if none exists on this map
-     */
-    private Location findMonitor(GameMap map) {
-        for (int y : map.getYRange()) {
-            for (int x : map.getXRange()) {
-                Location here = map.at(x, y);
-                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
-                    return here;
-                }
-            }
-        }
-        return null;
     }
 
     /**

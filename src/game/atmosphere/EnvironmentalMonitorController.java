@@ -5,24 +5,18 @@ import edu.monash.fit2099.engine.positions.Location;
 import java.util.List;
 
 /**
- * Controller class that periodically triggers an {@link AtmosphericScanner}.
+ * Controller class that triggers atmospheric scans from the monitor ground.
  * <p>
- * This is the automatic scanning part of the REQ5 feature. Once attached to an
- * {@link AtmosphericMonitor}, it keeps its own internal tick counter and runs a
- * full atmospheric scan at a fixed interval.
+ * This class is used by {@link AtmosphericMonitor} during its regular ground
+ * tick. The controller keeps the scheduling logic separate from the ground so
+ * the monitor itself stays small and focused.
  * </p>
  *
  * @author esoo0013
  */
 public class EnvironmentalMonitorController {
 
-    private static final int REFRESH_INTERVAL = 1;
-
-    private final PollutionDataParser parser;
-    private final AtmosphericApiClient apiClient;
-    private final AtmosphericServicesFactory factory;
-
-    private int ticks = 0;
+    private final AtmosphericScanner scanner;
 
     /**
      * Constructor.
@@ -34,24 +28,17 @@ public class EnvironmentalMonitorController {
     public EnvironmentalMonitorController(PollutionDataParser parser,
                                           AtmosphericApiClient apiClient,
                                           AtmosphericServicesFactory factory) {
-        this.parser = parser;
-        this.apiClient = apiClient;
-        this.factory = factory;
+        List<AtmosphericCorruptor> corruptors = factory.createCorruptors();
+        this.scanner = new AtmosphericScanner(parser, corruptors, apiClient);
     }
 
     /**
-     * Runs the monitor controller for one tick.
+     * Runs the monitor controller for one game turn.
      *
      * @param anchor the atmospheric anchor owned by the monitor
      * @param location the current location of the atmospheric monitor
      */
     public void operate(AtmosphericAnchor anchor, Location location) {
-        ticks++;
-        if (ticks % REFRESH_INTERVAL != 0) {
-            return;
-        }
-
-        List<AtmosphericCorruptor> corruptors = factory.createCorruptors();
-        new AtmosphericScanner(parser, corruptors, apiClient).scan(anchor, location.map());
+        scanner.scan(anchor, location.map(), location);
     }
 }

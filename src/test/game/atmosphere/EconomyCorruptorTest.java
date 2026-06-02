@@ -1,6 +1,8 @@
 /* DISABLED FOR APP RUN
 package game.atmosphere;
 
+import game.grounds.SuperComputer;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //
 //    @Test
 //    void corruptEnablesEconomyDisruptionWhenSo2IsDominant() {
-//        EconomyCorruptor.ECONOMY_DISRUPTED = false;
+//        SuperComputer.isEconomyDisrupted() = false;
 //        EconomyCorruptor corruptor = new EconomyCorruptor();
 //
 //        AirQualityReport report = new AirQualityReport(4, "so2");
@@ -28,18 +30,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //            // The flag is set before map iteration begins.
 //        }
 //
-//        assertTrue(EconomyCorruptor.ECONOMY_DISRUPTED);
+//        assertTrue(SuperComputer.isEconomyDisrupted());
 //    }
 //
 //    @Test
 //    void corruptDisablesEconomyDisruptionWhenDominantPollutantIsNotSo2() {
-//        EconomyCorruptor.ECONOMY_DISRUPTED = true;
+//        SuperComputer.isEconomyDisrupted() = true;
 //        EconomyCorruptor corruptor = new EconomyCorruptor();
 //
 //        AirQualityReport report = new AirQualityReport(4, "no2");
 //
 //        corruptor.corrupt(null, report);
 //
-//        assertFalse(EconomyCorruptor.ECONOMY_DISRUPTED);
+//        assertFalse(SuperComputer.isEconomyDisrupted());
 //    }
 //}

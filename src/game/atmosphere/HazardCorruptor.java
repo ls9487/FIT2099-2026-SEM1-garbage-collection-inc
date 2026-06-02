@@ -29,8 +29,8 @@ public class HazardCorruptor implements AtmosphericCorruptor {
     private static final int SAFE_AQI_THRESHOLD = 2;
     private static final int MODERATE_AQI = 3;
     private static final int SEVERE_AQI_THRESHOLD = 4;
-    private static final int LOCAL_WASTE_SPREAD_CHANCE_DIVISOR = 4;
-    private static final int LOCAL_WASTE_SPREAD_TRIGGER = 0;
+    private static final int LOCAL_WASTE_SPREAD_PERCENT = 25;
+    private static final int RANDOM_BOUND = 100;
     private static final int HOTSPOT_RADIUS = 2;
 
     private final Random random = new Random();
@@ -48,7 +48,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
      * @param report the air quality report describing the current atmospheric state
      */
     @Override
-    public void corrupt(GameMap map, AirQualityReport report) {
+    public void corrupt(GameMap map, AirQualityReport report, Location anchorLocation) {
         int aqi = report.getAqi();
 
         if (aqi <= SAFE_AQI_THRESHOLD) {
@@ -75,7 +75,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
 
         if (aqi >= SEVERE_AQI_THRESHOLD) {
             createBorderWasteRing(map);
-            createAnchorHotspot(map);
+            createAnchorHotspot(map, anchorLocation);
         }
     }
 
@@ -94,7 +94,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
                 continue;
             }
 
-            if (random.nextInt(LOCAL_WASTE_SPREAD_CHANCE_DIVISOR) == LOCAL_WASTE_SPREAD_TRIGGER) {
+            if (random.nextInt(RANDOM_BOUND) < LOCAL_WASTE_SPREAD_PERCENT) {
                 dest.setGround(new ToxicWaste());
             }
         }
@@ -132,20 +132,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
      *
      * @param map the map in which to search for the atmospheric anchor
      */
-    private void createAnchorHotspot(GameMap map) {
-        Location anchorLocation = null;
-
-        outer:
-        for (int y : map.getYRange()) {
-            for (int x : map.getXRange()) {
-                Location here = map.at(x, y);
-                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
-                    anchorLocation = here;
-                    break outer;
-                }
-            }
-        }
-
+    private void createAnchorHotspot(GameMap map, Location anchorLocation) {
         if (anchorLocation == null) {
             return;
         }

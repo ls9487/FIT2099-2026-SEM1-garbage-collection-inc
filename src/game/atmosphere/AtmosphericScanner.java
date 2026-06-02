@@ -1,6 +1,7 @@
 package game.atmosphere;
 
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 
 import java.util.List;
 
@@ -17,8 +18,8 @@ import java.util.List;
  */
 public class AtmosphericScanner {
 
-    private static final int SAFE_AQI_THRESHOLD = 2;
-    private static final int MODERATE_AQI = 3;
+    public static final int SAFE_AQI_THRESHOLD = 2;
+    public static final int MODERATE_AQI = 3;
 
     private final PollutionDataParser parser;
     private final List<AtmosphericCorruptor> corruptors;
@@ -44,25 +45,14 @@ public class AtmosphericScanner {
      *
      * @param anchor the atmospheric anchor that acts as the scan source
      * @param map the map containing the atmospheric monitor
-     * @return a summary string showing the AQI tier and dominant pollutant
+     * @param anchorLocation the current location of the atmospheric monitor
      */
-    public String scan(AtmosphericAnchor anchor, GameMap map) {
-        String json = apiClient.fetch(anchor, map);
+    public void scan(AtmosphericAnchor anchor, GameMap map, Location anchorLocation) {
+        String json = apiClient.fetch(anchor, map, anchorLocation);
         AirQualityReport report = parser.parse(json);
 
         for (AtmosphericCorruptor corruptor : corruptors) {
-            corruptor.corrupt(map, report);
+            corruptor.corrupt(map, report, anchorLocation);
         }
-
-        String tier;
-        if (report.getAqi() <= SAFE_AQI_THRESHOLD) {
-            tier = "Safe : no effects";
-        } else if (report.getAqi() == MODERATE_AQI) {
-            tier = "Moderate : local contamination spreading";
-        } else {
-            tier = "SEVERE : facility-wide toxic event!";
-        }
-        return String.format("[Atmospheric Scan] AQI %d (%s), dominant pollutant: %s.",
-                report.getAqi(), tier, report.getDominantPollutant().toUpperCase());
     }
 }
