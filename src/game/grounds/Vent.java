@@ -34,8 +34,9 @@ public class Vent extends Ground implements Cuttable {
 
     private static final Random random = new Random();
     // Keeps a list of spawners so they can be used to spawn creatures.
-    private final List<Spawner> tickSpawners;       // for tick() motion-activated spawning
-    private final Location superComputerLocation;   // for IndustrialFan on cut
+    private final List<Spawner> tickSpawners;
+    private final Location superComputerLocation;
+    private final List<Spawner> cutSpawners;
     private static final int POISON_DAMAGE = 1;
     private static  int POISON_DURATION = 5;
     private static final int POISON_RANGE = 1;
@@ -45,10 +46,11 @@ public class Vent extends Ground implements Cuttable {
      * Constructor for the Vent class.
      * @param tickSpawners A list of spawners for actors.
      */
-    public Vent(List<Spawner> tickSpawners, Location superComputerLocation) {
+    public Vent(List<Spawner> tickSpawners, Location superComputerLocation, List<Spawner> cutSpawners) {
         super('V', "Vent");
         this.tickSpawners = tickSpawners;
         this.superComputerLocation = superComputerLocation;
+        this.cutSpawners = cutSpawners;
     }
 
     /**
@@ -177,7 +179,7 @@ public class Vent extends Ground implements Cuttable {
         ventLocation.setGround(new Floor());
 
         // Spawn Undead on that exact tile using UndeadSpawner (A2 effect applies)
-        new UndeadSpawner().spawnAt(ventLocation);
+        cutSpawners.get(random.nextInt(cutSpawners.size())).spawnAt(ventLocation);
 
         return String.format(
                 "%s cuts the Vent — an Industrial Fan crashes to the floor! " +
