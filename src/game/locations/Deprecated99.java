@@ -19,6 +19,9 @@ import game.spawners.SlimeSpawner;
 import game.spawners.Spawner;
 import game.spawners.UndeadSpawner;
 import game.trees.*;
+import game.vehicles.BulldozerPlough;
+import game.vehicles.MagneticField;
+import game.vehicles.WarpBattery;
 
 import java.util.function.Supplier;
 
@@ -82,6 +85,10 @@ public class Deprecated99 extends GameMap {
      */
     private void addLooseItems() {
         // Add the loose items onto the ship.
+        this.at(10, 1).addItem(new MagneticField());
+        this.at(11, 1).addItem(new BulldozerPlough());
+        this.at(12, 1).addItem(new WarpBattery());
+
         this.at(7, 2).addItem(new AccessCardL1());
         //this.at(6, 2).addItem(new FirstAidKit()); removed since it should only be bought / cannot get for FREE
         //this.at(5, 2).addItem(new SterilisationBox()); removed since it should only be bought / cannot get for FREE

@@ -259,6 +259,31 @@ The game reads `list[0].main.aqi` and compares `components.no_2` and `components
 3. Travel to the Moonbase map and observe the atmospheric monitor effects over time.
 4. If no API key is configured, the system falls back to a safe pollution report.
 
+## Testing
+
+REQ5 unit tests are located in `src/test/game/atmosphere`.
+
+Current REQ5-focused tests include:
+- `AirQualityReportTest`, which verifies that `AirQualityReport` stores and returns the AQI and dominant pollutant correctly.
+- `OpenWeatherPollutionParserTest`, which verifies that the API parser extracts AQI correctly and chooses the correct dominant pollutant from valid API-like JSON.
+- `OpenWeatherPollutionParserDefaultTest`, which verifies that the parser falls back to safe defaults when JSON is null or missing AQI data.
+- `FallbackPollutionParserTest`, which verifies that the fallback parser always returns a safe AQI-1 report with no active pollutant.
+- `EconomyCorruptorTest`, which verifies that economy disruption is toggled correctly based on the dominant pollutant.
+- `HazardCorruptorTest`, which verifies that safe AQI causes `HazardCorruptor` to return immediately without applying corruption.
+- `PollutantSpawnCorruptorTest`, which verifies that AQI below the severe threshold does not attempt undead spawning.
+
+Tests are run with Maven from the project root:
+
+```bash
+mvn test
+```
+
+This project uses a custom Maven layout:
+- main source code in `src`
+- test source code in `src/test`
+
+The tests are intended to focus mainly on the new REQ5 atmospheric classes and behaviours rather than on existing engine classes.
+
 ## Environment variable setup
 
 The OpenWeather API key must be available as an environment variable named `OPENWEATHER_API_KEY`.

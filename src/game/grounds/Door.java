@@ -5,9 +5,12 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.CrushAction;
 import game.actions.UnlockAction;
 import game.items.ItemStatistics;
 import game.statuses.Alarmable;
+import game.vehicles.Crushable;
+import game.vehicles.VehicleAbilities;
 
 /**
  * Abstract secured door that opens only for sufficient clearance and applies
@@ -17,7 +20,7 @@ import game.statuses.Alarmable;
  * @author echu0057
  * @author eche0116
  */
-public abstract class Door extends Ground implements Unlockable, Alarmable {
+public abstract class Door extends Ground implements Unlockable, Alarmable, Crushable {
 
     private boolean isUnlocked;
     private boolean isAlarmed;
@@ -66,7 +69,7 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
     }
 
     /**
-     * Returns an ActionList that could contain an UnlockAction under certain conditions.
+     * Returns an ActionList that could contain an UnlockAction and CrushAction under certain conditions.
      * @param actor the Actor acting
      * @param location the current Location
      * @param direction the direction of the Ground from the Actor
@@ -78,6 +81,9 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
         ActionList actions = super.allowableActions(actor, location, direction);
         if (canActorUnlock(actor)) {
             actions.add(new UnlockAction(this));
+        }
+        if (actor.hasAbility(VehicleAbilities.CRUSH)) {
+            actions.add(new CrushAction(this, location));
         }
         return actions;
     }
@@ -137,5 +143,18 @@ public abstract class Door extends Ground implements Unlockable, Alarmable {
     @Override
     public void disableAlarmed(Actor alarmTripper) {
         isAlarmed = false;
+    }
+
+    /**
+     * Crushes this door into dirt at the actor's location.
+     *
+     * @param actor the actor crushing the door
+     * @param map the map containing the door
+     * @return a narrative description of the crush outcome
+     */
+    @Override
+    public String crush(Actor actor, GameMap map, Location location) {
+        location.setGround(new Dirt());
+        return String.format("%s crushes %s to %s at %s.", actor, this, location.getGround(), location);
     }
 }
