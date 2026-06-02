@@ -8,6 +8,7 @@ import game.actors.ActorAbilities;
 import game.spawners.Spawner;
 import game.statuses.PoisonStatus;
 import game.statuses.Poisonable;
+import game.vehicles.VehicleAbilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Random;
  * Spawns a creature each turn if an adjacent actor has the ability of activating it.
  * What creatures it spawns should depend on the moon (GameMap).
  *
+ * Only actors with VehicleAbilities.HOVER may enter a vent.
  * @author echu0057
  */
 public class Vent extends Ground {
@@ -117,12 +119,13 @@ public class Vent extends Ground {
 
     /**
      * Actors can't walk over a vent. They just can't.
+     * Only hovering actors may enter a vent.
      * @param actor The actor to check.
-     * @return false
+     * @return true if actor has VehicleAbilities.HOVER else false
      */
     @Override
     public boolean canActorEnter(Actor actor) {
-        return false;
+        return actor.hasAbility(VehicleAbilities.HOVER);
     }
 
 }
