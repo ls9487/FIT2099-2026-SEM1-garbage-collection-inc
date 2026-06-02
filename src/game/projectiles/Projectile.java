@@ -1,5 +1,6 @@
 package game.projectiles;
 
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
@@ -62,9 +63,12 @@ public abstract class Projectile extends Item {
             currentLocation = getCloserDestination(currentLocation);
             // Check if the projectile is going to be stopped and activate the hit effect.
             if (isStopped(currentLocation)) {
-                onHitEffect(currentLocation);
+                String hitString = onHitEffect(currentLocation);
+                // Display the hit description returned by the hit effect.
+                displayHitDescription(hitString);
                 // Remove the projectile from the ORIGINAL location (since we didn't actually move it).
                 location.removeItem(this);
+                return;
             }
         }
         // Since the projectile was not stopped, move the projectile to the new location.
@@ -127,8 +131,19 @@ public abstract class Projectile extends Item {
      * Called when the projectile hits its final destination or gets blocked on the way.
      * Subclasses of Projectile are to define what happens when a projectile impacts.
      * @param hitLocation The location of the projectile's impact.
+     * @return A string description of the projectile hitting a location.
      */
-    protected abstract void onHitEffect(Location hitLocation);
+    protected abstract String onHitEffect(Location hitLocation);
+
+    /**
+     * Uses the display to print out a given description.
+     * To be used internally within this class only.
+     * @param hitString The description of the projectile that hit.
+     */
+    private void displayHitDescription(String hitString) {
+        Display display = new Display();
+        display.println(hitString);
+    }
 
     /**
      * Compute the Manhattan (sum of x-difference + y-difference) distance between two locations.

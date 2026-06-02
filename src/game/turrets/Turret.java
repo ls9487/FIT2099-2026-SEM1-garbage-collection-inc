@@ -1,6 +1,7 @@
 package game.turrets;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
@@ -53,11 +54,14 @@ public abstract class Turret extends Ground {
             // If ready, get a target destination and fire a projectile if it's not null.
             Location targetDestination = this.getTargetDestination(location);
             if (targetDestination != null) {
-                this.fireProjectileAt(location, targetDestination);
-                // Since the projectile was fired, decrement ammo and reset cooldown.
+                // Since the projectile will be fired, decrement ammo and reset cooldown.
                 this.modifyStatistic(GroundStatistics.AMMUNITION, StatisticOperations.DECREASE, 1);
                 this.modifyStatistic(GroundStatistics.COOLDOWN, StatisticOperations.UPDATE,
                         this.getMaximumStatistic(GroundStatistics.COOLDOWN));
+                // Then fire the projectile (defined by Turret subclass).
+                String fireString = fireProjectileAt(location, targetDestination);
+                // Use display to indicate the turret fired.
+                displayFiringDescription(fireString);
             }
         }
     }
@@ -99,8 +103,19 @@ public abstract class Turret extends Ground {
      * Those projectiles also need an end destination.
      * @param origin The location of the turret that fired the projectile.
      * @param destination The destination location where the projectile should hit.
+     * @return A String description of having fired the projectile.
      */
-    protected abstract void fireProjectileAt(Location origin, Location destination);
+    protected abstract String fireProjectileAt(Location origin, Location destination);
+
+    /**
+     * Uses the display to print out a given description.
+     * To be used internally within this class only.
+     * @param fireString The description of the turret firing.
+     */
+    private void displayFiringDescription(String fireString) {
+        Display display = new Display();
+        display.println(fireString);
+    }
 
     /**
      * Indicates whether the turret is ready to fire a projectile.

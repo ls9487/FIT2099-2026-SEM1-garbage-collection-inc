@@ -32,21 +32,36 @@ public class FireBullet extends Projectile {
      * If an actor is standing on this location where it hit, deal 2 damage to them.
      * Additionally, there's a 50% chance to burn the actor.
      * @param hitLocation The location of the projectile's impact.
+     * @return A String description of this hit effect.
      */
     @Override
-    protected void onHitEffect(Location hitLocation) {
+    protected String onHitEffect(Location hitLocation) {
+        // Prepare a description.
+        StringBuilder description = new StringBuilder(this.toString());
+
         if (hitLocation.containsAnActor()) {
             // Get the actor standing at the impact point.
             Actor target = hitLocation.getActor();
             // Deal 2 damage to them.
             target.hurt(HIT_DAMAGE);
+            description.append(" hits ").append(target);
             // 50% chance to burn the flammable actor.
             Flammable flammable = hitLocation.getActorAs(Flammable.class);
             if (flammable != null && Math.random() <= BURN_CHANCE) {
                 // Burn the flammable actor (1 damage, lasts 3 turns).
                 target.addStatus(new BurnStatus(BURN_DURATION, BURN_DAMAGE, flammable));
+                description.append(" and sets them on fire!");
+            } else {
+                // Target was not burnt.
+                description.append(" but it failed to set them on fire.");
             }
+
+        } else {
+            // No actor present, so consider it a miss.
+            description.append(" didn't hit anyone and fizzled on impact.");
         }
+
+        return description.toString();
     }
 
 }
