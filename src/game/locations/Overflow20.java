@@ -7,12 +7,10 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.Undead;
-import game.grounds.Hole;
-import game.grounds.MagicCircle;
-import game.grounds.MagicCircleGroup;
-import game.grounds.Vent;
+import game.grounds.*;
 import game.items.AlienCube;
 import game.items.Flask;
+import game.items.IndustrialFan;
 import game.spawners.*;
 import game.trees.*;
 
@@ -38,7 +36,7 @@ public class Overflow20 extends GameMap {
      * @param groundCreator engine ground factory
      * @throws GameEngineException when the map cannot be created
      */
-    public Overflow20(GroundCreator groundCreator, List<Supplier<Item>> depositable) throws GameEngineException {
+    public Overflow20(GroundCreator groundCreator, List<Supplier<Item>> depositable, QuotaManager quotaManager) throws GameEngineException {
         super("20-Overflow", groundCreator, Arrays.asList(
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 "...#######...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈##################≈≈≈≈≈≈≈",
@@ -67,6 +65,7 @@ public class Overflow20 extends GameMap {
         this.setMagicCircles();
         this.setAlienCubes();
         this.setTrees();
+        this.setSuperComputer(quotaManager);
 
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
         this.tubeLocations.add(this.at(6, 3));
@@ -82,13 +81,14 @@ public class Overflow20 extends GameMap {
     }
 
     private void setVents(List<Supplier<Item>> depositable) {
-        // Define the spawners the vents on this map can spawn.
-        List<Spawner> spawners = new ArrayList<>();
-        spawners.add(new SlimeSpawner());
-        spawners.add(new ParasiteSpawner());
-        spawners.add(new ScrapSnatcherSpawner(depositable));
+        // Existing tick spawners — unchanged
+        List<Spawner> tickSpawners = new ArrayList<>();
+        tickSpawners.add(new SlimeSpawner());
+        tickSpawners.add(new ParasiteSpawner());
+        tickSpawners.add(new ScrapSnatcherSpawner(depositable));
 
-        this.at(51, 2).setGround(new Vent(spawners));
+        Location superComputerLocation = this.at(3, 2); // Overflow20 SC location
+        this.at(51, 2).setGround(new Vent(tickSpawners, superComputerLocation));
     }
 
     private void setMagicCircles() {
@@ -128,6 +128,12 @@ public class Overflow20 extends GameMap {
 
         this.at(4, 16).setGround(new WarperTreeSapling(new WarperTreeMature()));
     }
+
+    private void setSuperComputer(QuotaManager quotaManager) {
+        // '≡' is at map position (3, 2) in Overflow20 layout
+        this.at(3, 2).setGround(new SuperComputer(SuperComputer.defaultCatalogue(), quotaManager));
+    }
+
     /**
      * Locations reserved for installing teleportation tubes after all maps are
      * constructed.

@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Hole;
+import game.grounds.QuotaManager;
 import game.items.AccessCardL1;
 import game.items.Apple;
 import game.items.CookiePack;
@@ -43,7 +44,7 @@ public class Deprecated99 extends GameMap {
      * @param groundCreator The ground creator object.
      * @throws Exception in case if anything goes wrong...
      */
-    public Deprecated99(GroundCreator groundCreator, List<Supplier<Item>> depositable) throws Exception {
+    public Deprecated99(GroundCreator groundCreator, List<Supplier<Item>> depositable, QuotaManager quotaManager) throws Exception {
         super("99-Deprecated", groundCreator, Arrays.asList(
                 "....................########################################",
                 "...#######..........#__________________#___________________#",
@@ -71,7 +72,7 @@ public class Deprecated99 extends GameMap {
         this.setHoles(depositable);
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
         this.tubeLocations.add(this.at(6, 3));
-        this.setSuperComputer();
+        this.setSuperComputer(quotaManager);
         this.setTrees(depositable);
     }
 
@@ -135,9 +136,9 @@ public class Deprecated99 extends GameMap {
      *
      * @author esoo0013
      */
-    private void setSuperComputer() {
+    private void setSuperComputer(QuotaManager quotaManager) {
         // '≡' is at map position (4, 3) in the ship layout
-        this.at(4, 3).setGround(new SuperComputer(SuperComputer.defaultCatalogue()));
+        this.at(4, 3).setGround(new SuperComputer(SuperComputer.defaultCatalogue(),quotaManager));
     }
 
     /**
