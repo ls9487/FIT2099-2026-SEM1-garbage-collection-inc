@@ -3,3 +3,5 @@
 out
 .DS_Store
 docs/javadoc/
+# Maven build output: if you remove this you will get 252 unversioned files spam, so no touch
+target/

@@ -242,6 +242,17 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
   - When the interval elapses, the behaviour triggers an `AtmosphericScanAction`.
   - `AtmosphericScanAction` calls the API via `AtmosphericApiClient`, parses the JSON with the selected parser, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.
 
+### Testing Highlights
+
+- REQ5 unit tests are located in `src/test/game/atmosphere` and are intended to validate the new atmospheric feature classes rather than pre-existing engine internals.
+- The tests currently cover:
+  - `AirQualityReport` as the data carrier for AQI and dominant pollutant.
+  - `OpenWeatherPollutionParser` for valid payload parsing and safe default behaviour on null or incomplete JSON.
+  - `FallbackPollutionParser` for the no-API-key safe fallback path.
+  - `EconomyCorruptor` for SO2-driven disruption logic.
+  - `HazardCorruptor` and `PollutantSpawnCorruptor` for threshold guard behaviour, confirming that safe or below-severe AQI values do not trigger corruption or spawning.
+- This keeps the testing aligned with the assignment guidance by focusing primarily on the new REQ5 abstractions and rules.
+
 ---
 
 ### The Architecture
