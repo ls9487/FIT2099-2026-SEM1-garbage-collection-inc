@@ -61,7 +61,7 @@ public abstract class Turret extends Ground {
                 // Then fire the projectile (defined by Turret subclass).
                 String fireString = fireProjectileAt(location, targetDestination);
                 // Use display to indicate the turret fired.
-                displayFiringDescription(fireString);
+                displayDescription(fireString);
             }
         }
     }
@@ -109,12 +109,11 @@ public abstract class Turret extends Ground {
 
     /**
      * Uses the display to print out a given description.
-     * To be used internally within this class only.
-     * @param fireString The description of the turret firing.
+     * @param description The given description to display.
      */
-    private void displayFiringDescription(String fireString) {
+    protected void displayDescription(String description) {
         Display display = new Display();
-        display.println(fireString);
+        display.println(description);
     }
 
     /**

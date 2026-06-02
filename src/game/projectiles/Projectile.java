@@ -65,7 +65,7 @@ public abstract class Projectile extends Item {
             if (isStopped(currentLocation)) {
                 String hitString = onHitEffect(currentLocation);
                 // Display the hit description returned by the hit effect.
-                displayHitDescription(hitString);
+                displayDescription(hitString);
                 // Remove the projectile from the ORIGINAL location (since we didn't actually move it).
                 location.removeItem(this);
                 return;
@@ -137,12 +137,11 @@ public abstract class Projectile extends Item {
 
     /**
      * Uses the display to print out a given description.
-     * To be used internally within this class only.
-     * @param hitString The description of the projectile that hit.
+     * @param description The given description to display.
      */
-    private void displayHitDescription(String hitString) {
+    protected void displayDescription(String description) {
         Display display = new Display();
-        display.println(hitString);
+        display.println(description);
     }
 
     /**
