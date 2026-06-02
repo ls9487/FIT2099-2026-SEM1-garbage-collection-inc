@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.spawners.Spawner;
+import game.vehicles.VehicleAbilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.Random;
  * Spawns one creature every 20 turns.
  * What creatures it spawns should depend on the moon (GameMap).
  *
+ * Only actors with VehicleAbilities.HOVER may enter a hole.
  * @author echu0057
  */
 public class Hole extends Ground {
@@ -90,12 +92,14 @@ public class Hole extends Ground {
 
     /**
      * Creatures can crawl out of a hole, but they can't walk over it, can they?
+     * Only hovering actors may enter a hole; others fall through impassably.
+     *
      * @param actor The actor to check.
-     * @return false
+     * @return true if actor has VehicleAbilities.HOVER else false
      */
     @Override
     public boolean canActorEnter(Actor actor) {
-        return false;
+        return actor.hasAbility(VehicleAbilities.HOVER);
     }
 
 }
