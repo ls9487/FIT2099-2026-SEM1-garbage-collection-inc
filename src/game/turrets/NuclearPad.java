@@ -109,15 +109,15 @@ public class NuclearPad extends Turret {
         // Various messages may be displayed depending on the ammunition and arming status.
         if (this.getStatistic(GroundStatistics.AMMUNITION) <= 0) {
             // If there's no ammo, only this will be printed.
-            displayDescription(this + "[ALERT] MISSILE PAYLOAD DEPLETED.");
+            displayDescription(this + " [ALERT] MISSILE PAYLOAD DEPLETED.");
         } else if (this.getStatistic(GroundStatistics.ARMING_COOLDOWN) > 0) {
             // There's ammo, and NuclearPad is still arming.
-            displayDescription(this + "[ALERT] MISSILE ARMING SEQUENCE PROGRESSING. " +
+            displayDescription(this + " [ALERT] MISSILE ARMING SEQUENCE PROGRESSING. " +
                     this.getStatistic(GroundStatistics.ARMING_COOLDOWN) +
                     " TURNS LEFT. STEP AWAY TO RESET.");
         } else {
             // There's ammo, and NuclearPad has armed.
-            displayDescription(this + "[ALERT] MISSILE ARMED AND READY TO FIRE. " +
+            displayDescription(this + " [ALERT] MISSILE ARMED AND READY TO FIRE. " +
                     "STEP AWAY TO DISENGAGE IF IT'S NOT TOO LATE.");
         }
     }
