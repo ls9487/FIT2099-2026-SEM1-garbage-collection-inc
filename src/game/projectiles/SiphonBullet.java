@@ -71,5 +71,4 @@ public class SiphonBullet extends Projectile {
         return description.toString();
     }
 
-
 }
