@@ -27,4 +27,14 @@ public class Wall extends Ground {
     public boolean canActorEnter(Actor actor) {
         return false;
     }
+
+    /**
+     * Walls will always block projectiles.
+     * @return true
+     */
+    @Override
+    public boolean blocksThrownObjects() {
+        return true;
+    }
+
 }
