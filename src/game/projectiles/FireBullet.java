@@ -44,7 +44,7 @@ public class FireBullet extends Projectile {
             Actor target = hitLocation.getActor();
             // Deal 2 damage to them.
             target.hurt(HIT_DAMAGE);
-            description.append(" hits ").append(target);
+            description.append(" hits ").append(target).append(" at ").append(hitLocation);
             // 50% chance to burn the flammable actor.
             Flammable flammable = hitLocation.getActorAs(Flammable.class);
             if (flammable != null && Math.random() <= BURN_CHANCE) {
@@ -58,7 +58,8 @@ public class FireBullet extends Projectile {
 
         } else {
             // No actor present, so consider it a miss.
-            description.append(" didn't hit anyone and fizzled on impact.");
+            description.append(" didn't hit anyone at ").append(hitLocation)
+                .append(" and fizzled on impact.");
         }
 
         return description.toString();
