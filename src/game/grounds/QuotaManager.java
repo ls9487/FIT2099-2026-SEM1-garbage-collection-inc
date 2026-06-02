@@ -56,7 +56,7 @@ public class QuotaManager {
     }
 
     /**
-     * Called once per game turn. Decrements the turn counter and
+     * Each game turn tick is called once. Decrements the turn counter and
      * checks if the deadline has been reached.
      *
      */
@@ -83,7 +83,7 @@ public class QuotaManager {
                             "The SuperComputer fires adjacent workers!", companyCredits, quota));
             fireAdjacentWorkers();
             // Reset turns so the game continues (workers avoiding SC can still perish naturally)
-            turnsRemaining = this.turnsRemaining <= 0 ? BASE_TURNS : turnsRemaining;
+            turnsRemaining = BASE_TURNS;
         }
     }
 
