@@ -39,6 +39,7 @@ public abstract class Projectile extends Item {
     protected Projectile(String name, char displayChar, int velocity, Location destination) {
         super(name, displayChar);
         this.addNewStatistic(ItemStatistics.VELOCITY, new BaseStatistic(velocity));
+        this.destination = destination;
         this.locked = false;
     }
 
@@ -125,9 +126,9 @@ public abstract class Projectile extends Item {
     /**
      * Called when the projectile hits its final destination or gets blocked on the way.
      * Subclasses of Projectile are to define what happens when a projectile impacts.
-     * @param location The location of the projectile's impact.
+     * @param hitLocation The location of the projectile's impact.
      */
-    protected abstract void onHitEffect(Location location);
+    protected abstract void onHitEffect(Location hitLocation);
 
     /**
      * Compute the Manhattan (sum of x-difference + y-difference) distance between two locations.

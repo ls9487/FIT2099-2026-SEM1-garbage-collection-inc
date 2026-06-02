@@ -53,7 +53,7 @@ public abstract class Turret extends Ground {
             // If ready, get a target destination and fire a projectile if it's not null.
             Location targetDestination = this.getTargetDestination(location);
             if (targetDestination != null) {
-                this.fireProjectileAt(targetDestination);
+                this.fireProjectileAt(location, targetDestination);
                 // Since the projectile was fired, decrement ammo and reset cooldown.
                 this.modifyStatistic(GroundStatistics.AMMUNITION, StatisticOperations.DECREASE, 1);
                 this.modifyStatistic(GroundStatistics.COOLDOWN, StatisticOperations.UPDATE,
@@ -94,10 +94,13 @@ public abstract class Turret extends Ground {
 
     /**
      * Subclasses of Turret should create the type of projectile they fire in this method.
-     * Those projectiles need an end destination, so pass them in.
+     * Takes in an origin so the turret knows where to spawn the projectile (whether directly on it
+     * or adjacent, up to them).
+     * Those projectiles also need an end destination.
+     * @param origin The location of the turret that fired the projectile.
      * @param destination The destination location where the projectile should hit.
      */
-    protected abstract void fireProjectileAt(Location destination);
+    protected abstract void fireProjectileAt(Location origin, Location destination);
 
     /**
      * Indicates whether the turret is ready to fire a projectile.
