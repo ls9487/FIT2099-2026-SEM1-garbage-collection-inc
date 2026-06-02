@@ -5,7 +5,7 @@ import edu.monash.fit2099.engine.positions.Location;
 import java.util.List;
 
 /**
- * Behaviour class that periodically triggers an {@link AtmosphericScanAction}.
+ * Controller class that periodically triggers an {@link AtmosphericScanner}.
  * <p>
  * This is the automatic scanning part of the REQ5 feature. Once attached to an
  * {@link AtmosphericMonitor}, it keeps its own internal tick counter and runs a
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author esoo0013
  */
-public class EnvironmentalMonitorBehaviour {
+public class EnvironmentalMonitorController {
 
     private static final int REFRESH_INTERVAL = 1;
 
@@ -31,18 +31,18 @@ public class EnvironmentalMonitorBehaviour {
      * @param apiClient the API client used to fetch live air pollution data
      * @param factory the factory used to create the atmosphere corruptors
      */
-    public EnvironmentalMonitorBehaviour(PollutionDataParser parser,
-                                         AtmosphericApiClient apiClient,
-                                         AtmosphericServicesFactory factory) {
+    public EnvironmentalMonitorController(PollutionDataParser parser,
+                                          AtmosphericApiClient apiClient,
+                                          AtmosphericServicesFactory factory) {
         this.parser = parser;
         this.apiClient = apiClient;
         this.factory = factory;
     }
 
     /**
-     * Runs the monitor behaviour for one tick.
+     * Runs the monitor controller for one tick.
      *
-     * @param anchor the atmospheric anchor that owns this behaviour
+     * @param anchor the atmospheric anchor owned by the monitor
      * @param location the current location of the atmospheric monitor
      */
     public void operate(AtmosphericAnchor anchor, Location location) {
@@ -52,6 +52,6 @@ public class EnvironmentalMonitorBehaviour {
         }
 
         List<AtmosphericCorruptor> corruptors = factory.createCorruptors();
-        new AtmosphericScanAction(parser, corruptors, apiClient).execute(anchor, location.map());
+        new AtmosphericScanner(parser, corruptors, apiClient).scan(anchor, location.map());
     }
 }

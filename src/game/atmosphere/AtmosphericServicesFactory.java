@@ -3,8 +3,8 @@ package game.atmosphere;
 /**
  * Factory class that wires together the main REQ5 atmosphere services.
  * <p>
- * High-level classes such as {@link EnvironmentalMonitorBehaviour} and
- * {@link AtmosphericScanAction} use this factory so they can depend on the
+ * High-level classes such as {@link EnvironmentalMonitorController} and
+ * {@link AtmosphericScanner} use this factory so they can depend on the
  * parser and corruptor abstractions instead of directly depending on concrete
  * implementations.
  * </p>
