@@ -44,6 +44,8 @@ public class EclipseNebula extends World {
      * @throws Exception in case if anything goes wrong...
      */
     public void initialise() throws Exception {
+        QuotaManager quotaManager = new QuotaManager();
+
         // Set up the groundCreator to be using.
         DefaultGroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('.', Dirt::new);
@@ -54,7 +56,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('N', IronDoor::new);
         groundCreator.registerGround('M', TitaniumDoor::new);
         groundCreator.registerGround('≈', ToxicWaste::new);
-//        groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue()));
+        groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue(),quotaManager));
         // Placeholder mappings for special glyphs that are decorated later
 
         // NOTE: We cannot use the default ground creator to create holes,
@@ -66,7 +68,7 @@ public class EclipseNebula extends World {
         depositable.add(AlienArtifact::new);
 
         // Produce the maps...
-        QuotaManager quotaManager = new QuotaManager();
+
 
         Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator, depositable, quotaManager);
         Overflow20 overflow20Map = new Overflow20(groundCreator, depositable, quotaManager);
