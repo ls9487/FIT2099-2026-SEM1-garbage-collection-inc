@@ -101,8 +101,11 @@ public class Overflow20 extends GameMap {
         tickSpawners.add(new ParasiteSpawner());
         tickSpawners.add(new ScrapSnatcherSpawner(depositable));
 
+        List<Spawner> cutSpawners = new ArrayList<>();
+        cutSpawners.add(new UndeadSpawner());
+
         Location superComputerLocation = this.at(3, 2); // Overflow20 SC location
-        this.at(51, 2).setGround(new Vent(tickSpawners, superComputerLocation));
+        this.at(51, 2).setGround(new Vent(tickSpawners, superComputerLocation, cutSpawners));
     }
 
     private void setMagicCircles() {
