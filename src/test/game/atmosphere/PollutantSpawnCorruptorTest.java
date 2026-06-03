@@ -1,4 +1,3 @@
-/* DISABLED FOR APP RUN
 package game.atmosphere;
 
 import org.junit.jupiter.api.Test;
@@ -10,15 +9,13 @@ import org.junit.jupiter.api.Test;
  * @author esoo0013
  */
 
-//class PollutantSpawnCorruptorTest {
-//
-//    @Test
-//    void corruptDoesNothingBelowSevereAqiWhenMapIsNull() {
-//        PollutantSpawnCorruptor corruptor = new PollutantSpawnCorruptor();
-//        AirQualityReport report = new AirQualityReport(3, "no2");
-//
-//        corruptor.corrupt(null, report);
-//    }
-//}
-//
-//
+class PollutantSpawnCorruptorTest {
+
+    @Test
+    void corruptDoesNothingBelowSevereAqiWhenMapIsNull() {
+        PollutantSpawnCorruptor corruptor = new PollutantSpawnCorruptor();
+        AirQualityReport report = new AirQualityReport(3, "no2");
+
+        corruptor.corrupt(null, report, null);
+    }
+}

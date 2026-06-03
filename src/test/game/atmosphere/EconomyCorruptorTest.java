@@ -1,12 +1,16 @@
-/* DISABLED FOR APP RUN
 package game.atmosphere;
 
+import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.positions.NumberRange;
 import game.grounds.SuperComputer;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests EconomyCorruptor to check that the global economy disruption flag reacts
@@ -15,33 +19,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author esoo0013
  */
 
-//class EconomyCorruptorTest {
-//
-//    @Test
-//    void corruptEnablesEconomyDisruptionWhenSo2IsDominant() {
-//        SuperComputer.isEconomyDisrupted() = false;
-//        EconomyCorruptor corruptor = new EconomyCorruptor();
-//
-//        AirQualityReport report = new AirQualityReport(4, "so2");
-//
-//        try {
-//            corruptor.corrupt(null, report);
-//        } catch (NullPointerException ignored) {
-//            // The flag is set before map iteration begins.
-//        }
-//
-//        assertTrue(SuperComputer.isEconomyDisrupted());
-//    }
-//
-//    @Test
-//    void corruptDisablesEconomyDisruptionWhenDominantPollutantIsNotSo2() {
-//        SuperComputer.isEconomyDisrupted() = true;
-//        EconomyCorruptor corruptor = new EconomyCorruptor();
-//
-//        AirQualityReport report = new AirQualityReport(4, "no2");
-//
-//        corruptor.corrupt(null, report);
-//
-//        assertFalse(SuperComputer.isEconomyDisrupted());
-//    }
-//}
+class EconomyCorruptorTest {
+
+    @Test
+    void corruptEnablesEconomyDisruptionWhenSo2IsDominant() {
+        SuperComputer.setEconomyDisrupted(false);
+        EconomyCorruptor corruptor = new EconomyCorruptor();
+
+        AirQualityReport report = new AirQualityReport(4, "so2");
+        GameMap map = mock(GameMap.class);
+        Location emptyLocation = mock(Location.class);
+
+        when(map.getYRange()).thenReturn(new NumberRange(0, 1));
+        when(map.getXRange()).thenReturn(new NumberRange(0, 1));
+        when(map.at(0, 0)).thenReturn(emptyLocation);
+        when(emptyLocation.getActor()).thenReturn(null);
+
+        corruptor.corrupt(map, report, null);
+
+        assertTrue(SuperComputer.isEconomyDisrupted());
+    }
+
+    @Test
+    void corruptDisablesEconomyDisruptionWhenDominantPollutantIsNotSo2() {
+        SuperComputer.setEconomyDisrupted(true);
+        EconomyCorruptor corruptor = new EconomyCorruptor();
+
+        AirQualityReport report = new AirQualityReport(4, "no2");
+        GameMap map = mock(GameMap.class);
+
+        corruptor.corrupt(map, report, null);
+
+        assertFalse(SuperComputer.isEconomyDisrupted());
+    }
+}
