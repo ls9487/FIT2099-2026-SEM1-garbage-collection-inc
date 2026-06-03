@@ -52,7 +52,7 @@ public class NuclearMissile extends Projectile {
      * @return A String description of this hit effect.
      */
     @Override
-    protected String onHitEffect(Location hitLocation) {
+    public String onHitEffect(Location hitLocation) {
         // This is for the location where it directly hit.
         if (hitLocation.containsAnActor()) {
             // Get the actor standing at the impact point.

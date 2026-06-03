@@ -74,7 +74,7 @@ public abstract class Turret extends Ground {
      * @param location The given location of the turret.
      * @return The chosen target actor's location.
      */
-    protected Location getTargetDestination(Location location) {
+    public Location getTargetDestination(Location location) {
         // Store the nearby actors' locations in a list here, to be used later.
         List<Location> targetLocations = new ArrayList<>();
         // Get the nearby locations (based on detection radius).
@@ -105,7 +105,7 @@ public abstract class Turret extends Ground {
      * @param destination The destination location where the projectile should hit.
      * @return A String description of having fired the projectile.
      */
-    protected abstract String fireProjectileAt(Location origin, Location destination);
+    public abstract String fireProjectileAt(Location origin, Location destination);
 
     /**
      * Uses the display to print out a given description.

@@ -25,7 +25,7 @@ public class FireBullet extends Projectile {
      * @param destination The destination this projectile is fired at.
      */
     public FireBullet(Location destination) {
-        super("Fire Bullet", '>', VELOCITY, destination);
+        super("Fire Bullet", '»', VELOCITY, destination);
     }
 
     /**
@@ -35,7 +35,7 @@ public class FireBullet extends Projectile {
      * @return A String description of this hit effect.
      */
     @Override
-    protected String onHitEffect(Location hitLocation) {
+    public String onHitEffect(Location hitLocation) {
         // Prepare a description.
         StringBuilder description = new StringBuilder(this.toString());
 

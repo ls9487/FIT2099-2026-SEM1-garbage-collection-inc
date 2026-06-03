@@ -133,7 +133,7 @@ public abstract class Projectile extends Item {
      * @param hitLocation The location of the projectile's impact.
      * @return A string description of the projectile hitting a location.
      */
-    protected abstract String onHitEffect(Location hitLocation);
+    public abstract String onHitEffect(Location hitLocation);
 
     /**
      * Uses the display to print out a given description.

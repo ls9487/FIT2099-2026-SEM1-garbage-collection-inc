@@ -36,7 +36,7 @@ public class SiphonBullet extends Projectile {
      * @return A String description of this hit effect.
      */
     @Override
-    protected String onHitEffect(Location hitLocation) {
+    public String onHitEffect(Location hitLocation) {
         // Prepare a description.
         StringBuilder description = new StringBuilder(this.toString() + " hits at " +
                 hitLocation);

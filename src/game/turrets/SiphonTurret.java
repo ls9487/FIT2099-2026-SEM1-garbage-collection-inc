@@ -61,7 +61,7 @@ public class SiphonTurret extends Turret {
      * @param destination The destination location where the projectile should hit.
      */
     @Override
-    protected String fireProjectileAt(Location origin, Location destination) {
+    public String fireProjectileAt(Location origin, Location destination) {
         // Create the SiphonBullet.
         Projectile bullet = new SiphonBullet(destination, registeredActor);
         // Place it onto the game at where the turret is.
