@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.atmosphere.AirQualityReport;
 import game.atmosphere.AtmosphereSensitiveActor;
+import game.atmosphere.AtmosphericScanner;
 import game.behaviours.AttackBehaviour;
 import game.behaviours.WanderBehaviour;
 import game.grounds.ToxicWaste;
@@ -21,6 +22,8 @@ import game.weapons.BareFist;
  * @author echu0057
  */
 public class Undead extends EclipseActor implements Infectable, AtmosphereSensitiveActor {
+    private static final int ADJACENT_RADIATION_DAMAGE = 1;
+
     private static final int ATTACK_BEHAVIOUR_PRIORITY = 1;
     private static final int WANDER_BEHAVIOUR_PRIORITY = 999;
 
@@ -66,7 +69,7 @@ public class Undead extends EclipseActor implements Infectable, AtmosphereSensit
         int aqi = report.getAqi();
 
         // Safe air: no atmospheric reaction.
-        if (aqi <= 2) {
+        if (aqi <= AtmosphericScanner.SAFE_AQI_THRESHOLD) {
             return;
         }
 
@@ -75,7 +78,7 @@ public class Undead extends EclipseActor implements Infectable, AtmosphereSensit
         System.out.println("[Toxic Atmosphere] AQI " + aqi
                 + " : " + this + " seeps necrotic ooze, corrupting the ground it stands on!");
 
-        if (aqi >= 4) {
+        if (aqi > AtmosphericScanner.MODERATE_AQI) {
             // Severe: emanate toxic energy to adjacent actors.
             for (Exit exit : here.getExits()) {
                 Location neighbour = exit.getDestination();
@@ -83,7 +86,7 @@ public class Undead extends EclipseActor implements Infectable, AtmosphereSensit
                     continue;
                 }
                 var victim = neighbour.getActor();
-                victim.hurt(1);
+                victim.hurt(ADJACENT_RADIATION_DAMAGE);
                 System.out.println("[Toxic Atmosphere] " + this
                         + " radiates lethal pollution : " + victim + " takes 1 damage!");
             }

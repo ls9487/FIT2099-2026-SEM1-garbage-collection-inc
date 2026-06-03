@@ -1,16 +1,15 @@
-/* DISABLED FOR APP RUN
-package game.atmosphere;
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Tests the small AirQualityReport value object to make sure its constructor
- * and getters keep the AQI and dominant pollutant values exactly as expected.
- *
- * @author esoo0013
- */
-
+//package game.atmosphere;
+//
+//import org.junit.jupiter.api.Test;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//
+///**
+// * Tests the small AirQualityReport value object to make sure its constructor
+// * and getters keep the AQI and dominant pollutant values exactly as expected.
+// *
+// * @author esoo0013
+// */
+//
 //class AirQualityReportTest {
 //
 //    @Test

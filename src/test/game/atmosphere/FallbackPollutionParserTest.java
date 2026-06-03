@@ -1,17 +1,16 @@
-/* DISABLED FOR APP RUN
-package game.atmosphere;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Tests FallbackPollutionParser to make sure it always returns a safe default
- * air quality report when usable pollution data is missing or ignored.
- *
- * @author esoo0013
- */
-
+//package game.atmosphere;
+//
+//import org.junit.jupiter.api.Test;
+//
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//
+///**
+// * Tests FallbackPollutionParser to make sure it always returns a safe default
+// * air quality report when usable pollution data is missing or ignored.
+// *
+// * @author esoo0013
+// */
+//
 //class FallbackPollutionParserTest {
 //
 //    @Test

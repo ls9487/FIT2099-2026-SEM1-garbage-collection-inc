@@ -226,10 +226,10 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 - **EconomyCorruptor**
   - Interprets sulphur dioxide (`SO2`) as a proxy for economic disruption.
   - When the dominant pollutant in `AirQualityReport` is `"so2"`, it:
-    - Sets a global disruption flag `EconomyCorruptor.ECONOMY_DISRUPTED` to `true`.
+    - Sets a global disruption flag `SuperComputer.isEconomyDisrupted()` to `true`.
     - Iterates over all tiles in the `GameMap` and, for any actor that tracks `EclipseStatistics.CREDITS`, reduces that statistic by 10 with a floor at 0.
   - The disruption flag is consumed by the REQ1 shop system:
-    - When `EconomyCorruptor.ECONOMY_DISRUPTED` is `true`, `SellAction` still removes the item from the seller's inventory, but there is a **50% chance** that the **payout is 0 credits** instead of the normal price.
+    - When `SuperComputer.isEconomyDisrupted()` is `true`, `SellAction` still removes the item from the seller's inventory, but there is a **50% chance** that the **payout is 0 credits** instead of the normal price.
     - When the flag is `false`, `SellAction` behaves normally.
 
 - **PollutantSpawnCorruptor**
@@ -237,10 +237,10 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 
 - The atmospheric system is driven by a dedicated monitor ground:
   - `AtmosphericMonitor` is a stationary `Ground` that represents the facility's automated probe and also acts as an `AtmosphericAnchor`.
-  - It owns an `EnvironmentalMonitorBehaviour`, which keeps an internal tick counter.
+  - It owns an `EnvironmentalMonitorController`, which keeps an internal tick counter.
   - To keep testing simple and make the feature observable in a short demo, the behaviour is configured to trigger a new scan every turn through a named refresh-interval constant.
-  - When the interval elapses, the behaviour triggers an `AtmosphericScanAction`.
-  - `AtmosphericScanAction` calls the API via `AtmosphericApiClient`, parses the JSON with the selected parser, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.
+  - During each ground tick, the controller delegates directly to `AtmosphericScanner`.
+  - `AtmosphericScanner` calls the API via `AtmosphericApiClient`, parses the JSON with the selected parser, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.
 
 ### Testing Highlights
 
@@ -294,8 +294,8 @@ For REQ5, the feature is structured around **two primary gameplay abstractions t
 | AtmosphericApiClient          | New      | -                                       | Calls the external API with a query profile derived from the monitor's game-state coordinates and returns the raw JSON string. |
 | AtmosphericServicesFactory    | New      | -                                       | Factory that wires together the parser, client, and all `AtmosphericCorruptor`s so higher-level classes do not need to construct concrete implementations directly. |
 | AtmosphericMonitor            | New      | Ground, AtmosphericAnchor               | Stationary probe ground; acts as the atmospheric anchor so corruptors can locate it without downcasting to a concrete actor type. |
-| EnvironmentalMonitorBehaviour | New      | -                                       | Triggers periodic atmospheric scans and coordinates the API pipeline through abstractions. |
-| AtmosphericScanAction         | New      | Action                                  | Fetches JSON, parses it, prints an AQI summary, and invokes all registered `AtmosphericCorruptor`s. |
+| EnvironmentalMonitorController | New      | -                                       | Triggers periodic atmospheric scans and coordinates the API pipeline through abstractions. |
+| AtmosphericScanner         | New      | Action                                  | Fetches JSON, parses it, prints an AQI summary, and invokes all registered `AtmosphericCorruptor`s. |
 | HazardCorruptor               | New      | AtmosphericCorruptor                    | Calls `applyAtmosphere` on all `AtmosphereSensitiveActor`s; at moderate AQI spreads local toxic puddles; at severe AQI creates a border ring and monitor hotspot. |
 | EconomyCorruptor              | New      | AtmosphericCorruptor                    | `SO2`-driven: reduces credits for tracked actors and toggles a disruption flag consumed by `SellAction` to probabilistically void transactions. |
 | PollutantSpawnCorruptor       | New      | AtmosphericCorruptor                    | At severe AQI, locates the `AtmosphericAnchor` and spawns one `Undead` on a valid adjacent empty tile. |

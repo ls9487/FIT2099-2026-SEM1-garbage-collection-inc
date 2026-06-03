@@ -1,26 +1,21 @@
+package game.atmosphere;
+
 /**
- * Strategy abstraction for turning a raw JSON string from the AirVisual API
- * into an {@link AirQualityReport} that the rest of the game can understand.
- * <p>
- * Implementations of this interface are deliberately kept pure: they do not
- * perform any HTTP calls or mutate the game. Their only job is to translate
- * the JSON payload into a strongly typed snapshot of the atmosphere.
- * </p>
+ * Strategy interface for turning raw API JSON into an {@link AirQualityReport}.
+ *
+ * This abstraction keeps the rest of the atmosphere system independent from any
+ * one API format. It also allows the game to swap between live and fallback
+ * parsers without changing the higher-level scan flow.
  *
  * @author esoo0013
  */
-package game.atmosphere;
-
 public interface PollutionDataParser {
 
     /**
-     * Parse a raw JSON response string into an {@link AirQualityReport}.
-     * Implementations may throw an unchecked exception if the payload is
-     * malformed, but they should aim to be robust to missing fields.
+     * Parses raw JSON into a simplified air quality report.
      *
-     * @param json raw JSON payload from the AirVisual API
-     * @return a populated AirQualityReport representing the current conditions
+     * @param json the raw JSON response
+     * @return a simplified air quality report
      */
     AirQualityReport parse(String json);
-
 }

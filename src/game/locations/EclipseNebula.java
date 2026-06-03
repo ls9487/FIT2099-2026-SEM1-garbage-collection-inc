@@ -17,8 +17,7 @@ import game.items.AluminiumScrap;
 import game.items.Flask;
 import game.atmosphere.AtmosphericApiClient;
 import game.atmosphere.AtmosphericMonitor;
-import game.atmosphere.AtmosphericServicesFactory;
-import game.atmosphere.EnvironmentalMonitorBehaviour;
+import game.atmosphere.EnvironmentalMonitorController;
 import game.items.IndustrialFan;
 
 import java.util.ArrayList;
@@ -126,12 +125,12 @@ public class EclipseNebula extends World {
         // Passive atmospheric monitor for A3 REQ5: sits near the SuperComputer
         // and periodically scans the real-world air quality.
         AtmosphericServicesFactory servicesFactory = new AtmosphericServicesFactory();
-        EnvironmentalMonitorBehaviour monitorBehaviour = new EnvironmentalMonitorBehaviour(
+        EnvironmentalMonitorController monitorController = new EnvironmentalMonitorController(
                 servicesFactory.createParser(),
                 new AtmosphericApiClient(),
                 servicesFactory
         );
-        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorBehaviour);
+        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorController);
         moon99DeprecatedMap.at(15, 2).setGround(monitor);
     }
 

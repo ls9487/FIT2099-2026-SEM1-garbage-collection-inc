@@ -1,17 +1,16 @@
-/* DISABLED FOR APP RUN
-package game.atmosphere;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Tests the default and fallback behaviour of OpenWeatherPollutionParser so null
- * or incomplete input still produces a safe and predictable air quality report.
- *
- * @author esoo0013
- */
-
+//package game.atmosphere;
+//
+//import org.junit.jupiter.api.Test;
+//
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//
+///**
+// * Tests the default and fallback behaviour of OpenWeatherPollutionParser so null
+// * or incomplete input still produces a safe and predictable air quality report.
+// *
+// * @author esoo0013
+// */
+//
 //class OpenWeatherPollutionParserDefaultTest {
 //
 //    @Test

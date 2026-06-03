@@ -9,7 +9,7 @@ import edu.monash.fit2099.engine.positions.Location;
  * This class represents the fixed monitor station placed on the map. Instead
  * of behaving like a living actor, it stays as environmental infrastructure and
  * triggers atmospheric scans through its attached
- * {@link EnvironmentalMonitorBehaviour}. It also implements
+ * {@link EnvironmentalMonitorController}. It also implements
  * {@link AtmosphericAnchor} so other REQ5 systems can use it as the centre
  * point for hotspot corruption and pollution-based spawning.
  *
@@ -20,16 +20,16 @@ public class AtmosphericMonitor extends Ground implements AtmosphericAnchor {
     private static final char DISPLAY_CHARACTER = '⌬';
     private static final String NAME = "Atmospheric Monitor";
 
-    private final EnvironmentalMonitorBehaviour behaviour;
+    private final EnvironmentalMonitorController controller;
 
     /**
      * Constructor.
      *
-     * @param behaviour the behaviour that controls periodic atmospheric scans
+     * @param controller the controller that manages periodic atmospheric scans
      */
-    public AtmosphericMonitor(EnvironmentalMonitorBehaviour behaviour) {
+    public AtmosphericMonitor(EnvironmentalMonitorController controller) {
         super(DISPLAY_CHARACTER, NAME);
-        this.behaviour = behaviour;
+        this.controller = controller;
     }
 
     /**
@@ -39,6 +39,6 @@ public class AtmosphericMonitor extends Ground implements AtmosphericAnchor {
      */
     @Override
     public void tick(Location location) {
-        behaviour.operate(this, location);
+        controller.operate(this, location);
     }
 }
