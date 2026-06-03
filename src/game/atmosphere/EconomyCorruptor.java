@@ -48,8 +48,12 @@ public class EconomyCorruptor implements AtmosphericCorruptor {
                 }
 
                 if (actor.hasStatistic(EclipseStatistics.CREDITS)) {
-                actor.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.INCREASE, -CREDIT_PENALTY);
-            }
+                    int currentCredits = actor.getStatistic(EclipseStatistics.CREDITS);
+                    int deduction = Math.min(CREDIT_PENALTY, currentCredits);
+                    if (deduction > 0) {
+                        actor.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, deduction);
+                    }
+                }
             }
         }
     }

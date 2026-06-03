@@ -14,9 +14,10 @@ import java.util.Random;
  * This corruptor interprets the AQI stored in an {@link AirQualityReport} and
  * applies escalating effects to the game world. At moderate pollution levels,
  * it delegates actor-specific reactions to all {@link AtmosphereSensitiveActor}
- * implementations and creates small localised toxic spills. At severe
- * pollution levels, it additionally corrupts large regions of the map,
- * including the outer border and an area surrounding the atmospheric anchor.
+ * implementations and can create small local waste clusters near affected
+ * actors. At severe pollution levels, it also corrupts large regions of the
+ * map, including the outer border and an area surrounding the atmospheric
+ * anchor.
  *
  * This design keeps atmospheric mutation logic centralised while preserving
  * polymorphism by letting each affected actor define its own reaction through
@@ -39,13 +40,15 @@ public class HazardCorruptor implements AtmosphericCorruptor {
      * Applies AQI-driven hazard effects to the provided map.
      *
      * Safe or mild pollution causes no change. Moderate pollution applies
-     * actor-specific atmospheric reactions and may create local toxic puddles.
+     * actor-specific atmospheric reactions and may create small toxic puddles.
      * Severe pollution further mutates the wider environment by surrounding the
      * map border with {@link ToxicWaste} and creating a pollution hotspot near
-     * an atmospheric anchor.
+     * an atmospheric anchor. This method also prints event messages only when a
+     * visible terrain change actually happens.
      *
      * @param map the game map to corrupt
      * @param report the air quality report describing the current atmospheric state
+     * @param anchorLocation the current location of the atmospheric monitor
      */
     @Override
     public void corrupt(GameMap map, AirQualityReport report, Location anchorLocation) {
@@ -55,6 +58,8 @@ public class HazardCorruptor implements AtmosphericCorruptor {
             return;
         }
 
+        int localWasteTilesCreated = 0;
+
         for (int y : map.getYRange()) {
             for (int x : map.getXRange()) {
                 Location location = map.at(x, y);
@@ -63,19 +68,35 @@ public class HazardCorruptor implements AtmosphericCorruptor {
                     continue;
                 }
 
-                actor.asCapability(AtmosphereSensitiveActor.class).ifPresent(sensitive -> {
-                    sensitive.applyAtmosphere(report, location);
+                var sensitive = actor.asCapability(AtmosphereSensitiveActor.class);
+                if (sensitive.isPresent()) {
+                    sensitive.get().applyAtmosphere(report, location);
 
                     if (aqi == MODERATE_AQI) {
-                        spreadLocalWaste(location);
+                        localWasteTilesCreated += spreadLocalWaste(location);
                     }
-                });
+                }
             }
         }
 
+        if (aqi == MODERATE_AQI && localWasteTilesCreated > 0) {
+            System.out.println("[Toxic Atmosphere] Local contamination spreads: "
+                    + localWasteTilesCreated + " toxic waste tile(s) form near affected actors.");
+        }
+
         if (aqi >= SEVERE_AQI_THRESHOLD) {
-            createBorderWasteRing(map);
-            createAnchorHotspot(map, anchorLocation);
+            int borderTilesCorrupted = createBorderWasteRing(map);
+            int hotspotTilesCorrupted = createAnchorHotspot(map, anchorLocation);
+
+            if (borderTilesCorrupted > 0) {
+                System.out.println("[Toxic Atmosphere] Severe pollution corrupts the facility border: "
+                        + borderTilesCorrupted + " perimeter tile(s) become toxic waste.");
+            }
+
+            if (hotspotTilesCorrupted > 0) {
+                System.out.println("[Toxic Atmosphere] The monitor hotspot mutates: "
+                        + hotspotTilesCorrupted + " nearby tile(s) become toxic waste.");
+            }
         }
     }
 
@@ -83,11 +104,15 @@ public class HazardCorruptor implements AtmosphericCorruptor {
      * Randomly spreads small pockets of {@link ToxicWaste} around a centre
      * location to simulate local contamination.
      *
-     * Only empty adjacent tiles may be corrupted.
+     * Only empty adjacent tiles may be corrupted. Existing toxic waste tiles do
+     * not count again.
      *
      * @param centre the source location around which waste may spread
+     * @return the number of newly corrupted adjacent tiles
      */
-    private void spreadLocalWaste(Location centre) {
+    private int spreadLocalWaste(Location centre) {
+        int tilesCreated = 0;
+
         for (Exit exit : centre.getExits()) {
             Location dest = exit.getDestination();
             if (dest.containsAnActor()) {
@@ -95,50 +120,61 @@ public class HazardCorruptor implements AtmosphericCorruptor {
             }
 
             if (random.nextInt(RANDOM_BOUND) < LOCAL_WASTE_SPREAD_PERCENT) {
-                dest.setGround(new ToxicWaste());
+                tilesCreated += corruptIfNeeded(dest);
             }
         }
+        return tilesCreated;
     }
 
     /**
      * Corrupts the outer border of the map with {@link ToxicWaste} to represent
      * severe, persistent atmospheric contamination.
      *
+     * The returned count only includes perimeter tiles that were newly changed
+     * during this scan.
+     *
      * @param map the map whose perimeter should be mutated
+     * @return the number of perimeter tiles newly converted into toxic waste
      */
-    private void createBorderWasteRing(GameMap map) {
+    private int createBorderWasteRing(GameMap map) {
         int minX = map.getXRange().min();
         int maxX = map.getXRange().max();
         int minY = map.getYRange().min();
         int maxY = map.getYRange().max();
+        int tilesCreated = 0;
 
         for (int x = minX; x <= maxX; x++) {
-            map.at(x, minY).setGround(new ToxicWaste());
-            map.at(x, maxY).setGround(new ToxicWaste());
+            tilesCreated += corruptIfNeeded(map.at(x, minY));
+            tilesCreated += corruptIfNeeded(map.at(x, maxY));
         }
 
-        for (int y = minY; y <= maxY; y++) {
-            map.at(minX, y).setGround(new ToxicWaste());
-            map.at(maxX, y).setGround(new ToxicWaste());
+        for (int y = minY + 1; y < maxY; y++) {
+            tilesCreated += corruptIfNeeded(map.at(minX, y));
+            tilesCreated += corruptIfNeeded(map.at(maxX, y));
         }
+        return tilesCreated;
     }
 
     /**
-     * Locates a ground marked as an {@link AtmosphericAnchor} and creates a
-     * concentrated hotspot of {@link ToxicWaste} within Manhattan distance 2.
+     * Creates a concentrated hotspot of {@link ToxicWaste} around the monitor.
      *
-     * Only empty tiles may be corrupted. If no atmospheric anchor exists on the
-     * map, no hotspot is created.
+     * Only empty tiles within Manhattan distance 2 of the atmospheric anchor
+     * may be corrupted. Each eligible tile has a 50 percent chance to change.
+     * The returned count only includes tiles that actually became toxic waste
+     * during this scan.
      *
-     * @param map the map in which to search for the atmospheric anchor
+     * @param map the map in which to apply the hotspot effect
+     * @param anchorLocation the current location of the atmospheric anchor
+     * @return the number of hotspot tiles newly converted into toxic waste
      */
-    private void createAnchorHotspot(GameMap map, Location anchorLocation) {
+    private int createAnchorHotspot(GameMap map, Location anchorLocation) {
         if (anchorLocation == null) {
-            return;
+            return 0;
         }
 
         int centreX = anchorLocation.x();
         int centreY = anchorLocation.y();
+        int tilesCreated = 0;
 
         for (int y : map.getYRange()) {
             for (int x : map.getXRange()) {
@@ -153,9 +189,27 @@ public class HazardCorruptor implements AtmosphericCorruptor {
                 }
 
                 if (random.nextBoolean()) {
-                    here.setGround(new ToxicWaste());
+                    tilesCreated += corruptIfNeeded(here);
                 }
             }
         }
+        return tilesCreated;
+    }
+
+    /**
+     * Converts a location into toxic waste only when it is not already toxic.
+     *
+     * This version avoids type checks and instead compares the ground display
+     * character directly with the Toxic Waste symbol.
+     *
+     * @param location the location to mutate
+     * @return 1 if the tile was newly corrupted, otherwise 0
+     */
+    private int corruptIfNeeded(Location location) {
+        if (location.getGround().getDisplayChar() == '≈') {
+            return 0;
+        }
+        location.setGround(new ToxicWaste());
+        return 1;
     }
 }
