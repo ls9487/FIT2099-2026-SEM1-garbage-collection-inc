@@ -29,7 +29,22 @@ public class IndustrialFan extends EclipseItem implements Depositable, Sellable 
     private final Random random = new Random();
 
     /**
-     * Constructs an Industrial Fan with weight 5 and display char '@'.
+     * Default constructor for when IndustrialFan is spawned as ground loot
+     *
+     * Sell side effect is disabled since superComputerLocation is unknown.
+     */
+    public IndustrialFan() {
+        super("Industrial Fan", '@', WEIGHT);
+        this.superComputerLocation = null;
+        this.spawners = new ArrayList<>();
+    }
+
+    /**
+     * Parameterized constructor for when IndustrialFan is dropped by cutting a Vent.
+     * Sell side effect fully enabled, slime spawns adjacent to the SuperComputer on sell.
+     *
+     * @param superComputerLocation the location of the SuperComputer on this map
+     * @param spawners              list of spawners used when the fan is sold
      */
     public IndustrialFan(Location superComputerLocation, List<Spawner> spawners) {
         super("Industrial Fan", '@', WEIGHT);
@@ -59,7 +74,9 @@ public class IndustrialFan extends EclipseItem implements Depositable, Sellable 
      */
     @Override
     public String soldBy(Actor seller, GameMap map) {
-        spawn(superComputerLocation);
+        if (superComputerLocation != null) {
+            spawn(superComputerLocation);
+        }
         seller.getInventory().remove(this);
         return String.format(
                 "%s sells Industrial Fan for %d credits. " +

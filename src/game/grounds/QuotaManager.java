@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,12 +35,12 @@ public class QuotaManager {
     /**
      * Constructs a QuotaManager starting at Rank 1 with base quota and turn limit.
      */
-    public QuotaManager(List<Location> superComputerLocations) {
+    public QuotaManager() {
         this.companyCredits = DEFAULT_CREDITS;
         this.quota = BASE_QUOTA;
         this.turnsRemaining = BASE_TURNS;
         this.rank = STARTING_RANK;
-        this.superComputerLocations = superComputerLocations;
+        this.superComputerLocations = new ArrayList<>();
     }
 
     /**
@@ -55,7 +56,7 @@ public class QuotaManager {
     }
 
     /**
-     * Called once per game turn. Decrements the turn counter and
+     * Each game turn tick is called once. Decrements the turn counter and
      * checks if the deadline has been reached.
      *
      */
@@ -82,7 +83,7 @@ public class QuotaManager {
                             "The SuperComputer fires adjacent workers!", companyCredits, quota));
             fireAdjacentWorkers();
             // Reset turns so the game continues (workers avoiding SC can still perish naturally)
-            turnsRemaining = this.turnsRemaining <= 0 ? BASE_TURNS : turnsRemaining;
+            turnsRemaining = BASE_TURNS;
         }
     }
 
@@ -138,5 +139,9 @@ public class QuotaManager {
     public String getStatus() {
         return String.format("[Rank %d | Company Credits: %d / %d | Turns left: %d]",
                 rank, companyCredits, quota, turnsRemaining);
+    }
+
+    public void registerSuperComputerLocation(Location location) {
+        superComputerLocations.add(location);
     }
 }

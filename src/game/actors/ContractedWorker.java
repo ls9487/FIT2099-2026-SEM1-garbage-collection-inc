@@ -1,6 +1,5 @@
 package game.actors;
 
-import edu.monash.fit2099.demo.forest.AttackAction;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actions.DoNothingAction;
@@ -13,12 +12,14 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.BaseStatistic;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
+import game.actions.AttackAction;
 import game.atmosphere.AirQualityReport;
 import game.atmosphere.AtmosphereSensitiveActor;
 import game.atmosphere.AtmosphericScanner;
 import game.spawners.ParasiteSpawner;
 import game.spawners.Spawner;
 import game.statuses.Infectable;
+import game.vehicles.VehicleAbilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,9 +130,9 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
      */
     @Override
     public ActionList allowableActions(Actor otherActor, String direction, GameMap map) {
-        ActionList actions = new ActionList();
+        ActionList actions = super.allowableActions(otherActor, direction, map);
         // Add a new AttackAction if the other ability is hostile to workers.
-        if(otherActor.hasAbility(ActorAbilities.WORKER_HOSTILE)) {
+        if(otherActor.hasAbility(ActorAbilities.WORKER_HOSTILE) && !hasAbility(VehicleAbilities.HOVER)) {
             actions.add(new AttackAction(this, direction));
         }
         return actions;

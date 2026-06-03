@@ -1,5 +1,6 @@
 package game.locations;
 
+import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
@@ -9,24 +10,15 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
 import game.actors.Muckraker;
 import game.actors.PhantasmWisp;
-import game.grounds.AluminiumDoor;
-import game.grounds.Dirt;
-import game.grounds.Floor;
-import game.grounds.IronDoor;
-import game.grounds.Puddle;
-import game.grounds.TitaniumDoor;
-import game.grounds.ToxicWaste;
-import game.grounds.Wall;
+import game.grounds.*;
 import game.inventories.WeightLimitedInventory;
 import game.items.AlienArtifact;
 import game.items.AluminiumScrap;
 import game.items.Flask;
-import game.grounds.SuperComputer;
-import game.grounds.TeleportationTube;
 import game.atmosphere.AtmosphericApiClient;
 import game.atmosphere.AtmosphericMonitor;
-import game.atmosphere.AtmosphericServicesFactory;
 import game.atmosphere.EnvironmentalMonitorController;
+import game.items.IndustrialFan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +29,7 @@ import java.util.function.Supplier;
  * and hashtags into a sprawling, functional sci-fi facility.
  */
 public class EclipseNebula extends World {
+    private QuotaManager quotaManager;
 
     /**
      * Creates the game world bound to the given display.
@@ -62,7 +55,7 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('N', IronDoor::new);
         groundCreator.registerGround('M', TitaniumDoor::new);
         groundCreator.registerGround('≈', ToxicWaste::new);
-        groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue()));
+        groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue(),quotaManager));
         // Placeholder mappings for special glyphs that are decorated later
 
         // NOTE: We cannot use the default ground creator to create holes,
@@ -70,18 +63,21 @@ public class EclipseNebula extends World {
 
         List<Supplier<Item>> depositable = new ArrayList<>();
         depositable.add(AluminiumScrap::new);
-//        depositable.add(IndustrialFan::new);
+        depositable.add(() -> new IndustrialFan());
         depositable.add(AlienArtifact::new);
 
         // Produce the maps...
-        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator, depositable);
-        Overflow20 overflow20Map = new Overflow20(groundCreator, depositable);
+        this.quotaManager = new QuotaManager();
+
+        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator, depositable, quotaManager);
+        Overflow20 overflow20Map = new Overflow20(groundCreator, depositable, quotaManager);
         this.addGameMap(moon99DeprecatedMap);
         this.addGameMap(overflow20Map);
 
+        quotaManager.registerSuperComputerLocation(moon99DeprecatedMap.at(4, 3));
+        quotaManager.registerSuperComputerLocation(overflow20Map.at(3, 2));
+
         // Install teleportation tubes with mixed intra- and inter-map destinations.
-
-
         for (Location tubeLocation : moon99DeprecatedMap.getTubeLocations()) {
             List<Location> tubeTeleportableLocation = new ArrayList<>();
             tubeTeleportableLocation.add(moon99DeprecatedMap.at(6, 3));
@@ -99,7 +95,7 @@ public class EclipseNebula extends World {
         }
 
         // BEHOLD, LOCAL MULTIPLAYER!!! ...comment some guys out for easier testing.
-        ContractedWorker contractedWorker1 = initialiseNewWorker("#1 Bob", 'ඞ', 10);
+        ContractedWorker contractedWorker1 = initialiseNewWorker("#1 Bob", 'ඞ', 10, quotaManager);
         //ContractedWorker contractedWorker2 = initialiseNewWorker("#2 Tom", 'ඞ', 10);
         //ContractedWorker contractedWorker3 = initialiseNewWorker("#3 Sarah", 'ඞ', 10);
         //ContractedWorker contractedWorker4 = initialiseNewWorker("#4 Julie", 'ඞ', 10);
@@ -146,11 +142,22 @@ public class EclipseNebula extends World {
      * @param hitPoints   the health value of the worker
      * @return a new contracted worker with a weighted inventory and starter flask
      */
-    public ContractedWorker initialiseNewWorker(String name, char displayChar, int hitPoints) {
+    public ContractedWorker initialiseNewWorker(String name, char displayChar, int hitPoints, QuotaManager quotaManager) {
         // Inventory is weighted, with a limit of 50.
         Inventory inventory = new WeightLimitedInventory(50);
         inventory.add(new Flask());
         return new ContractedWorker(name, displayChar, hitPoints, inventory);
+    }
+
+    /**
+     * Overrides the game loop to tick the QuotaManager each turn,
+     * checking quota progress and deadline.
+     */
+    @Override
+    protected void gameLoop() throws GameEngineException {
+        quotaManager.tick();
+        display.println(quotaManager.getStatus()); // print HUD here instead
+        super.gameLoop();
     }
 
 }

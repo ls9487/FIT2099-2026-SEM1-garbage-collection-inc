@@ -1,13 +1,21 @@
 package game.grounds;
 
+import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
+import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.CutAction;
 import game.actors.ActorAbilities;
+import game.items.Cuttable;
+import game.items.IndustrialFan;
+import game.items.ItemAbilities;
 import game.spawners.Spawner;
+import game.spawners.UndeadSpawner;
 import game.statuses.PoisonStatus;
 import game.statuses.Poisonable;
+import game.vehicles.VehicleAbilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +27,15 @@ import java.util.Random;
  * Spawns a creature each turn if an adjacent actor has the ability of activating it.
  * What creatures it spawns should depend on the moon (GameMap).
  *
+ * Only actors with VehicleAbilities.HOVER may enter a vent.
  * @author echu0057
  */
-public class Vent extends Ground {
+public class Vent extends Ground implements Cuttable {
 
     private static final Random random = new Random();
     // Keeps a list of spawners so they can be used to spawn creatures.
-    private List<Spawner> spawners;
+    private final List<Spawner> tickSpawners;       // for tick() motion-activated spawning
+    private final Location superComputerLocation;   // for IndustrialFan on cut
     private static final int POISON_DAMAGE = 1;
     private static  int POISON_DURATION = 5;
     private static final int POISON_RANGE = 1;
@@ -33,11 +43,12 @@ public class Vent extends Ground {
 
     /**
      * Constructor for the Vent class.
-     * @param spawners A list of spawners for actors.
+     * @param tickSpawners A list of spawners for actors.
      */
-    public Vent(List<Spawner> spawners) {
+    public Vent(List<Spawner> tickSpawners, Location superComputerLocation) {
         super('V', "Vent");
-        this.spawners = spawners;
+        this.tickSpawners = tickSpawners;
+        this.superComputerLocation = superComputerLocation;
     }
 
     /**
@@ -85,7 +96,7 @@ public class Vent extends Ground {
 
         if (!validLocations.isEmpty()) {
             // There is at least one valid location. Randomly choose the spawner and location.
-            Spawner chosenSpawner = spawners.get(random.nextInt(spawners.size()));
+            Spawner chosenSpawner = tickSpawners.get(random.nextInt(tickSpawners.size()));
             Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
             chosenSpawner.spawnAt(chosenLocation);
             // The spawn was done, and we'll need to poison everyone around.
@@ -115,14 +126,62 @@ public class Vent extends Ground {
         }
     }
 
+    @Override
+    public ActionList allowableActions(Actor actor, Location location, String direction) {
+        ActionList actions = super.allowableActions(actor, location, direction);
+        boolean hasPlasmaCutter = actor.getInventory().getItems().stream()
+                .anyMatch(item -> item.hasAbility(ItemAbilities.CUTTER));
+        if (hasPlasmaCutter) {
+            actions.add(new CutAction(this));
+        }
+        return actions;
+    }
+
     /**
      * Actors can't walk over a vent. They just can't.
+     * Only hovering actors may enter a vent.
      * @param actor The actor to check.
-     * @return false
+     * @return true if actor has VehicleAbilities.HOVER else false
      */
     @Override
     public boolean canActorEnter(Actor actor) {
-        return false;
+        return actor.hasAbility(VehicleAbilities.HOVER);
+    }
+
+    /**
+     * Cuts the vent with a Plasma Cutter.
+     * Drops an IndustrialFan, replaces tile with Floor,
+     * and spawns an Undead on that exact tile.
+     *
+     * @param actor The actor performing the cut.
+     * @param map   The map the actor is on.
+     * @return A description of what happened.
+     */
+    @Override
+    public String cutBy(Actor actor, GameMap map) {
+        // Find this vent's location
+        Location ventLocation = null;
+        for (Exit exit : map.locationOf(actor).getExits()) {
+            if (exit.getDestination().getGround() == this) {
+                ventLocation = exit.getDestination();
+                break;
+            }
+        }
+
+        if (ventLocation == null) return "Could not locate the vent.";
+
+        // Drop IndustrialFan with SC location and cut spawners
+        ventLocation.addItem(new IndustrialFan(superComputerLocation, tickSpawners));
+
+        // Replace vent tile with Floor
+        ventLocation.setGround(new Floor());
+
+        // Spawn Undead on that exact tile using UndeadSpawner (A2 effect applies)
+        new UndeadSpawner().spawnAt(ventLocation);
+
+        return String.format(
+                "%s cuts the Vent — an Industrial Fan crashes to the floor! " +
+                        "Something stirs in the darkness...", actor);
     }
 
 }
