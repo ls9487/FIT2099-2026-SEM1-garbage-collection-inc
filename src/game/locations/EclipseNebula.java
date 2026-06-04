@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
 import game.actors.Muckraker;
 import game.actors.PhantasmWisp;
+import game.atmosphere.AtmosphericServicesFactory;
 import game.grounds.*;
 import game.inventories.WeightLimitedInventory;
 import game.items.AlienArtifact;
