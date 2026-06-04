@@ -99,10 +99,13 @@ public class AtmosphericScanner {
                 .append(aqi)
                 .append(" with dominant pollutant ")
                 .append(pollutant)
-                .append(". Severe pollution can heavily harm sensitive actors, spread toxic waste across the facility border, corrupt tiles near the monitor hotspot, and reanimate undead near the monitor.");
+                .append(". Severe pollution can heavily harm sensitive actors, " +
+                        "spread toxic waste across the facility border, corrupt " +
+                        "tiles near the monitor hotspot, and reanimate undead near the monitor.");
 
         if (SuperComputer.isEconomyDisrupted()) {
-            summary.append(" Sulphur dioxide has disrupted the economy, so credits may be reduced but will not drop below 0, and Super Computer sell payouts may fail this turn.");
+            summary.append(" Sulphur dioxide has disrupted the economy, so credits may be reduced but will not " +
+                    "drop below 0, and Super Computer sell payouts may fail this turn.");
         }
 
         return summary.toString();
