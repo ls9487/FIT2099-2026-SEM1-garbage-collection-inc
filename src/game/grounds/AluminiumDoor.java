@@ -66,7 +66,7 @@ public class AluminiumDoor extends Door implements Cuttable {
 
         // 25% chance to explode
         StringBuilder result = new StringBuilder(
-                String.format("%s cuts the Aluminium Door — it crumbles into scrap!", actor));
+                String.format("%s cuts the Aluminium Door, it crumbles into scrap!", actor));
         if (new Random().nextDouble() < 0.25) {
             result.append(" The door EXPLODES!");
             for (Exit exit : map.locationOf(actor).getExits()) {
