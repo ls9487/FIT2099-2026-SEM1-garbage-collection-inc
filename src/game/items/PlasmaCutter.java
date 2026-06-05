@@ -56,7 +56,10 @@ public class PlasmaCutter extends EclipseItem implements Buyable {
     @Override
     public String boughtBy(Actor buyer, GameMap map) {
         buyer.hurt(PURCHASE_DAMAGE);
-        buyer.addStatus(new BurnStatus(BURN_DURATION, BURN_INTENSITY, (Flammable) buyer));
+        Flammable flammable = buyer.asCapability(Flammable.class).orElse(null);
+        if (flammable != null) {
+            buyer.addStatus(new BurnStatus(BURN_DURATION, BURN_INTENSITY, flammable));
+        }
         buyer.getInventory().add(this);
         return String.format(
                 "%s buys the Plasma Cutter for %d credits. " + "It ejects from the chute at searing temperatures! " +
