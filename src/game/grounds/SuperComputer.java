@@ -107,7 +107,7 @@ public class SuperComputer extends Ground {
         // Non-sellable items are skipped automatically through asCapability
         for (Item item : actor.getInventory().getItems()) {
             item.asCapability(Sellable.class)
-                    .ifPresent(s -> actions.add(new SellAction(s)));
+                    .ifPresent(s -> actions.add(new SellAction(s, location)));
         }
 
         // Deposit actions for Depositable items in inventory
