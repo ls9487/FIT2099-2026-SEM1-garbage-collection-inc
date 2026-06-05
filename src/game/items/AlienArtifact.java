@@ -55,7 +55,7 @@ public class AlienArtifact extends EclipseItem implements Depositable, Sellable 
      * @return A description of the sale and its effects.
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         StringBuilder result = new StringBuilder(
                 String.format("%s sells Alien Artifact for %d credits.", seller, SELL_PRICE));
         if (random.nextDouble() < POISON_CHANCE) {

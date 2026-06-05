@@ -64,7 +64,7 @@ public class CrtMonitor extends EclipseItem implements Sellable {
      * @author esoo0013
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         seller.heal(SELL_HEAL);
         StringBuilder msg = new StringBuilder(seller + " sells the CRT monitor for "
                 + getSellPrice() + " credits. Offloading it heals " + SELL_HEAL + " hp.");

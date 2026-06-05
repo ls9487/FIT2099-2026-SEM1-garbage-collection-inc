@@ -136,7 +136,7 @@ public class Apple extends EclipseItem implements Consumable, Sellable {
      * @author esoo0013
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         StringBuilder msg = new StringBuilder(seller + " sells an apple for "
                 + getSellPrice() + " credit. ");
 

@@ -1,5 +1,6 @@
 package game.items;
 
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
@@ -60,7 +61,7 @@ public class FloppyDisk extends EclipseItem implements Sellable {
      * @author esoo0013
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for "
                 + getSellPrice() + " credit.");
 

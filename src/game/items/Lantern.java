@@ -100,7 +100,7 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
      * @author esoo0013
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation){
         StringBuilder msg = new StringBuilder(seller + " sells the lantern for "
                 + getSellPrice() + " credits.");
 
