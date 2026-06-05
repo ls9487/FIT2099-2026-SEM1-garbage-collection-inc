@@ -114,13 +114,13 @@ public class HazardCorruptor implements AtmosphericCorruptor {
         int tilesCreated = 0;
 
         for (Exit exit : centre.getExits()) {
-            Location dest = exit.getDestination();
-            if (dest.containsAnActor()) {
+            Location destination = exit.getDestination();
+            if (destination.containsAnActor()) {
                 continue;
             }
 
             if (random.nextInt(RANDOM_BOUND) < LOCAL_WASTE_SPREAD_PERCENT) {
-                tilesCreated += corruptIfNeeded(dest);
+                tilesCreated += corruptIfNeeded(destination);
             }
         }
         return tilesCreated;
