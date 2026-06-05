@@ -63,7 +63,7 @@ public class FloppyDisk extends EclipseItem implements Sellable {
     @Override
     public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         StringBuilder msg = new StringBuilder(seller + " sells the floppy disk for "
-                + getSellPrice() + " credit.");
+                + getSellPrice() + " credit at " + superComputerLocation + ".");
 
         if (random.nextDouble() < GLITCH_CHANCE && seller.hasStatistic(EclipseStatistics.CREDITS)) {
             seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.DECREASE, GLITCH_DEDUCTION);

@@ -67,7 +67,7 @@ public class CrtMonitor extends EclipseItem implements Sellable {
     public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         seller.heal(SELL_HEAL);
         StringBuilder msg = new StringBuilder(seller + " sells the CRT monitor for "
-                + getSellPrice() + " credits. Offloading it heals " + SELL_HEAL + " hp.");
+                + getSellPrice() + " credits at " + superComputerLocation + ". Offloading it heals " + SELL_HEAL + " hp.");
 
         // 20% chance for the terminal to short.
         if (random.nextDouble() < SHORT_CHANCE) {

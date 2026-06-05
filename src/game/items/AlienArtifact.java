@@ -57,7 +57,7 @@ public class AlienArtifact extends EclipseItem implements Depositable, Sellable 
     @Override
     public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         StringBuilder result = new StringBuilder(
-                String.format("%s sells Alien Artifact for %d credits.", seller, SELL_PRICE));
+                String.format("%s sells Alien Artifact for %d credits at %s.", seller, SELL_PRICE, superComputerLocation));
         if (random.nextDouble() < POISON_CHANCE) {
             Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
             if (poisonable != null) {
