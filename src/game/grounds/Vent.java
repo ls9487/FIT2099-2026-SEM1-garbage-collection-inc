@@ -134,7 +134,7 @@ public class Vent extends Ground implements Cuttable {
         boolean hasPlasmaCutter = actor.getInventory().getItems().stream()
                 .anyMatch(item -> item.hasAbility(ItemAbilities.CUTTER));
         if (hasPlasmaCutter) {
-            actions.add(new CutAction(this));
+            actions.add(new CutAction(this, location));
         }
         return actions;
     }
@@ -160,26 +160,12 @@ public class Vent extends Ground implements Cuttable {
      * @return A description of what happened.
      */
     @Override
-    public String cutBy(Actor actor, GameMap map) {
-        // Find this vent's location
-        Location ventLocation = null;
-        for (Exit exit : map.locationOf(actor).getExits()) {
-            if (exit.getDestination().getGround() == this) {
-                ventLocation = exit.getDestination();
-                break;
-            }
-        }
-
-        if (ventLocation == null) return "Could not locate the vent.";
-
-        // Drop IndustrialFan with SC location and cut spawners
-        ventLocation.addItem(new IndustrialFan(superComputerLocation, tickSpawners));
-
-        // Replace vent tile with Floor
-        ventLocation.setGround(new Floor());
+    public String cutBy(Actor actor, GameMap map, Location location) {
+        location.addItem(new IndustrialFan(superComputerLocation, tickSpawners));
+        location.setGround(new Floor());
 
         // Spawn Undead on that exact tile using UndeadSpawner (A2 effect applies)
-        cutSpawners.get(random.nextInt(cutSpawners.size())).spawnAt(ventLocation);
+        cutSpawners.get(random.nextInt(cutSpawners.size())).spawnAt(location);
 
         return String.format(
                 "%s cuts the Vent — an Industrial Fan crashes to the floor! " +
