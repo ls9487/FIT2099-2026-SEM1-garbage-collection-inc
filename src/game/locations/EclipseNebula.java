@@ -20,6 +20,7 @@ import game.atmosphere.AtmosphericApiClient;
 import game.atmosphere.AtmosphericMonitor;
 import game.atmosphere.EnvironmentalMonitorController;
 import game.items.IndustrialFan;
+import game.atmosphere.AtmosphericServicesFactory;
 
 import java.util.ArrayList;
 import java.util.List;

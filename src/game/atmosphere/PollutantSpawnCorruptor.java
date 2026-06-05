@@ -79,13 +79,13 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
      * @return a list of empty neighbouring locations
      */
     private List<Location> collectEmptyNeighbours(Location centre) {
-        List<Location> result = new ArrayList<>();
+        List<Location> emptyNeighbours = new ArrayList<>();
         for (Exit exit : centre.getExits()) {
-            Location dest = exit.getDestination();
-            if (!dest.containsAnActor()) {
-                result.add(dest);
+            Location destination = exit.getDestination();
+            if (!destination.containsAnActor()) {
+                emptyNeighbours.add(destination);
             }
         }
-        return result;
+        return emptyNeighbours;
     }
 }
