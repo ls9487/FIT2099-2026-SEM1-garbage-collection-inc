@@ -6,6 +6,7 @@ import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.PickUpAction;
 import edu.monash.fit2099.engine.positions.Location;
+import game.items.Depositable;
 
 /**
  * Behaviour that picks up the first depositable portable item on the actor's tile.
@@ -30,5 +31,6 @@ public class SnatchBehaviour implements Behaviour<Actor, Action> {
                 return new PickUpAction(item);
             }
         }
+        return null;
     }
 }

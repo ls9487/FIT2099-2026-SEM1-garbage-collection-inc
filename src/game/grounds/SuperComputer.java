@@ -6,14 +6,9 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.BuyAction;
+import game.actions.DepositAction;
 import game.actions.SellAction;
-import game.items.AccessCardL1;
-import game.items.AccessCardL2;
-import game.items.AccessCardL3;
-import game.items.Buyable;
-import game.items.SterilisationBox;
-import game.items.FirstAidKit;
-import game.items.Sellable;
+import game.items.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +26,23 @@ import java.util.function.Supplier;
  */
 public class SuperComputer extends Ground {
 
+    private static boolean economyDisrupted = false;
+
+    public static void setEconomyDisrupted(boolean disrupted) {
+        economyDisrupted = disrupted;
+    }
+
+    public static boolean isEconomyDisrupted() {
+        return economyDisrupted;
+    }
+
     /**
      * Factories for every item this terminal offers for purchase.
      * Stored as Suppliers so each call to allowableActions produces a fresh item instance
      * So, it avoids shared mutable state across turns.
      */
     private final List<Supplier<Buyable>> catalogue;
+    private final QuotaManager quotaManager;
 
     /**
      * Constructor for a SuperComputer terminal with an injected catalogue.
@@ -46,9 +52,10 @@ public class SuperComputer extends Ground {
      * @param catalogue list of item factories defining this terminal's purchasable offerings
      * @author esoo0013
      */
-    public SuperComputer(List<Supplier<Buyable>> catalogue) {
+    public SuperComputer(List<Supplier<Buyable>> catalogue, QuotaManager quotaManager) {
         super('≡', "Supercomputer");
         this.catalogue = catalogue;
+        this.quotaManager = quotaManager;
     }
 
     /**
@@ -66,6 +73,7 @@ public class SuperComputer extends Ground {
         catalogue.add(AccessCardL3::new);
         catalogue.add(SterilisationBox::new);
         catalogue.add(FirstAidKit::new);
+        catalogue.add(PlasmaCutter::new);
         return catalogue;
     }
 
@@ -110,6 +118,12 @@ public class SuperComputer extends Ground {
         for (Item item : actor.getInventory().getItems()) {
             item.asCapability(Sellable.class)
                     .ifPresent(s -> actions.add(new SellAction(s)));
+        }
+
+        // Deposit actions for Depositable items in inventory
+        for (Item item : actor.getInventory().getItems()) {
+            item.asCapability(Depositable.class)
+                    .ifPresent(d -> actions.add(new DepositAction(d, quotaManager)));
         }
 
         return actions;
