@@ -2,6 +2,7 @@ package game.items;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 
 /**
  * Stuff we can flog to the SuperComputer for credits.
@@ -37,5 +38,5 @@ public interface Sellable {
      * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */
-    public String soldBy(Actor seller, GameMap map);
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation);
 }
