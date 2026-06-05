@@ -84,7 +84,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
         boolean hasPlasmaCutter = owner.getInventory().getItems().stream()
                 .anyMatch(item -> item.hasAbility(ItemAbilities.CUTTER));
         if (hasPlasmaCutter) {
-            actions.add(new CutAction(this));
+            actions.add(new CutAction(this, map.locationOf(owner)));
         }
 
         return actions;
@@ -131,11 +131,11 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
      * @return description of the Undead awakening
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         Location origin = map.locationOf(seller);
         spawn(origin);
         seller.getInventory().remove(this);
-        return "An Undead claws its way into reality beside " + seller + ".";
+        return "An Undead claws its way into reality beside " + seller + "at " + superComputerLocation + ".";
     }
 
     /**
@@ -171,7 +171,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
      * @return A description of what happened.
      */
     @Override
-    public String cutBy(Actor actor, GameMap map) {
+    public String cutBy(Actor actor, GameMap map, Location location) {
         // Drop Alien Artifact at actor's current location
         map.locationOf(actor).addItem(new AlienArtifact());
 
