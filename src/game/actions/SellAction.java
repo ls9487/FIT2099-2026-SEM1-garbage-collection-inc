@@ -1,5 +1,6 @@
 package game.actions;
 
+import edu.monash.fit2099.engine.positions.Location;
 import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
@@ -19,14 +20,16 @@ import game.actors.EclipseStatistics;
 public class SellAction extends Action {
 
     private final Sellable sellable;
+    private final Location location;
 
     /**
      * Constructor for a SellAction.
      * @param sellable the sellable being offered for sale.
      * @author esoo0013
      */
-    public SellAction(Sellable sellable) {
+    public SellAction(Sellable sellable, Location location) {
         this.sellable = sellable;
+        this.location = location;
     }
 
     /**
@@ -40,7 +43,6 @@ public class SellAction extends Action {
      */
     @Override
     public String execute(Actor seller, GameMap map) {
-        // Not all actors have credits. If they don't, then the action will not proceed further.
         if (!seller.hasStatistic(EclipseStatistics.CREDITS)) {
             return seller + " has nowhere to put credits.";
         }
@@ -54,7 +56,7 @@ public class SellAction extends Action {
             if (new java.util.Random().nextBoolean()) {
                 // Still let the item handle its own removal/side-effects so the
                 // world state progresses, but give no credits.
-                sellable.soldBy(seller, map);
+                sellable.soldBy(seller, map, location);
                 return seller + " attempts to sell " + sellable
                         + ", but the toxic atmosphere corrupts the transaction and no credits are received.";
             }
@@ -63,7 +65,7 @@ public class SellAction extends Action {
         // Normal sale path: give credits to the seller since they're selling it.
         seller.modifyStatistic(EclipseStatistics.CREDITS, StatisticOperations.INCREASE, price);
         // Let the sellable handle their side-effects and inventory removal.
-        return sellable.soldBy(seller, map);
+        return sellable.soldBy(seller, map, location);
     }
 
     /**
