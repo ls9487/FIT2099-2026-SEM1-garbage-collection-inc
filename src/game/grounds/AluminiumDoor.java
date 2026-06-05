@@ -54,31 +54,15 @@ public class AluminiumDoor extends Door implements Cuttable {
         // Add CutAction if actor holds a PlasmaCutter
         boolean hasPlasmaCutter = actor.getInventory().getItems().stream().anyMatch(item -> item.hasAbility(ItemAbilities.CUTTER));
         if (hasPlasmaCutter) {
-            actions.add(new CutAction(this));
+            actions.add(new CutAction(this, location));
         }
         return actions;
     }
 
     @Override
-    public String cutBy(Actor actor, GameMap map) {
-        // Find this door's location by scanning actor's adjacent tiles
-        Location doorLocation = null;
-        for (Exit exit : map.locationOf(actor).getExits()) {
-            if (exit.getDestination().getGround() == this) {
-                doorLocation = exit.getDestination();
-                break;
-            }
-        }
-
-        if (doorLocation == null) {
-            return "Could not locate the door.";
-        }
-
-        // Drop aluminium scrap on the floor
-        doorLocation.addItem(new AluminiumScrap());
-
-        // Transform tile into Floor
-        doorLocation.setGround(new Floor());
+    public String cutBy(Actor actor, GameMap map, Location location) {
+        location.addItem(new AluminiumScrap());
+        location.setGround(new Floor());
 
         // 25% chance to explode
         StringBuilder result = new StringBuilder(
