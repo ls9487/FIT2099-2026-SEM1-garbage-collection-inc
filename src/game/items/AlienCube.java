@@ -175,7 +175,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
         // Drop Alien Artifact at actor's current location
         map.locationOf(actor).addItem(new AlienArtifact());
 
-        // Poison the worker — 1 damage per turn for 5 turns
+        // Poison the worker 1 damage per turn for 5 turns
         Poisonable poisonable = actor.asCapability(Poisonable.class).orElse(null);
         String poisonMsg = "";
         if (poisonable != null) {
@@ -183,7 +183,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
             poisonMsg = String.format(" The alien matter seeps into %s's skin, poisoned for 5 turns!", actor);
         }
 
-        // Remove the cube from inventory — it's destroyed
+        // Remove the cube from inventory it's destroyed
         actor.getInventory().remove(this);
 
         return String.format(
