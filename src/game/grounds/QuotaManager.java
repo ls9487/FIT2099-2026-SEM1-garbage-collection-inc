@@ -69,7 +69,7 @@ public class QuotaManager {
 
     /**
      * Called when the turn countdown reaches zero.
-     * If quota is met, advances the cycle. Otherwise fires adjacent workers.
+     * If quota is met, advances the cycle (next round). Otherwise fires adjacent workers.
      *
      */
     private void onDeadline() {
@@ -134,7 +134,7 @@ public class QuotaManager {
      * Returns a HUD string showing current quota progress and turns remaining.
      * Displayed to the player each turn via ContractedWorker.playTurn().
      *
-     * @return A formatted status string.
+     * @return Display for rank, company creds, and turns left
      */
     public String getStatus() {
         return String.format("[Rank %d | Company Credits: %d / %d | Turns left: %d]",
