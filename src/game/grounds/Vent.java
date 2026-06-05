@@ -168,7 +168,7 @@ public class Vent extends Ground implements Cuttable {
         cutSpawners.get(random.nextInt(cutSpawners.size())).spawnAt(location);
 
         return String.format(
-                "%s cuts the Vent — an Industrial Fan crashes to the floor! " +
+                "%s cuts the Vent, an Industrial Fan crashes to the floor! " +
                         "Something stirs in the darkness...", actor);
     }
 
