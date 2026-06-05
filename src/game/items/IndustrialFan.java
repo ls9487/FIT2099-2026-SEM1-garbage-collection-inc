@@ -73,14 +73,14 @@ public class IndustrialFan extends EclipseItem implements Depositable, Sellable 
      * @return A description of the sale and its effects.
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         if (superComputerLocation != null) {
             spawn(superComputerLocation);
         }
         seller.getInventory().remove(this);
         return String.format(
                 "%s sells Industrial Fan for %d credits. " +
-                        "The facility's cooling system destabilises — a Slime emerges!",
+                        "The facility's cooling system destabilises a Slime emerges!",
                 seller, SELL_PRICE);
     }
 
