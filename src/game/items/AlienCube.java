@@ -180,14 +180,14 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
         String poisonMsg = "";
         if (poisonable != null) {
             actor.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE, poisonable));
-            poisonMsg = String.format(" The alien matter seeps into %s's skin — poisoned for 5 turns!", actor);
+            poisonMsg = String.format(" The alien matter seeps into %s's skin, poisoned for 5 turns!", actor);
         }
 
         // Remove the cube from inventory — it's destroyed
         actor.getInventory().remove(this);
 
         return String.format(
-                "%s cuts open the Alien Cube — an Alien Artifact spills out!%s",
+                "%s cuts open the Alien Cube. An Alien Artifact spills out!%s",
                 actor, poisonMsg);
     }
 }
