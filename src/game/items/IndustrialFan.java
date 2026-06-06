@@ -4,7 +4,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.spawners.Spawner;
+import game.spawners.SlimeSpawner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,32 +24,15 @@ public class IndustrialFan extends EclipseItem implements Depositable, Sellable 
     private static final int DEPOSIT_VALUE = 10;
     private static final int HEAL_AMOUNT = 10;
 
-    private final Location superComputerLocation;
-    private final List<Spawner> spawners;
     private final Random random = new Random();
-
-    /**
-     * Default constructor for when IndustrialFan is spawned as ground loot
-     *
-     * Sell side effect is disabled since superComputerLocation is unknown.
-     */
-    public IndustrialFan() {
-        super("Industrial Fan", '@', WEIGHT);
-        this.superComputerLocation = null;
-        this.spawners = new ArrayList<>();
-    }
 
     /**
      * Parameterized constructor for when IndustrialFan is dropped by cutting a Vent.
      * Sell side effect fully enabled, slime spawns adjacent to the SuperComputer on sell.
      *
-     * @param superComputerLocation the location of the SuperComputer on this map
-     * @param spawners              list of spawners used when the fan is sold
      */
-    public IndustrialFan(Location superComputerLocation, List<Spawner> spawners) {
+    public IndustrialFan() {
         super("Industrial Fan", '@', WEIGHT);
-        this.superComputerLocation = superComputerLocation;
-        this.spawners = spawners;
     }
 
     /**
@@ -80,7 +63,7 @@ public class IndustrialFan extends EclipseItem implements Depositable, Sellable 
         seller.getInventory().remove(this);
         return String.format(
                 "%s sells Industrial Fan for %d credits. " +
-                        "The facility's cooling system destabilises a Slime emerges!",
+                        "The facility's cooling system destabilises, a Slime emerges!",
                 seller, SELL_PRICE);
     }
 
@@ -130,7 +113,7 @@ public class IndustrialFan extends EclipseItem implements Depositable, Sellable 
         }
         if (!candidates.isEmpty()) {
             Location spawnTile = candidates.get(random.nextInt(candidates.size()));
-            spawners.get(random.nextInt(spawners.size())).spawnAt(spawnTile);
+            new SlimeSpawner().spawnAt(spawnTile);
         }
     }
 }
