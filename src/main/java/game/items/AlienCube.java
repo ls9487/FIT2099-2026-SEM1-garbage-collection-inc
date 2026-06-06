@@ -7,7 +7,6 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.CutAction;
 import game.actions.TeleportAction;
-import game.actors.Undead;
 import game.grounds.Teleporter;
 import game.grounds.ToxicWaste;
 import game.spawners.Spawner;
@@ -17,7 +16,6 @@ import game.statuses.Poisonable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Supplier;
 
 /**
  * Mysterious alien artifact that can short-range teleport its carrier or be

@@ -169,7 +169,7 @@ public class QuotaManager {
             return String.format("[Quota Status] [Rank %d | Company Credits: %d / %d | Turns left: %d]",
                     rank, companyCredits, quota, turnsRemaining);
         } else {
-            return "[Quota Status] [Rank %d | DEADLINE PASSED]";
+            return String.format("[Quota Status] [Rank %d | DEADLINE PASSED]", rank);
         }
     }
 
