@@ -3,6 +3,7 @@ package game.actions;
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
 import game.items.Cuttable;
 
 /**
@@ -14,14 +15,17 @@ import game.items.Cuttable;
 public class CutAction extends Action {
 
     private final Cuttable cuttable;
+    private final Location location;
 
     /**
      * Constructs a CutAction targeting the given Cuttable.
      *
      * @param cuttable The object to be cut.
+     * @param location The location of where the object was cut.
      */
-    public CutAction(Cuttable cuttable) {
+    public CutAction(Cuttable cuttable, Location location) {
         this.cuttable = cuttable;
+        this.location = location;
     }
 
     /**
@@ -33,7 +37,7 @@ public class CutAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
-        return cuttable.cutBy(actor, map);
+        return cuttable.cutBy(actor, map, location);
     }
 
     /**

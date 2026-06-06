@@ -39,7 +39,7 @@ public class Overflow20 extends GameMap {
      * @param groundCreator engine ground factory
      * @throws GameEngineException when the map cannot be created
      */
-    public Overflow20(GroundCreator groundCreator, List<Supplier<Item>> depositable, QuotaManager quotaManager) throws GameEngineException {
+    public Overflow20(GroundCreator groundCreator, List<Supplier<Item>> depositable) throws GameEngineException {
         super("20-Overflow", groundCreator, Arrays.asList(
                 ".....................≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈",
                 "...#######...........≈≈≈≈≈≈≈≈≈≈≈≈≈≈##################≈≈≈≈≈≈≈",
@@ -69,7 +69,7 @@ public class Overflow20 extends GameMap {
         this.setMagicCircles();
         this.setAlienCubes();
         this.setTrees();
-        this.setSuperComputer(quotaManager);
+        this.setSuperComputer();
 
         // Pre-reserve a tube location inside the starter ship (bridge corridor).
         this.tubeLocations.add(this.at(6, 3));
@@ -95,14 +95,13 @@ public class Overflow20 extends GameMap {
     }
 
     private void setVents(List<Supplier<Item>> depositable) {
-        // Existing tick spawners — unchanged
+        // Existing tick spawners unchanged
         List<Spawner> tickSpawners = new ArrayList<>();
         tickSpawners.add(new SlimeSpawner());
         tickSpawners.add(new ParasiteSpawner());
         tickSpawners.add(new ScrapSnatcherSpawner(depositable));
 
-        Location superComputerLocation = this.at(3, 2); // Overflow20 SC location
-        this.at(51, 2).setGround(new Vent(tickSpawners, superComputerLocation));
+        this.at(51, 2).setGround(new Vent(tickSpawners));
     }
 
     private void setMagicCircles() {
@@ -143,9 +142,9 @@ public class Overflow20 extends GameMap {
         this.at(4, 16).setGround(new WarperTreeSapling(new WarperTreeMature()));
     }
 
-    private void setSuperComputer(QuotaManager quotaManager) {
+    private void setSuperComputer() {
         // '≡' is at map position (3, 2) in Overflow20 layout
-        this.at(3, 2).setGround(new SuperComputer(SuperComputer.defaultCatalogue(), quotaManager));
+        this.at(3, 2).setGround(new SuperComputer(SuperComputer.defaultCatalogue()));
     }
 
     /**

@@ -52,21 +52,23 @@ public class AlienArtifact extends EclipseItem implements Depositable, Sellable 
      *
      * @param seller The actor selling this item.
      * @param map    The map the seller is on.
+     * @param superComputerLocation The location where the sellable was sold to.
      * @return A description of the sale and its effects.
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
+        // Prepare a description.
         StringBuilder result = new StringBuilder(
-                String.format("%s sells Alien Artifact for %d credits.", seller, SELL_PRICE));
+                String.format("%s sells Alien Artifact for %d credits at %s.", seller, SELL_PRICE, superComputerLocation));
+        // Check if the seller is to be poisoned.
         if (random.nextDouble() < POISON_CHANCE) {
             Poisonable poisonable = seller.asCapability(Poisonable.class).orElse(null);
             if (poisonable != null) {
                 seller.addStatus(new PoisonStatus(POISON_DURATION, POISON_INTENSITY, poisonable));
-                result.append(String.format(
-                        " The unstable artifact poisons %s! (%d dmg/turn for %d turns)",
-                        seller, POISON_INTENSITY, POISON_DURATION));
+                result.append(String.format(" The unstable artifact poisons %s!", seller));
             }
         }
+        // Remove the sold item.
         seller.getInventory().remove(this);
         return result.toString();
     }
@@ -85,6 +87,7 @@ public class AlienArtifact extends EclipseItem implements Depositable, Sellable 
      * Depositing side effect: the worker is immediately teleported to a
      * random valid (walkable and unoccupied) location on the same map.
      * Removes this item from the actor's inventory.
+     * Note that the teleporting is a one-off side effect, so this isn't a Teleporter.
      *
      * @param actor The actor depositing this item.
      * @param map   The map the actor is on.
@@ -92,24 +95,34 @@ public class AlienArtifact extends EclipseItem implements Depositable, Sellable 
      */
     @Override
     public String depositedBy(Actor actor, GameMap map) {
+        // Remove the item from inventory.
+        actor.getInventory().remove(this);
+        // Prepare a description.
+        StringBuilder result = new StringBuilder(String.format("%s deposits Alien Artifact" +
+                        " for %d company credits.", actor, DEPOSIT_VALUE));
+        // From the map, get all the locations that the actor is allowed to enter.
         List<Location> candidates = new ArrayList<>();
         for (int x : map.getXRange()) {
             for (int y : map.getYRange()) {
                 Location loc = map.at(x, y);
-                if (!loc.containsAnActor() && loc.getGround().canActorEnter(actor)) {
+                if (loc.canActorEnter(actor)) {
                     candidates.add(loc);
                 }
             }
         }
-        String teleportMsg = "";
+
         if (!candidates.isEmpty()) {
+            // Teleport possible, so move the actor to a random possible location.
             Location destination = candidates.get(random.nextInt(candidates.size()));
             map.moveActor(actor, destination);
-            teleportMsg = String.format(
-                    " The Company teleports %s back to work at %s!", actor, destination);
+            result.append(String.format(" The Company teleports %s back to work at %s!",
+                    actor, destination));
+        } else {
+            // Just in case teleporting wasn't possible... (all tiles occupied).
+            result.append("But the Company couldn't find a valid spot for teleportation...");
         }
-        actor.getInventory().remove(this);
-        return String.format("%s deposits Alien Artifact for %d company credits.%s",
-                actor, DEPOSIT_VALUE, teleportMsg);
+
+        return result.toString();
     }
+
 }

@@ -22,6 +22,8 @@ import java.util.function.Supplier;
  *
  * All buying and selling side-effects are fully encapsulated inside the items themselves.
  *
+ * Also, SuperComputers have a QuotaManager as an add-on.
+ *
  * @author esoo0013
  */
 public class SuperComputer extends Ground {
@@ -42,6 +44,7 @@ public class SuperComputer extends Ground {
      * So, it avoids shared mutable state across turns.
      */
     private final List<Supplier<Buyable>> catalogue;
+
     private final QuotaManager quotaManager;
 
     /**
@@ -52,10 +55,10 @@ public class SuperComputer extends Ground {
      * @param catalogue list of item factories defining this terminal's purchasable offerings
      * @author esoo0013
      */
-    public SuperComputer(List<Supplier<Buyable>> catalogue, QuotaManager quotaManager) {
+    public SuperComputer(List<Supplier<Buyable>> catalogue) {
         super('≡', "Supercomputer");
         this.catalogue = catalogue;
-        this.quotaManager = quotaManager;
+        this.quotaManager = new QuotaManager();
     }
 
     /**
@@ -107,6 +110,10 @@ public class SuperComputer extends Ground {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
 
+        if (quotaManager.isPastDeadline()) {
+            return actions; // Blacklisted, so it won't bother generating BuyActions etc.
+        }
+
         // Generate one fresh BuyAction per catalogue entry
         // Mirrors the Hole pattern: Supplier.get() creates a new instance each time
         for (Supplier<Buyable> factory : catalogue) {
@@ -117,7 +124,7 @@ public class SuperComputer extends Ground {
         // Non-sellable items are skipped automatically through asCapability
         for (Item item : actor.getInventory().getItems()) {
             item.asCapability(Sellable.class)
-                    .ifPresent(s -> actions.add(new SellAction(s)));
+                    .ifPresent(s -> actions.add(new SellAction(s, location)));
         }
 
         // Deposit actions for Depositable items in inventory
@@ -127,5 +134,15 @@ public class SuperComputer extends Ground {
         }
 
         return actions;
+    }
+
+    /**
+     * Overrides the game loop to tick the QuotaManager each turn,
+     * checking quota progress and deadline.
+     *
+     */
+    @Override
+    public void tick(Location location){
+        quotaManager.updateTurn(location);
     }
 }

@@ -137,12 +137,12 @@ public class CookiePack extends EclipseItem implements Consumable, Sellable, Inf
      * @author esoo0013
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         int damage = this.getStatistic(ItemStatistics.DURABILITY);
         seller.hurt(damage);
         seller.getInventory().remove(this);
         return seller + " sells the cookie pack for " + getSellPrice() + " credits and loses "
-                + damage + " HP to the organic processing fee.";
+                + damage + " HP to the organic processing fee at " + superComputerLocation + ".";
     }
 
     /**
