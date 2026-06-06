@@ -100,9 +100,9 @@ public class Lantern extends EclipseItem implements Sellable, Infectable {
      * @author esoo0013
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation){
         StringBuilder msg = new StringBuilder(seller + " sells the lantern for "
-                + getSellPrice() + " credits.");
+                + getSellPrice() + " credits at " + superComputerLocation + ".");
 
         if (random.nextDouble() < BURN_SELLER_CHANCE) {
             Flammable flammable = seller.asCapability(Flammable.class).orElse(null);

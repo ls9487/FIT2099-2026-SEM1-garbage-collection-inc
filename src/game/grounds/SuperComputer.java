@@ -6,14 +6,9 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actions.BuyAction;
+import game.actions.DepositAction;
 import game.actions.SellAction;
-import game.items.AccessCardL1;
-import game.items.AccessCardL2;
-import game.items.AccessCardL3;
-import game.items.Buyable;
-import game.items.SterilisationBox;
-import game.items.FirstAidKit;
-import game.items.Sellable;
+import game.items.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +22,21 @@ import java.util.function.Supplier;
  *
  * All buying and selling side-effects are fully encapsulated inside the items themselves.
  *
+ * Also, SuperComputers have a QuotaManager as an add-on.
+ *
  * @author esoo0013
  */
 public class SuperComputer extends Ground {
+
+    private static boolean economyDisrupted = false;
+
+    public static void setEconomyDisrupted(boolean disrupted) {
+        economyDisrupted = disrupted;
+    }
+
+    public static boolean isEconomyDisrupted() {
+        return economyDisrupted;
+    }
 
     /**
      * Factories for every item this terminal offers for purchase.
@@ -37,6 +44,8 @@ public class SuperComputer extends Ground {
      * So, it avoids shared mutable state across turns.
      */
     private final List<Supplier<Buyable>> catalogue;
+
+    private final QuotaManager quotaManager;
 
     /**
      * Constructor for a SuperComputer terminal with an injected catalogue.
@@ -49,6 +58,7 @@ public class SuperComputer extends Ground {
     public SuperComputer(List<Supplier<Buyable>> catalogue) {
         super('≡', "Supercomputer");
         this.catalogue = catalogue;
+        this.quotaManager = new QuotaManager();
     }
 
     /**
@@ -66,6 +76,7 @@ public class SuperComputer extends Ground {
         catalogue.add(AccessCardL3::new);
         catalogue.add(SterilisationBox::new);
         catalogue.add(FirstAidKit::new);
+        catalogue.add(PlasmaCutter::new);
         return catalogue;
     }
 
@@ -99,6 +110,10 @@ public class SuperComputer extends Ground {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
 
+        if (quotaManager.isPastDeadline()) {
+            return actions; // Blacklisted, so it won't bother generating BuyActions etc.
+        }
+
         // Generate one fresh BuyAction per catalogue entry
         // Mirrors the Hole pattern: Supplier.get() creates a new instance each time
         for (Supplier<Buyable> factory : catalogue) {
@@ -109,9 +124,25 @@ public class SuperComputer extends Ground {
         // Non-sellable items are skipped automatically through asCapability
         for (Item item : actor.getInventory().getItems()) {
             item.asCapability(Sellable.class)
-                    .ifPresent(s -> actions.add(new SellAction(s)));
+                    .ifPresent(s -> actions.add(new SellAction(s, location)));
+        }
+
+        // Deposit actions for Depositable items in inventory
+        for (Item item : actor.getInventory().getItems()) {
+            item.asCapability(Depositable.class)
+                    .ifPresent(d -> actions.add(new DepositAction(d, quotaManager)));
         }
 
         return actions;
+    }
+
+    /**
+     * Overrides the game loop to tick the QuotaManager each turn,
+     * checking quota progress and deadline.
+     *
+     */
+    @Override
+    public void tick(Location location){
+        quotaManager.updateTurn(location);
     }
 }

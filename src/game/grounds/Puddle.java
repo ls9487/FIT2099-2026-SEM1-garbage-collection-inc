@@ -50,8 +50,9 @@ public class Puddle extends Ground implements Consumable {
     /**
      * Have the actor drink straight from the puddle.
      * This may or may not go well depending on whether the actor can sterilise the water.
-     * @param actor The actor consuming from the puddle.
-     * @return A string description of the result of consuming from this puddle.
+     * @param actor the actor consuming from the puddle
+     * @param map   the map the actor occupies
+     * @return a string description of the result of consuming from this puddle
      */
     public String consumedBy(Actor actor, GameMap map) {
         // Check if the consumer has the STERILISER ability.

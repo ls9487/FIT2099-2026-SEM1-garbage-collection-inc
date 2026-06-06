@@ -18,6 +18,9 @@ public final class MagicCircleGroup {
 
     private final List<Location> sites;
 
+    /**
+     * Creates an empty group of linked magic circle sites.
+     */
     public MagicCircleGroup() {
         sites = new ArrayList<>();
     }

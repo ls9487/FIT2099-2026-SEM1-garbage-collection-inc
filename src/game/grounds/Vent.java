@@ -1,13 +1,21 @@
 package game.grounds;
 
+import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
+import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.CutAction;
 import game.actors.ActorAbilities;
+import game.items.Cuttable;
+import game.items.IndustrialFan;
+import game.items.ItemAbilities;
 import game.spawners.Spawner;
+import game.spawners.UndeadSpawner;
 import game.statuses.PoisonStatus;
 import game.statuses.Poisonable;
+import game.vehicles.VehicleAbilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +27,14 @@ import java.util.Random;
  * Spawns a creature each turn if an adjacent actor has the ability of activating it.
  * What creatures it spawns should depend on the moon (GameMap).
  *
+ * Only actors with VehicleAbilities.HOVER may enter a vent.
  * @author echu0057
  */
-public class Vent extends Ground {
+public class Vent extends Ground implements Cuttable {
 
     private static final Random random = new Random();
     // Keeps a list of spawners so they can be used to spawn creatures.
-    private List<Spawner> spawners;
+    private final List<Spawner> tickSpawners;
     private static final int POISON_DAMAGE = 1;
     private static  int POISON_DURATION = 5;
     private static final int POISON_RANGE = 1;
@@ -33,17 +42,19 @@ public class Vent extends Ground {
 
     /**
      * Constructor for the Vent class.
-     * @param spawners A list of spawners for actors.
+     *
+     * @param tickSpawners A list of spawners for actors.
      */
-    public Vent(List<Spawner> spawners) {
+    public Vent(List<Spawner> tickSpawners) {
         super('V', "Vent");
-        this.spawners = spawners;
+        this.tickSpawners = tickSpawners;
     }
 
     /**
      * Vent is motion-activated, and only to whatever actors it's sensitive to.
      * That includes the worker (and actually only the worker for now).
      * Every tick, if there's a surrounding worker, it'll spawn a creature.
+     *
      * @param location The location of the Ground.
      */
     @Override
@@ -70,6 +81,7 @@ public class Vent extends Ground {
      * Randomly chooses an actor to be spawned (based on what it can spawn).
      * The actor will be spawned adjacent to the vent.
      * To be used internally within this class only.
+     *
      * @param location The location of the vent.
      */
     private void spawn(Location location) {
@@ -85,7 +97,7 @@ public class Vent extends Ground {
 
         if (!validLocations.isEmpty()) {
             // There is at least one valid location. Randomly choose the spawner and location.
-            Spawner chosenSpawner = spawners.get(random.nextInt(spawners.size()));
+            Spawner chosenSpawner = tickSpawners.get(random.nextInt(tickSpawners.size()));
             Location chosenLocation = validLocations.get(random.nextInt(validLocations.size()));
             chosenSpawner.spawnAt(chosenLocation);
             // The spawn was done, and we'll need to poison everyone around.
@@ -97,6 +109,7 @@ public class Vent extends Ground {
      * Upon successful spawning, the vent poisons all actors adjacent to it.
      * Poison does 1 damage per turn, for 5 turns.
      * To be used internally within this class only.
+     *
      * @param location The location of the vent.
      */
     private void poisonAdjacent(Location location) {
@@ -116,13 +129,60 @@ public class Vent extends Ground {
     }
 
     /**
+     * Vent may be cut if the actor is able to do so.
+     *
+     * @param actor the Actor acting
+     * @param location the current Location
+     * @param direction the direction of the Ground from the Actor
+     * @return A list of allowed actions.
+     */
+    @Override
+    public ActionList allowableActions(Actor actor, Location location, String direction) {
+        ActionList actions = super.allowableActions(actor, location, direction);
+
+        // Add CutAction if actor holds a PlasmaCutter (i.e. CUTTER ability).
+        if (actor.hasAbility(ItemAbilities.CUTTER)) {
+            actions.add(new CutAction(this, location));
+        }
+
+        return actions;
+    }
+
+    /**
      * Actors can't walk over a vent. They just can't.
+     * Only hovering actors may enter a vent.
+     *
      * @param actor The actor to check.
-     * @return false
+     * @return true if actor has VehicleAbilities.HOVER else false
      */
     @Override
     public boolean canActorEnter(Actor actor) {
-        return false;
+        return actor.hasAbility(VehicleAbilities.HOVER);
+    }
+
+    /**
+     * Cuts the vent with a Plasma Cutter.
+     * Drops an IndustrialFan, replaces tile with Floor,
+     * and spawns an Undead on that exact tile (note: independent of the tickSpawners).
+     *
+     * @param actor The actor performing the cut.
+     * @param map   The map the actor is on.
+     * @param location The location where the cuttable object was cut.
+     * @return A string description of what happened.
+     */
+    @Override
+    public String cutBy(Actor actor, GameMap map, Location location) {
+        // Handle dropping IndustrialFan and replacing with Floor.
+        location.addItem(new IndustrialFan());
+        location.setGround(new Floor());
+        // Spawn the undead at the given location where the cutting happened.
+        Spawner undeadSpawner = new UndeadSpawner();
+        undeadSpawner.spawnAt(location);
+
+        return String.format(
+                "%s cuts the Vent, as an Industrial Fan crashes to the floor! " +
+                        "Something stirs in the darkness...", actor);
+
     }
 
 }

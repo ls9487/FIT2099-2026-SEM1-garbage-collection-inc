@@ -5,11 +5,14 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.actions.CutAction;
 import game.actions.TeleportAction;
 import game.actors.Undead;
 import game.grounds.Teleporter;
 import game.grounds.ToxicWaste;
 import game.spawners.Spawner;
+import game.statuses.PoisonStatus;
+import game.statuses.Poisonable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +20,19 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * Mysterious alien artefact that can short-range teleport its carrier or be
+ * Mysterious alien artifact that can short-range teleport its carrier or be
  * sold for credits at the cost of waking an Undead.
  *
  * @author eche0116
  * @version 1.0
  */
-public class AlienCube extends EclipseItem implements Teleporter, Sellable {
+public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cuttable {
 
     private static final int SELL_PRICE = 25;
     private static final int RANDOM_LOCATION_TO_TELEPORT = 3;
+    private static final int POISON_DURATION = 5;
+    private static final int POISON_DAMAGE = 1;
+    private static final int WEIGHT = 1;
     private static final Random random = new Random();
 
     private final List<Spawner> spawners;
@@ -36,17 +42,18 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
      * @param spawners spawnable actors by the alien cube
      */
     public AlienCube(List<Spawner> spawners) {
-        super("Alien Cube", '◈', 1);
+        super("Alien Cube", '◈', WEIGHT);
         this.spawners = spawners;
     }
 
     /**
      * Offers up to three teleport options within the current map while the cube
      * is carried in the inventory.
+     * Also cutting, if the owner can do that.
      *
      * @param owner the actor carrying the cube
      * @param map   the map the owner is on
-     * @return teleport choices for this turn
+     * @return A list of allowable actions.
      */
     @Override
     public ActionList allowableActions(Actor owner, GameMap map) {
@@ -73,6 +80,12 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
         for (Location destination : destinations) {
             actions.add(new TeleportAction(this, destination));
         }
+
+        // Allows CutAction if worker holds a PlasmaCutter (CUTTER ability).
+        if (owner.hasAbility(ItemAbilities.CUTTER)) {
+            actions.add(new CutAction(this, map.locationOf(owner)));
+        }
+
         return actions;
     }
 
@@ -117,11 +130,11 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
      * @return description of the Undead awakening
      */
     @Override
-    public String soldBy(Actor seller, GameMap map) {
+    public String soldBy(Actor seller, GameMap map, Location superComputerLocation) {
         Location origin = map.locationOf(seller);
         spawn(origin);
         seller.getInventory().remove(this);
-        return "An Undead claws its way into reality beside " + seller + ".";
+        return "An Undead claws its way into reality beside " + seller + " at " + superComputerLocation + ".";
     }
 
     /**
@@ -145,5 +158,35 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable {
             Spawner spawner = spawners.get(random.nextInt(spawners.size()));
             spawner.spawnAt(spawnTile);
         }
+    }
+
+    /**
+     * Cuts the Alien Cube while it is in the worker's inventory.
+     * Drops an Alien Artifact at the worker's current location,
+     * poisons the worker, and removes the cube from inventory.
+     * @param actor The actor performing the cut.
+     * @param map   The map the actor is on.
+     * @param location The location where the cuttable object was cut.
+     * @return A description of what happened.
+     */
+    @Override
+    public String cutBy(Actor actor, GameMap map, Location location) {
+        // Drop Alien Artifact at actor's current location.
+        location.addItem(new AlienArtifact());
+        // Remove the cube from inventory since it's destroyed.
+        actor.getInventory().remove(this);
+
+        // Prepare a description.
+        StringBuilder result = new StringBuilder(
+                String.format("%s cuts the Alien Cube. An Alien Artifact spills out!", actor));
+
+        // Poison the worker (1 damage per turn for 5 turns).
+        Poisonable poisonable = actor.asCapability(Poisonable.class).orElse(null);
+        if (poisonable != null) {
+            actor.addStatus(new PoisonStatus(POISON_DURATION, POISON_DAMAGE, poisonable));
+            result.append(String.format(" %s was poisoned by this!", actor));
+        }
+
+        return result.toString();
     }
 }
