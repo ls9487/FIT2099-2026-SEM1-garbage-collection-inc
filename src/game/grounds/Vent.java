@@ -42,6 +42,7 @@ public class Vent extends Ground implements Cuttable {
 
     /**
      * Constructor for the Vent class.
+     *
      * @param tickSpawners A list of spawners for actors.
      */
     public Vent(List<Spawner> tickSpawners) {
@@ -53,6 +54,7 @@ public class Vent extends Ground implements Cuttable {
      * Vent is motion-activated, and only to whatever actors it's sensitive to.
      * That includes the worker (and actually only the worker for now).
      * Every tick, if there's a surrounding worker, it'll spawn a creature.
+     *
      * @param location The location of the Ground.
      */
     @Override
@@ -79,6 +81,7 @@ public class Vent extends Ground implements Cuttable {
      * Randomly chooses an actor to be spawned (based on what it can spawn).
      * The actor will be spawned adjacent to the vent.
      * To be used internally within this class only.
+     *
      * @param location The location of the vent.
      */
     private void spawn(Location location) {
@@ -106,6 +109,7 @@ public class Vent extends Ground implements Cuttable {
      * Upon successful spawning, the vent poisons all actors adjacent to it.
      * Poison does 1 damage per turn, for 5 turns.
      * To be used internally within this class only.
+     *
      * @param location The location of the vent.
      */
     private void poisonAdjacent(Location location) {
@@ -126,6 +130,7 @@ public class Vent extends Ground implements Cuttable {
 
     /**
      * Vent may be cut if the actor is able to do so.
+     *
      * @param actor the Actor acting
      * @param location the current Location
      * @param direction the direction of the Ground from the Actor
@@ -146,6 +151,7 @@ public class Vent extends Ground implements Cuttable {
     /**
      * Actors can't walk over a vent. They just can't.
      * Only hovering actors may enter a vent.
+     *
      * @param actor The actor to check.
      * @return true if actor has VehicleAbilities.HOVER else false
      */
@@ -158,6 +164,7 @@ public class Vent extends Ground implements Cuttable {
      * Cuts the vent with a Plasma Cutter.
      * Drops an IndustrialFan, replaces tile with Floor,
      * and spawns an Undead on that exact tile (note: independent of the tickSpawners).
+     *
      * @param actor The actor performing the cut.
      * @param map   The map the actor is on.
      * @param location The location where the cuttable object was cut.
