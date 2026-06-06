@@ -18,6 +18,7 @@ public interface Cuttable {
      *
      * @param actor The actor performing the cut.
      * @param map   The map the actor is on.
+     * @param location The location where the cuttable object was cut.
      * @return A string description of what happened.
      */
     String cutBy(Actor actor, GameMap map, Location location);

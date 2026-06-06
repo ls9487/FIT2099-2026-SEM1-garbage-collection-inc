@@ -21,6 +21,7 @@ public class CutAction extends Action {
      * Constructs a CutAction targeting the given Cuttable.
      *
      * @param cuttable The object to be cut.
+     * @param location The location of where the object was cut.
      */
     public CutAction(Cuttable cuttable, Location location) {
         this.cuttable = cuttable;

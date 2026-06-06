@@ -124,14 +124,22 @@ public class Vent extends Ground implements Cuttable {
         }
     }
 
+    /**
+     * Vent may be cut if the actor is able to do so.
+     * @param actor the Actor acting
+     * @param location the current Location
+     * @param direction the direction of the Ground from the Actor
+     * @return A list of allowed actions.
+     */
     @Override
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
-        boolean hasPlasmaCutter = actor.getInventory().getItems().stream()
-                .anyMatch(item -> item.hasAbility(ItemAbilities.CUTTER));
-        if (hasPlasmaCutter) {
+
+        // Add CutAction if actor holds a PlasmaCutter (i.e. CUTTER ability).
+        if (actor.hasAbility(ItemAbilities.CUTTER)) {
             actions.add(new CutAction(this, location));
         }
+
         return actions;
     }
 
@@ -150,21 +158,24 @@ public class Vent extends Ground implements Cuttable {
      * Cuts the vent with a Plasma Cutter.
      * Drops an IndustrialFan, replaces tile with Floor,
      * and spawns an Undead on that exact tile.
-     *
      * @param actor The actor performing the cut.
      * @param map   The map the actor is on.
-     * @return A description of what happened.
+     * @param location The location where the cuttable object was cut.
+     * @return A string description of what happened.
      */
     @Override
     public String cutBy(Actor actor, GameMap map, Location location) {
+        // Handle dropping IndustrialFan and replacing with Floor.
         location.addItem(new IndustrialFan());
         location.setGround(new Floor());
-
-        new UndeadSpawner().spawnAt(location);
+        // Spawn the undead at the given location where the cutting happened.
+        Spawner undeadSpawner = new UndeadSpawner();
+        undeadSpawner.spawnAt(location);
 
         return String.format(
-                "%s cuts the Vent, an Industrial Fan crashes to the floor! " +
+                "%s cuts the Vent, as an Industrial Fan crashes to the floor! " +
                         "Something stirs in the darkness...", actor);
+
     }
 
 }
