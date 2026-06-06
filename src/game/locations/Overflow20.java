@@ -95,7 +95,7 @@ public class Overflow20 extends GameMap {
     }
 
     private void setVents(List<Supplier<Item>> depositable) {
-        // Existing tick spawners — unchanged
+        // Existing tick spawners unchanged
         List<Spawner> tickSpawners = new ArrayList<>();
         tickSpawners.add(new SlimeSpawner());
         tickSpawners.add(new ParasiteSpawner());
