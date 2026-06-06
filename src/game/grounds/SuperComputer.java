@@ -97,6 +97,10 @@ public class SuperComputer extends Ground {
     public ActionList allowableActions(Actor actor, Location location, String direction) {
         ActionList actions = super.allowableActions(actor, location, direction);
 
+        if (quotaManager.isPastDeadline()) {
+            return actions; // blacklisted — no buy/sell/deposit offered
+        }
+
         // Generate one fresh BuyAction per catalogue entry
         // Mirrors the Hole pattern: Supplier.get() creates a new instance each time
         for (Supplier<Buyable> factory : catalogue) {
@@ -117,5 +121,15 @@ public class SuperComputer extends Ground {
         }
 
         return actions;
+    }
+
+    /**
+     * Overrides the game loop to tick the QuotaManager each turn,
+     * checking quota progress and deadline.
+     *
+     */
+    @Override
+    public void tick(Location location){
+        quotaManager.tickTracker(location);
     }
 }
