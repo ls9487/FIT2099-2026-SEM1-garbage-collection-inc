@@ -1,6 +1,7 @@
 package game.spawners;
 
 import edu.monash.fit2099.engine.GameEngineException;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.actors.ActorAbilities;
@@ -28,6 +29,8 @@ public class ParasiteSpawner implements Spawner {
             // At this point, spawning was successful. Trigger the environmental reaction.
             this.hurtAdjacentActors(location);
 
+            Display display = new Display();
+            display.println(String.format("%s spawned at %s", spawnedParasite, location));
         } catch (GameEngineException ignored) {
             // Spawn failed (likely because location was occupied).
             // It's fine to proceed, this attempt is just ignored.

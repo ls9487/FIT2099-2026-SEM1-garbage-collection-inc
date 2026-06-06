@@ -1,11 +1,9 @@
 package game.spawners;
 
 import edu.monash.fit2099.engine.GameEngineException;
-import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
-import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
-import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actors.ScrapSnatcher;
 
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.function.Supplier;
  */
 public class ScrapSnatcherSpawner implements Spawner {
     private static final Random random = new Random();
-    private List<Supplier<Item>> depositable;
+    private final List<Supplier<Item>> depositable;
 
     /**
      * Creates a spawner that drops random depositable items after a successful spawn.
@@ -47,6 +45,8 @@ public class ScrapSnatcherSpawner implements Spawner {
             // At this point, spawning was successful. Trigger the environmental reaction.
             this.lootExplosion(spawnedScrapSnatcher, location);
 
+            Display display = new Display();
+            display.println(String.format("%s spawned at %s", spawnedScrapSnatcher, location));
         } catch (GameEngineException ignored) {
             // Spawn failed (likely because location was occupied).
             // It's fine to proceed, this attempt is just ignored.
@@ -60,10 +60,13 @@ public class ScrapSnatcherSpawner implements Spawner {
      * @param location The location where the ScrapSnatcher was spawned.
      */
     private void lootExplosion(ScrapSnatcher spawnedScrapSnatcher, Location location) {
+        Display display = new Display();
+
         for (Location here : location.getNearbyLocations(1)) {
             if (here.canActorEnter(spawnedScrapSnatcher)) {
                 Item item = depositable.get(random.nextInt(depositable.size())).get();
                 here.addItem(item);
+                display.println(String.format("%s spawned %s at %s", spawnedScrapSnatcher, item, here));
             }
         }
     }
