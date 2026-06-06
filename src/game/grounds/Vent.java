@@ -157,7 +157,7 @@ public class Vent extends Ground implements Cuttable {
     /**
      * Cuts the vent with a Plasma Cutter.
      * Drops an IndustrialFan, replaces tile with Floor,
-     * and spawns an Undead on that exact tile.
+     * and spawns an Undead on that exact tile (note: independent of the tickSpawners).
      * @param actor The actor performing the cut.
      * @param map   The map the actor is on.
      * @param location The location where the cuttable object was cut.
