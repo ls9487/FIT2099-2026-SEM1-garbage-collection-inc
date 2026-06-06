@@ -13,7 +13,7 @@ import game.grounds.Teleporter;
  * @version 1.0
  */
 public class FleshyTreeMonolith extends Tree implements Teleporter {
-    private static final char DISPLAY_CHAR = 'M';
+    private static final char DISPLAY_CHAR = 'H';
     private static final String NAME = "Fleshy Tree Monolith";
     private static final int TELEPORT_BEHAVIOUR_PRIORITY = 1;
 
