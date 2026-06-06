@@ -1,6 +1,7 @@
 package game.actors;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
@@ -84,6 +85,7 @@ public class Muckraker extends StatefulCreature implements AtmosphereSensitiveAc
      */
     @Override
     public void applyAtmosphere(AirQualityReport report, Location here) {
+        Display display = new Display();
         int aqi = report.getAqi();
 
         if (aqi <= AtmosphericScanner.SAFE_AQI_THRESHOLD) {
@@ -122,7 +124,7 @@ public class Muckraker extends StatefulCreature implements AtmosphereSensitiveAc
                     // Use map.moveActor so the engine updates the actor registry
                     // correctly avoids ghost actors from the OLD addActor-only approach.
                     here.map().moveActor(target, destination);
-                    System.out.println("[Toxic Atmosphere] " + this
+                    display.println("[Toxic Atmosphere] " + this
                             + " violently shoves " + target + " aside!");
                 } catch (Exception e) {
                     // Engine rejected the move (e.g. destination became occupied);

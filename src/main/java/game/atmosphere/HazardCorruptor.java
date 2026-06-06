@@ -1,6 +1,7 @@
 package game.atmosphere;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -52,6 +53,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
      */
     @Override
     public void corrupt(GameMap map, AirQualityReport report, Location anchorLocation) {
+        Display display = new Display();
         int aqi = report.getAqi();
 
         if (aqi <= SAFE_AQI_THRESHOLD) {
@@ -68,9 +70,10 @@ public class HazardCorruptor implements AtmosphericCorruptor {
                     continue;
                 }
 
-                var sensitive = actor.asCapability(AtmosphereSensitiveActor.class);
-                if (sensitive.isPresent()) {
-                    sensitive.get().applyAtmosphere(report, location);
+                AtmosphereSensitiveActor sensitive =
+                        actor.asCapability(AtmosphereSensitiveActor.class).orElse(null);
+                if (sensitive != null) {
+                    sensitive.applyAtmosphere(report, location);
 
                     if (aqi == MODERATE_AQI) {
                         localWasteTilesCreated += spreadLocalWaste(location);
@@ -80,7 +83,7 @@ public class HazardCorruptor implements AtmosphericCorruptor {
         }
 
         if (aqi == MODERATE_AQI && localWasteTilesCreated > 0) {
-            System.out.println("[Toxic Atmosphere] Local contamination spreads: "
+            display.println("[Toxic Atmosphere] Local contamination spreads: "
                     + localWasteTilesCreated + " toxic waste tile(s) form near affected actors.");
         }
 
@@ -89,12 +92,12 @@ public class HazardCorruptor implements AtmosphericCorruptor {
             int hotspotTilesCorrupted = createAnchorHotspot(map, anchorLocation);
 
             if (borderTilesCorrupted > 0) {
-                System.out.println("[Toxic Atmosphere] Severe pollution corrupts the facility border: "
+                display.println("[Toxic Atmosphere] Severe pollution corrupts the facility border: "
                         + borderTilesCorrupted + " perimeter tile(s) become toxic waste.");
             }
 
             if (hotspotTilesCorrupted > 0) {
-                System.out.println("[Toxic Atmosphere] The monitor hotspot mutates: "
+                display.println("[Toxic Atmosphere] The monitor hotspot mutates: "
                         + hotspotTilesCorrupted + " nearby tile(s) become toxic waste.");
             }
         }

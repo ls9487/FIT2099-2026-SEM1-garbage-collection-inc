@@ -1,6 +1,8 @@
 package game.actors;
 
+import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.Location;
 import game.atmosphere.AirQualityReport;
@@ -66,6 +68,7 @@ public class Undead extends EclipseActor implements Infectable, AtmosphereSensit
      */
     @Override
     public void applyAtmosphere(AirQualityReport report, Location here) {
+        Display display = new Display();
         int aqi = report.getAqi();
 
         // Safe air: no atmospheric reaction.
@@ -75,7 +78,7 @@ public class Undead extends EclipseActor implements Infectable, AtmosphereSensit
 
         // Moderate or worse: corrupt the tile beneath the undead.
         here.setGround(new ToxicWaste());
-        System.out.println("[Toxic Atmosphere] AQI " + aqi
+        display.println("[Toxic Atmosphere] AQI " + aqi
                 + " : " + this + " seeps necrotic ooze, corrupting the ground it stands on!");
 
         if (aqi > AtmosphericScanner.MODERATE_AQI) {
@@ -85,9 +88,9 @@ public class Undead extends EclipseActor implements Infectable, AtmosphereSensit
                 if (!neighbour.containsAnActor()) {
                     continue;
                 }
-                var victim = neighbour.getActor();
+                Actor victim = neighbour.getActor();
                 victim.hurt(ADJACENT_RADIATION_DAMAGE);
-                System.out.println("[Toxic Atmosphere] " + this
+                display.println("[Toxic Atmosphere] " + this
                         + " radiates lethal pollution : " + victim + " takes 1 damage!");
             }
         }

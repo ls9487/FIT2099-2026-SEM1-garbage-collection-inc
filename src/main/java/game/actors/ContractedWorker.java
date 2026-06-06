@@ -195,6 +195,7 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
     // Applies A3:REQ5 toxic atmosphere effects to the worker.
     @Override
     public void applyAtmosphere(AirQualityReport report, Location here) {
+        Display display = new Display();
         int aqi = report.getAqi();
 
         // Mild or safe air quality: no effect.
@@ -205,7 +206,7 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
         // Moderate pollution: light damage and a short poison.
         if (aqi == AtmosphericScanner.MODERATE_AQI) {
             this.hurt(1);
-            System.out.println("[Toxic Atmosphere] AQI " + aqi
+            display.println("[Toxic Atmosphere] AQI " + aqi
                     + " : " + this + " chokes on foul air, losing 1 HP and gaining poison!");
             this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
                     this.addStatus(new game.statuses.PoisonStatus(
@@ -220,7 +221,7 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
         // Severe pollution (aqi >= 4): heavier damage and stronger poison.
         // Duration & intensity use the named severe-effect constants.
         this.hurt(SEVERE_ATMOSPHERE_DAMAGE);
-        System.out.println("[Toxic Atmosphere] AQI " + aqi
+        display.println("[Toxic Atmosphere] AQI " + aqi
                 + " : " + this + " is overwhelmed by toxic fumes! -2 HP and severe poison applied!");
         this.asCapability(game.statuses.Poisonable.class).ifPresent(poisonable ->
                 this.addStatus(new game.statuses.PoisonStatus(

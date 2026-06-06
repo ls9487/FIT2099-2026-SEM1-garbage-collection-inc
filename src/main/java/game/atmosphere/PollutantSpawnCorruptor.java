@@ -1,6 +1,7 @@
 package game.atmosphere;
 
 import edu.monash.fit2099.engine.GameEngineException;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -65,7 +66,8 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
         Location spawnLocation = candidates.get(random.nextInt(candidates.size()));
         try {
             spawnLocation.addActor(new Undead());
-            System.out.println("[Toxic Atmosphere] AQI " + report.getAqi()
+            Display display = new Display();
+            display.println("[Toxic Atmosphere] AQI " + report.getAqi()
                     + " : the polluted atmosphere reanimates a corpse near the monitor!");
         } catch (GameEngineException e) {
             // Destination became occupied between the check and the spawn; skip.

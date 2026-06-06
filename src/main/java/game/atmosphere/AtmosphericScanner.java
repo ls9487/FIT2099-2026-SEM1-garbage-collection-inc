@@ -1,5 +1,6 @@
 package game.atmosphere;
 
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.SuperComputer;
@@ -56,7 +57,8 @@ public class AtmosphericScanner {
             corruptor.corrupt(map, report, anchorLocation);
         }
 
-        System.out.println(buildScanSummary(report));
+        Display display = new Display();
+        display.println(buildScanSummary(report));
     }
 
     /**

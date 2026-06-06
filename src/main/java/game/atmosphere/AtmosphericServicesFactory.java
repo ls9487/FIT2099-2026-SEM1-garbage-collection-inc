@@ -1,5 +1,7 @@
 package game.atmosphere;
 
+import edu.monash.fit2099.engine.displays.Display;
+
 /**
  * Factory class that wires together the main REQ5 atmosphere services.
  * <p>
@@ -24,13 +26,14 @@ public class AtmosphericServicesFactory {
      * @return the parser to use for the current environment setup
      */
     public PollutionDataParser createParser() {
+        Display display = new Display();
         String apiKey = System.getenv("OPENWEATHER_API_KEY");
         if (apiKey == null || apiKey.isBlank()) {
-            System.out.println("[Toxic Atmosphere] No OPENWEATHER_API_KEY detected. Using fallback pollution data preset for demonstration.");
+            display.println("[Toxic Atmosphere] No OPENWEATHER_API_KEY detected. Using fallback pollution data preset for demonstration.");
             return new FallbackPollutionParser();
         }
 
-        System.out.println("[Toxic Atmosphere] OPENWEATHER_API_KEY detected. Using live OpenWeather pollution data.");
+        display.println("[Toxic Atmosphere] OPENWEATHER_API_KEY detected. Using live OpenWeather pollution data.");
         return new OpenWeatherPollutionParser();
     }
 
