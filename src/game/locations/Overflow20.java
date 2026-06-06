@@ -144,9 +144,7 @@ public class Overflow20 extends GameMap {
 
     private void setSuperComputer() {
         // '≡' is at map position (3, 2) in Overflow20 layout
-        QuotaManager quotaManager = new QuotaManager();
-
-        this.at(3, 2).setGround(new SuperComputer(SuperComputer.defaultCatalogue(), quotaManager));
+        this.at(3, 2).setGround(new SuperComputer(SuperComputer.defaultCatalogue()));
     }
 
     /**

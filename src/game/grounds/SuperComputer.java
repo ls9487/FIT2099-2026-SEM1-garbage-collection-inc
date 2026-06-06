@@ -22,6 +22,8 @@ import java.util.function.Supplier;
  *
  * All buying and selling side-effects are fully encapsulated inside the items themselves.
  *
+ * Also, SuperComputers have a QuotaManager as an add-on.
+ *
  * @author esoo0013
  */
 public class SuperComputer extends Ground {
@@ -32,6 +34,7 @@ public class SuperComputer extends Ground {
      * So, it avoids shared mutable state across turns.
      */
     private final List<Supplier<Buyable>> catalogue;
+
     private final QuotaManager quotaManager;
 
     /**
@@ -42,10 +45,10 @@ public class SuperComputer extends Ground {
      * @param catalogue list of item factories defining this terminal's purchasable offerings
      * @author esoo0013
      */
-    public SuperComputer(List<Supplier<Buyable>> catalogue, QuotaManager quotaManager) {
+    public SuperComputer(List<Supplier<Buyable>> catalogue) {
         super('≡', "Supercomputer");
         this.catalogue = catalogue;
-        this.quotaManager = quotaManager;
+        this.quotaManager = new QuotaManager();
     }
 
     /**
@@ -98,7 +101,7 @@ public class SuperComputer extends Ground {
         ActionList actions = super.allowableActions(actor, location, direction);
 
         if (quotaManager.isPastDeadline()) {
-            return actions; // blacklisted — no buy/sell/deposit offered
+            return actions; // Blacklisted, so it won't bother generating BuyActions etc.
         }
 
         // Generate one fresh BuyAction per catalogue entry
@@ -130,6 +133,6 @@ public class SuperComputer extends Ground {
      */
     @Override
     public void tick(Location location){
-        quotaManager.tickTracker(location);
+        quotaManager.updateTurn(location);
     }
 }

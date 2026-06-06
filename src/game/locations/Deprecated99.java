@@ -144,10 +144,7 @@ public class Deprecated99 extends GameMap {
      * @author esoo0013
      */
     private void setSuperComputer() {
-        // '≡' is at map position (4, 3) in the ship layout
-        QuotaManager quotaManager = new QuotaManager();
-
-        this.at(4, 3).setGround(new SuperComputer(SuperComputer.defaultCatalogue(), quotaManager));
+        this.at(4, 3).setGround(new SuperComputer(SuperComputer.defaultCatalogue()));
     }
 
     /**
