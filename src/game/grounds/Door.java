@@ -100,6 +100,16 @@ public abstract class Door extends Ground implements Unlockable, Alarmable, Crus
     }
 
     /**
+     * Doors will block projectiles if they haven't been unlocked yet.
+     * If they have been unlocked, it's assumed they're left wide open.
+     * @return false if the door is unlocked, true otherwise.
+     */
+    @Override
+    public boolean blocksThrownObjects() {
+        return !isUnlocked;
+    }
+
+    /**
      * Have the actor unlock the door using their card (or other means).
      * Unlocked door stays open so others can traverse them.
      * Note that unlocking doors have side effects, varying with each type of tier...

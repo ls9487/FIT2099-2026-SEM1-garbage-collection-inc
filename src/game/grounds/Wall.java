@@ -87,4 +87,14 @@ public class Wall extends Ground implements Crushable, Bulldozeable {
         location.setGround(new Sand());
         return String.format("%s bulldozes %s into %s at %s and moving into it.", actor, this, location.getGround(), location);
     }
+
+    /**
+     * Walls will always block projectiles.
+     * @return true
+     */
+    @Override
+    public boolean blocksThrownObjects() {
+        return true;
+    }
+
 }

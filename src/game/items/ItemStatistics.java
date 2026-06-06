@@ -11,5 +11,6 @@ public enum ItemStatistics {
     WEIGHT,
     DURABILITY,
     COOLDOWN,
-    CLEARANCE_LEVEL;
+    CLEARANCE_LEVEL,
+    VELOCITY,
 }
