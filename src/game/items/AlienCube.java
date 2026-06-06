@@ -135,7 +135,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
         Location origin = map.locationOf(seller);
         spawn(origin);
         seller.getInventory().remove(this);
-        return "An Undead claws its way into reality beside " + seller + "at " + superComputerLocation + ".";
+        return "An Undead claws its way into reality beside " + seller + " at " + superComputerLocation + ".";
     }
 
     /**
