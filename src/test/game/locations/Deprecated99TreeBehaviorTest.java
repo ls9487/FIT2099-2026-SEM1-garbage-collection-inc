@@ -3,7 +3,6 @@ package game.locations;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
-import game.grounds.QuotaManager;
 import game.trees.FleshyTreeSprout;
 import game.trees.FleshyTreeMature;
 import org.junit.jupiter.api.Test;
@@ -19,12 +18,11 @@ class Deprecated99TreeBehaviorTest {
     @Test
     void setTrees_PositiveCondition_VerifiesCorrectTreeHierarchyOnMoon99() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
-        QuotaManager mockQuota = mock(QuotaManager.class);
         List<Supplier<Item>> mockPool = new ArrayList<>();
         mockPool.add(() -> mock(Item.class));
         mockPool.add(() -> mock(Item.class));
 
-        Deprecated99 map99 = new Deprecated99(mockFactory, mockPool, mockQuota);
+        Deprecated99 map99 = new Deprecated99(mockFactory, mockPool);
         Location treeLocation = map99.at(1, 16);
 
         // Combined string identity and character validation from friend's test runner checks
@@ -40,10 +38,9 @@ class Deprecated99TreeBehaviorTest {
     @Test
     void treeEvolution_BoundaryCondition_DirectlyLinksSproutToMatureSkippingSapling() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
-        QuotaManager mockQuota = mock(QuotaManager.class);
         List<Supplier<Item>> pool = List.of(() -> mock(Item.class), () -> mock(Item.class));
 
-        Deprecated99 map99 = new Deprecated99(mockFactory, pool, mockQuota);
+        Deprecated99 map99 = new Deprecated99(mockFactory, pool);
         Location testLocation = map99.at(1, 16);
         FleshyTreeSprout sprout = (FleshyTreeSprout) testLocation.getGround();
 
@@ -56,10 +53,9 @@ class Deprecated99TreeBehaviorTest {
     @Test
     void treeEvolution_EdgeCondition_MatureEvolvesIntoFleshyMonolithOnMap99() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
-        QuotaManager mockQuota = mock(QuotaManager.class);
         List<Supplier<Item>> pool = List.of(() -> mock(Item.class), () -> mock(Item.class));
 
-        Deprecated99 map99 = new Deprecated99(mockFactory, pool, mockQuota);
+        Deprecated99 map99 = new Deprecated99(mockFactory, pool);
         Location testLocation = map99.at(1, 16);
 
         FleshyTreeSprout sprout = (FleshyTreeSprout) testLocation.getGround();
