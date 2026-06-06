@@ -24,11 +24,12 @@ public class QuotaManager {
     private static final int STARTING_RANK = 1;
     private static final int DEFAULT_CREDITS = 0;
 
-    private final List<Location> superComputerLocations;
     private int companyCredits;
     private int quota;
     private int turnsRemaining;
     private int rank;
+    private boolean deadlinePassed = false;
+    private int currentCycleDeadline = BASE_TURNS;
 
     private final Display display = new Display();
 
@@ -40,7 +41,6 @@ public class QuotaManager {
         this.quota = BASE_QUOTA;
         this.turnsRemaining = BASE_TURNS;
         this.rank = STARTING_RANK;
-        this.superComputerLocations = new ArrayList<>();
     }
 
     /**
@@ -56,15 +56,24 @@ public class QuotaManager {
     }
 
     /**
-     * Each game turn tick is called once. Decrements the turn counter and
+     * Each game turn tickTracker is called once. Decrements the turn counter and
      * checks if the deadline has been reached.
      *
      */
-    public void tick() {
+    public void tickTracker(Location superComputerLocation) {
         turnsRemaining--;
-        if (turnsRemaining <= 0) {
-            onDeadline();
-        }
+        onEveryTick(superComputerLocation);
+
+        display.println(getStatus()); // print HUD here instead
+    }
+
+    /**
+     * Checks if deadline has past
+     * @return a boolean if deadline has past
+     *
+     */
+    public boolean isPastDeadline() {
+        return turnsRemaining <= 0;
     }
 
     /**
@@ -72,18 +81,20 @@ public class QuotaManager {
      * If quota is met, advances the cycle (next round). Otherwise fires adjacent workers.
      *
      */
-    private void onDeadline() {
-        if (isQuotaMet()) {
+    private void onEveryTick(Location superComputerLocation) {
+        if (deadlinePassed) return; // added this guard to prevent the checking when deadline has past
+
+        if (isQuotaMet()) { // checks if quota is met, if it is then straight away goes next cycle.
             display.println(String.format(
                     "[Quota] Quota met! Rank %d complete. Advancing cycle...", rank));
             advanceCycle();
-        } else {
+        } else if (isPastDeadline()) {
+            deadlinePassed = true;
             display.println(String.format(
                     "[Quota] WARNING DEADLINE REACHED. Quota not met (%d / %d). " +
                             "The SuperComputer fires adjacent workers!", companyCredits, quota));
-            fireAdjacentWorkers();
-            // Reset turns so the game continues (workers avoiding SC can still perish naturally)
-            turnsRemaining = BASE_TURNS;
+
+            fireAdjacentWorkers(superComputerLocation);
         }
     }
 
@@ -102,8 +113,9 @@ public class QuotaManager {
      */
     private void advanceCycle() {
         quota = (int) Math.ceil(quota * (1 + QUOTA_INCREASE));
-        turnsRemaining = (int) Math.ceil(BASE_TURNS * Math.pow(1 + TURNS_INCREASE, rank));
-        companyCredits = 0;
+        currentCycleDeadline = (int) Math.ceil(currentCycleDeadline * (1 + TURNS_INCREASE));
+        turnsRemaining = currentCycleDeadline;
+        companyCredits = DEFAULT_CREDITS;
         rank++;
         display.println(String.format(
                 "[Quota] New cycle started. Rank: %d | New Quota: %d | Turns: %d",
@@ -116,16 +128,14 @@ public class QuotaManager {
      * Workers avoiding the SuperComputer are unaffected.
      *
      */
-    private void fireAdjacentWorkers() {
-        for (Location location : superComputerLocations) {
-            for (Exit exit : location.getExits()) {
-                Location adjacent = exit.getDestination();
-                if (adjacent.containsAnActor()) {
-                    Actor worker = adjacent.getActor();
-                    display.println(String.format(
-                            "[Quota] %s is fired by the SuperComputer!", worker));
-                    worker.unconscious(adjacent.map());
-                }
+    private void fireAdjacentWorkers(Location superComputerLocation) {
+        for (Exit exit : superComputerLocation.getExits()) {
+            Location adjacent = exit.getDestination();
+            if (adjacent.containsAnActor()) {
+                Actor worker = adjacent.getActor();
+                display.println(String.format(
+                        "[Quota] %s is fired by the SuperComputer!", worker));
+                worker.unconscious(adjacent.map());
             }
         }
     }
@@ -141,7 +151,4 @@ public class QuotaManager {
                 rank, companyCredits, quota, turnsRemaining);
     }
 
-    public void registerSuperComputerLocation(Location location) {
-        superComputerLocations.add(location);
-    }
 }
