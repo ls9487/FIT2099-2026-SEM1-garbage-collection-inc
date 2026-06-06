@@ -98,7 +98,7 @@ public class SuperComputer extends Ground {
         ActionList actions = super.allowableActions(actor, location, direction);
 
         if (quotaManager.isPastDeadline()) {
-            return actions; // blacklisted — no buy/sell/deposit offered
+            return actions; // blacklisted no buy/sell/deposit offered
         }
 
         // Generate one fresh BuyAction per catalogue entry
