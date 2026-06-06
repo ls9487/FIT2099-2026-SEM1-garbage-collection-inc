@@ -48,17 +48,16 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
      * @param report the current atmospheric conditions
      */
     @Override
-    public void corrupt(GameMap map, AirQualityReport report) {
+    public void corrupt(GameMap map, AirQualityReport report, Location anchorLocation) {
         if (report.getAqi() < SEVERE_AQI_THRESHOLD) {
             return;
         }
 
-        Location monitorLocation = findMonitor(map);
-        if (monitorLocation == null) {
+        if (anchorLocation == null) {
             return;
         }
 
-        List<Location> candidates = collectEmptyNeighbours(monitorLocation);
+        List<Location> candidates = collectEmptyNeighbours(anchorLocation);
         if (candidates.isEmpty()) {
             return;
         }
@@ -74,37 +73,19 @@ public class PollutantSpawnCorruptor implements AtmosphericCorruptor {
     }
 
     /**
-     * Scans the map for a location containing an atmospheric anchor.
-     *
-     * @param map the map to search
-     * @return the monitor location, or {@code null} if none exists on this map
-     */
-    private Location findMonitor(GameMap map) {
-        for (int y : map.getYRange()) {
-            for (int x : map.getXRange()) {
-                Location here = map.at(x, y);
-                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
-                    return here;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Collects all empty tiles adjacent to a given centre location.
      *
      * @param centre the location to inspect exits from
      * @return a list of empty neighbouring locations
      */
     private List<Location> collectEmptyNeighbours(Location centre) {
-        List<Location> result = new ArrayList<>();
+        List<Location> emptyNeighbours = new ArrayList<>();
         for (Exit exit : centre.getExits()) {
-            Location dest = exit.getDestination();
-            if (!dest.containsAnActor()) {
-                result.add(dest);
+            Location destination = exit.getDestination();
+            if (!destination.containsAnActor()) {
+                emptyNeighbours.add(destination);
             }
         }
-        return result;
+        return emptyNeighbours;
     }
 }

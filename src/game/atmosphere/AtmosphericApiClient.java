@@ -66,7 +66,7 @@ public class AtmosphericApiClient {
      * @param map the map containing the atmospheric monitor
      * @return the raw JSON API response, or "{}" if the request cannot be completed
      */
-    public String fetch(AtmosphericAnchor anchor, GameMap map) {
+    public String fetch(AtmosphericAnchor anchor, GameMap map, Location anchorLocation) {
         String apiKey = System.getenv("OPENWEATHER_API_KEY");
         if (apiKey == null) {
             return "{}";
@@ -77,7 +77,7 @@ public class AtmosphericApiClient {
             return "{}";
         }
 
-        Location location = findAnchorLocation(map);
+        Location location = anchorLocation;
         if (location == null) {
             return "{}";
         }
@@ -106,23 +106,5 @@ public class AtmosphericApiClient {
         } catch (IOException | InterruptedException e) {
             return "{}";
         }
-    }
-
-    /**
-     * Finds the map location of the atmospheric anchor.
-     *
-     * @param map the map to search
-     * @return the anchor location, or null if no anchor exists on the map
-     */
-    private Location findAnchorLocation(GameMap map) {
-        for (int y : map.getYRange()) {
-            for (int x : map.getXRange()) {
-                Location here = map.at(x, y);
-                if (here.getGroundAs(AtmosphericAnchor.class) != null) {
-                    return here;
-                }
-            }
-        }
-        return null;
     }
 }

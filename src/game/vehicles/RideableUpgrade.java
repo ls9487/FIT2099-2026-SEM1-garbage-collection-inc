@@ -1,6 +1,7 @@
 package game.vehicles;
 
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.EclipseItem;
 import game.statuses.RideStatus;
@@ -27,7 +28,6 @@ public abstract class RideableUpgrade extends EclipseItem {
      */
     public RideableUpgrade(String name, char displayChar, int weight) {
         super(name, displayChar, weight);
-        makePortable();
         abilities = new ArrayList<>();
     }
 
@@ -79,6 +79,26 @@ public abstract class RideableUpgrade extends EclipseItem {
             for (Enum<?> ability : abilities) {
                 super.disableAbility(ability);
             }
+        }
+    }
+
+    /**
+     * Make the item portable, allowing the item to be picked up or dropped by actor
+     */
+    @Override
+    public void makePortable() {
+        if (!this.hasAbility(ItemAbility.PORTABLE)) {
+            super.enableAbility(ItemAbility.PORTABLE);
+        }
+    }
+
+    /**
+     * Make the item non-portable, preventing the item from being picked up or dropped by actor
+     */
+    @Override
+    public void makeNonPortable() {
+        if (this.hasAbility(ItemAbility.PORTABLE)) {
+            super.disableAbility(ItemAbility.PORTABLE);
         }
     }
 }

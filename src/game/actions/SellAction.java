@@ -7,6 +7,7 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import game.items.Sellable;
 import game.actors.EclipseStatistics;
+import game.grounds.SuperComputer;
 
 /**
  * Handles selling a Sellable to the SuperComputer.
@@ -52,7 +53,7 @@ public class SellAction extends Action {
 
         // If the economy is disrupted by toxic air, there is a chance that the
         // SuperComputer fails to process the transaction.
-        if (game.atmosphere.EconomyCorruptor.ECONOMY_DISRUPTED && price > 0) {
+        if (SuperComputer.isEconomyDisrupted() && price > 0) {
             // 50% chance that the sale "glitches" and yields no payout.
             if (new java.util.Random().nextBoolean()) {
                 // Still let the item handle its own removal/side-effects so the

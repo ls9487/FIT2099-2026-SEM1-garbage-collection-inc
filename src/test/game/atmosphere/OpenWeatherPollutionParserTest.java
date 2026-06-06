@@ -1,17 +1,16 @@
-/* DISABLED FOR APP RUN
-package game.atmosphere;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Tests OpenWeatherPollutionParser with representative payloads to confirm it
- * reads AQI values and identifies the strongest pollutant correctly.
- *
- * @author esoo0013
- */
-
+//package game.atmosphere;
+//
+//import org.junit.jupiter.api.Test;
+//
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//
+///**
+// * Tests OpenWeatherPollutionParser with representative payloads to confirm it
+// * reads AQI values and identifies the strongest pollutant correctly.
+// *
+// * @author esoo0013
+// */
+//
 //class OpenWeatherPollutionParserTest {
 //
 //    @Test
@@ -39,4 +38,4 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //    }
 //}
 //
-
+//

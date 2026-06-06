@@ -15,6 +15,7 @@ import edu.monash.fit2099.engine.statistics.StatisticOperations;
 import game.actions.AttackAction;
 import game.atmosphere.AirQualityReport;
 import game.atmosphere.AtmosphereSensitiveActor;
+import game.atmosphere.AtmosphericScanner;
 import game.spawners.ParasiteSpawner;
 import game.spawners.Spawner;
 import game.statuses.Infectable;
@@ -197,12 +198,12 @@ public class ContractedWorker extends EclipseActor implements Infectable, Atmosp
         int aqi = report.getAqi();
 
         // Mild or safe air quality: no effect.
-        if (aqi <= 2) {
+        if (aqi <= AtmosphericScanner.SAFE_AQI_THRESHOLD) {
             return;
         }
 
         // Moderate pollution: light damage and a short poison.
-        if (aqi == 3) {
+        if (aqi == AtmosphericScanner.MODERATE_AQI) {
             this.hurt(1);
             System.out.println("[Toxic Atmosphere] AQI " + aqi
                     + " : " + this + " chokes on foul air, losing 1 HP and gaining poison!");

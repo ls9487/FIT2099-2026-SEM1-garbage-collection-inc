@@ -3,8 +3,8 @@ package game.atmosphere;
 /**
  * Factory class that wires together the main REQ5 atmosphere services.
  * <p>
- * High-level classes such as {@link EnvironmentalMonitorBehaviour} and
- * {@link AtmosphericScanAction} use this factory so they can depend on the
+ * High-level classes such as {@link EnvironmentalMonitorController} and
+ * {@link AtmosphericScanner} use this factory so they can depend on the
  * parser and corruptor abstractions instead of directly depending on concrete
  * implementations.
  * </p>
@@ -26,8 +26,11 @@ public class AtmosphericServicesFactory {
     public PollutionDataParser createParser() {
         String apiKey = System.getenv("OPENWEATHER_API_KEY");
         if (apiKey == null || apiKey.isBlank()) {
+            System.out.println("[Toxic Atmosphere] No OPENWEATHER_API_KEY detected. Using fallback pollution data preset for demonstration.");
             return new FallbackPollutionParser();
         }
+
+        System.out.println("[Toxic Atmosphere] OPENWEATHER_API_KEY detected. Using live OpenWeather pollution data.");
         return new OpenWeatherPollutionParser();
     }
 
@@ -40,9 +43,10 @@ public class AtmosphericServicesFactory {
      * @return the list of atmospheric corruptors to run after each scan
      */
     public java.util.List<AtmosphericCorruptor> createCorruptors() {
-        AtmosphericCorruptor hazard = new HazardCorruptor();
-        AtmosphericCorruptor economy = new EconomyCorruptor();
-        AtmosphericCorruptor spawn = new PollutantSpawnCorruptor();
-        return java.util.List.of(hazard, economy, spawn);
+        return java.util.List.of(
+                new HazardCorruptor(),
+                new EconomyCorruptor(),
+                new PollutantSpawnCorruptor()
+        );
     }
 }

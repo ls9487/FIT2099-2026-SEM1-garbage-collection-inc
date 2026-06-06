@@ -152,7 +152,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 - The raw JSON response is parsed into an `AirQualityReport` by the parser strategy supplied by `AtmosphericServicesFactory`.
   - `OpenWeatherPollutionParser` is the main parser and extracts:
     - `list[0].main.aqi` as an integer AQI index on the OpenWeather 1-5 scale.
-    - `list[0].components.no_2` and `list[0].components.so_2` to determine the dominant pollutant (`"no_2"` or `"so_2"`).
+    - `list[0].components.no2` and `list[0].components.so2` to determine the dominant pollutant (`"no2"` or `"so2"`).
   - `FallbackPollutionParser` is selected only when `OPENWEATHER_API_KEY` is absent or blank. By default it returns a safe fallback report so the feature remains executable without exposing secrets, and it can also be used locally with the commented demo presets to simulate REQ 5 corruption scenarios during testing or presentation.
 - The resulting `AirQualityReport` is passed to one or more `AtmosphericCorruptor` implementations, which translate air quality into concrete game effects. These effects fall into two categories:
   - **Probability-based world effects**: random map-level effects whose chance is explicitly encoded in the code, such as local toxic spread, hotspot corruption, and disrupted shop payouts.
@@ -169,16 +169,15 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
   - **Border ring**: it walks the outer border coordinates of the `GameMap` and replaces the ground with `ToxicWaste`, producing a visible toxic perimeter around the facility.
   - **Monitor hotspot**: it locates the atmospheric anchor near the monitor and, for all eligible empty tiles within Manhattan distance 2 of that anchor, applies a **50% chance per tile** to convert the ground into `ToxicWaste`.
 - `EconomyCorruptor` interprets sulphur dioxide (`SO_2`) as a proxy for economic disruption.
-  - When the dominant pollutant in `AirQualityReport` is `"so_2"`, it sets the global disruption flag, reduces credits for actors tracking `EclipseStatistics.CREDITS` by 10 with a floor at 0, and enables a disrupted shop state.
-  - When `EconomyCorruptor.ECONOMY_DISRUPTED` is `true`, `SellAction` still removes the item from the seller's inventory, but there is a **50% chance** that the payout becomes **0 credits** instead of the normal price.
-  - When the flag is `false`, `SellAction` behaves normally.
+  - When the dominant pollutant in `AirQualityReport` is `"so2"`, it updates the disruption state stored on `SuperComputer`, reduces credits for actors tracking `EclipseStatistics.CREDITS` by 10, and enables a disrupted shop state.
+  - When `SuperComputer.isEconomyDisrupted()` is `true`, `SellAction` still removes the item from the seller's inventory, but there is a **50% chance** that the payout becomes **0 credits** instead of the normal price.
+  - When the disruption state is `false`, `SellAction` behaves normally.
 - `PollutantSpawnCorruptor` reacts to severe AQI by locating the `AtmosphericAnchor` and spawning one `Undead` on a randomly selected valid adjacent tile.
 - The atmospheric system is driven by a dedicated monitor ground:
   - `AtmosphericMonitor` is a stationary `Ground` that represents the facility's automated probe and also acts as an `AtmosphericAnchor`.
-  - It owns an `EnvironmentalMonitorBehaviour`, which keeps an internal tick counter.
-  - To keep testing simple and make the feature observable in a short demo, the behaviour is configured to trigger a new scan every turn through a named refresh-interval constant.
-  - When the interval elapses, the behaviour triggers an `AtmosphericScanAction`.
-  - `AtmosphericScanAction` calls the API via `AtmosphericApiClient`, parses the JSON with the selected parser, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.
+  - It owns an `EnvironmentalMonitorController`, which keeps the monitor logic separate from the ground itself.
+  - During each ground tick, the controller delegates to `AtmosphericScanner`.
+  - `AtmosphericScanner` calls the API via `AtmosphericApiClient`, parses the JSON with the selected parser, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.
 
 ### Request
 
@@ -202,15 +201,15 @@ Example JSON structure expected by the game:
         "aqi": 4
       },
       "components": {
-        "no_2": 18.7,
-        "so_2": 42.1
+        "no2": 18.7,
+        "so2": 42.1
       }
     }
   ]
 }
 ```
 
-The game reads `list[0].main.aqi` and compares `components.no_2` and `components.so_2` to determine the dominant pollutant.
+The game reads `list[0].main.aqi` and compares `components.no2` and `components.so2` to determine the dominant pollutant.
 
 ### Architecture
 
@@ -246,8 +245,8 @@ The game reads `list[0].main.aqi` and compares `components.no_2` and `components
 
 #### Higher-level classes demonstrating dependency inversion
 
-- `AtmosphericScanAction` is a higher-level class that works with the `PollutionDataParser` abstraction and a `List<AtmosphericCorruptor>` instead of depending on one concrete corruptor class.
-- `EnvironmentalMonitorBehaviour` is a higher-level class that coordinates periodic scans and obtains corruptors through `AtmosphericServicesFactory`, allowing the scan pipeline to stay coupled to abstractions instead of directly constructing specific corruptors.
+- `AtmosphericScanner` is a higher-level class that works with the `PollutionDataParser` abstraction and a `List<AtmosphericCorruptor>` instead of depending on one concrete corruptor class.
+- `EnvironmentalMonitorController` is a higher-level class that coordinates scans and obtains corruptors through `AtmosphericServicesFactory`, allowing the scan pipeline to stay coupled to abstractions instead of directly constructing specific corruptors.
 - `AtmosphericServicesFactory` centralises the creation of parser and corruptor implementations so the scan workflow stays decoupled from specific concrete classes.
 ## Running the feature
 

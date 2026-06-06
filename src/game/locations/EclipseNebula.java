@@ -10,6 +10,7 @@ import edu.monash.fit2099.engine.positions.World;
 import game.actors.ContractedWorker;
 import game.actors.Muckraker;
 import game.actors.PhantasmWisp;
+import game.atmosphere.AtmosphericServicesFactory;
 import game.grounds.*;
 import game.inventories.WeightLimitedInventory;
 import game.items.AlienArtifact;
@@ -17,9 +18,9 @@ import game.items.AluminiumScrap;
 import game.items.Flask;
 import game.atmosphere.AtmosphericApiClient;
 import game.atmosphere.AtmosphericMonitor;
-import game.atmosphere.AtmosphericServicesFactory;
-import game.atmosphere.EnvironmentalMonitorBehaviour;
+import game.atmosphere.EnvironmentalMonitorController;
 import game.items.IndustrialFan;
+import game.atmosphere.AtmosphericServicesFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,12 +121,12 @@ public class EclipseNebula extends World {
         // Passive atmospheric monitor for A3 REQ5: sits near the SuperComputer
         // and periodically scans the real-world air quality.
         AtmosphericServicesFactory servicesFactory = new AtmosphericServicesFactory();
-        EnvironmentalMonitorBehaviour monitorBehaviour = new EnvironmentalMonitorBehaviour(
+        EnvironmentalMonitorController monitorController = new EnvironmentalMonitorController(
                 servicesFactory.createParser(),
                 new AtmosphericApiClient(),
                 servicesFactory
         );
-        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorBehaviour);
+        AtmosphericMonitor monitor = new AtmosphericMonitor(monitorController);
         moon99DeprecatedMap.at(15, 2).setGround(monitor);
     }
 
