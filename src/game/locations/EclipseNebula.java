@@ -30,7 +30,6 @@ import java.util.function.Supplier;
  * and hashtags into a sprawling, functional sci-fi facility.
  */
 public class EclipseNebula extends World {
-    private QuotaManager quotaManager;
 
     /**
      * Creates the game world bound to the given display.
@@ -64,19 +63,14 @@ public class EclipseNebula extends World {
 
         List<Supplier<Item>> depositable = new ArrayList<>();
         depositable.add(AluminiumScrap::new);
-        depositable.add(() -> new IndustrialFan());
+        depositable.add(IndustrialFan::new);
         depositable.add(AlienArtifact::new);
 
         // Produce the maps...
-        this.quotaManager = new QuotaManager();
-
-        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator, depositable, quotaManager);
-        Overflow20 overflow20Map = new Overflow20(groundCreator, depositable, quotaManager);
+        Deprecated99 moon99DeprecatedMap = new Deprecated99(groundCreator, depositable);
+        Overflow20 overflow20Map = new Overflow20(groundCreator, depositable);
         this.addGameMap(moon99DeprecatedMap);
         this.addGameMap(overflow20Map);
-
-        quotaManager.registerSuperComputerLocation(moon99DeprecatedMap.at(4, 3));
-        quotaManager.registerSuperComputerLocation(overflow20Map.at(3, 2));
 
         // Install teleportation tubes with mixed intra- and inter-map destinations.
         for (Location tubeLocation : moon99DeprecatedMap.getTubeLocations()) {
@@ -96,7 +90,7 @@ public class EclipseNebula extends World {
         }
 
         // BEHOLD, LOCAL MULTIPLAYER!!! ...comment some guys out for easier testing.
-        ContractedWorker contractedWorker1 = initialiseNewWorker("#1 Bob", 'ඞ', 10, quotaManager);
+        ContractedWorker contractedWorker1 = initialiseNewWorker("#1 Bob", 'ඞ', 10);
         //ContractedWorker contractedWorker2 = initialiseNewWorker("#2 Tom", 'ඞ', 10);
         //ContractedWorker contractedWorker3 = initialiseNewWorker("#3 Sarah", 'ඞ', 10);
         //ContractedWorker contractedWorker4 = initialiseNewWorker("#4 Julie", 'ඞ', 10);
@@ -143,22 +137,11 @@ public class EclipseNebula extends World {
      * @param hitPoints   the health value of the worker
      * @return a new contracted worker with a weighted inventory and starter flask
      */
-    public ContractedWorker initialiseNewWorker(String name, char displayChar, int hitPoints, QuotaManager quotaManager) {
+    public ContractedWorker initialiseNewWorker(String name, char displayChar, int hitPoints) {
         // Inventory is weighted, with a limit of 50.
         Inventory inventory = new WeightLimitedInventory(50);
         inventory.add(new Flask());
         return new ContractedWorker(name, displayChar, hitPoints, inventory);
-    }
-
-    /**
-     * Overrides the game loop to tick the QuotaManager each turn,
-     * checking quota progress and deadline.
-     */
-    @Override
-    protected void gameLoop() throws GameEngineException {
-        quotaManager.tick();
-        display.println(quotaManager.getStatus()); // print HUD here instead
-        super.gameLoop();
     }
 
 }
