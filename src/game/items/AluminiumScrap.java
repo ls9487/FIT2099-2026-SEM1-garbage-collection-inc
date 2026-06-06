@@ -48,15 +48,18 @@ public class AluminiumScrap extends EclipseItem implements Depositable {
      */
     @Override
     public String depositedBy(Actor actor, GameMap map) {
+        // Prepare a description.
         StringBuilder result = new StringBuilder(
                 String.format("%s deposits Aluminium Scrap for %d company credits.",
                         actor, DEPOSIT_VALUE));
+        // Check if the actor depositing will get cut for 5 damage.
         if (random.nextDouble() < CUT_CHANCE) {
             actor.hurt(CUT_DAMAGE);
             result.append(String.format(
                     " The jagged metal slices %s's hand! %d damage taken.",
                     actor, CUT_DAMAGE));
         }
+        // Remove the depositable from the inventory.
         actor.getInventory().remove(this);
         return result.toString();
     }

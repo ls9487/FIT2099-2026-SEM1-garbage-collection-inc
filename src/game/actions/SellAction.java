@@ -25,6 +25,7 @@ public class SellAction extends Action {
     /**
      * Constructor for a SellAction.
      * @param sellable the sellable being offered for sale.
+     * @param location The location where the sellable was sold to.
      * @author esoo0013
      */
     public SellAction(Sellable sellable, Location location) {

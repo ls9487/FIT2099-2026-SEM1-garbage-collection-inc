@@ -35,6 +35,7 @@ public interface Sellable {
      *
      * @param seller The actor doing the selling.
      * @param map The map the seller is on.
+     * @param superComputerLocation The location where the sellable was sold to.
      * @return A full sentence describing the sale and its effects.
      * @author esoo0013
      */

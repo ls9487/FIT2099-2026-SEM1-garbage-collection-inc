@@ -8,7 +8,7 @@ import game.items.Depositable;
 
 /**
  * DepositAction handles depositing a Depositable item into the SuperComputer
- * to contribute toward the company quota.
+ * to contribute toward the company quota (handled by a QuotaManager).
  *
  * The quota credit addition is handled here.
  * Item specific side effects and inventory removal are delegated to the Depositable.
@@ -26,7 +26,7 @@ public class DepositAction extends Action {
      * Constructs a DepositAction for the given item and quota manager.
      *
      * @param depositable  The item being deposited.
-     * @param quotaManager The QuotaManager to receive the company credits.
+     * @param quotaManager The QuotaManager to handle the company credits when deposited.
      */
     public DepositAction(Depositable depositable, QuotaManager quotaManager) {
         this.depositable = depositable;
@@ -43,7 +43,9 @@ public class DepositAction extends Action {
      */
     @Override
     public String execute(Actor actor, GameMap map) {
+        // Depositing will always add company credits to the QuotaManager.
         quotaManager.addCompanyCredits(depositable.getDepositValue());
+        // Let the depositable handle the side effects of depositing.
         return depositable.depositedBy(actor, map);
     }
 
