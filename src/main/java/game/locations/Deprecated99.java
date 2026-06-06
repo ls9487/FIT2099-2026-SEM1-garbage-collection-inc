@@ -5,7 +5,6 @@ import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
 import game.grounds.Hole;
-import game.grounds.QuotaManager;
 import game.items.AccessCardL1;
 import game.items.Apple;
 import game.items.CookiePack;

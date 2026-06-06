@@ -167,14 +167,14 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
   - On neighbouring eligible empty tiles, there is a **25% chance per tile** to replace the ground with `ToxicWaste`, forming a local contaminated cluster rather than corrupting the entire map.
 - At severe AQI (4-5), `HazardCorruptor` applies heavier guaranteed actor-specific effects via `applyAtmosphere`, and then performs two large-scale terrain mutations:
   - **Border ring**: it walks the outer border coordinates of the `GameMap` and replaces the ground with `ToxicWaste`, producing a visible toxic perimeter around the facility.
-  - **Monitor hotspot**: it locates the atmospheric anchor near the monitor and, for all eligible empty tiles within Manhattan distance 2 of that anchor, applies a **50% chance per tile** to convert the ground into `ToxicWaste`.
+  - **Monitor hotspot**: using the monitor's own location (passed in on each scan), for all eligible empty tiles within Manhattan distance 2 of that location it applies a **50% chance per tile** to convert the ground into `ToxicWaste`.
 - `EconomyCorruptor` interprets sulphur dioxide (`SO_2`) as a proxy for economic disruption.
   - When the dominant pollutant in `AirQualityReport` is `"so2"`, it updates the disruption state stored on `SuperComputer`, reduces credits for actors tracking `EclipseStatistics.CREDITS` by 10, and enables a disrupted shop state.
   - When `SuperComputer.isEconomyDisrupted()` is `true`, `SellAction` still removes the item from the seller's inventory, but there is a **50% chance** that the payout becomes **0 credits** instead of the normal price.
   - When the disruption state is `false`, `SellAction` behaves normally.
-- `PollutantSpawnCorruptor` reacts to severe AQI by locating the `AtmosphericAnchor` and spawning one `Undead` on a randomly selected valid adjacent tile.
+- `PollutantSpawnCorruptor` reacts to severe AQI by spawning one `Undead` on a randomly selected valid empty tile adjacent to the monitor's location.
 - The atmospheric system is driven by a dedicated monitor ground:
-  - `AtmosphericMonitor` is a stationary `Ground` that represents the facility's automated probe and also acts as an `AtmosphericAnchor`.
+  - `AtmosphericMonitor` is a stationary `Ground` that represents the facility's automated probe. The monitor's own `Location`, supplied by the engine on each `tick`, is what every downstream class uses as the centre point for atmosphere effects.
   - It owns an `EnvironmentalMonitorController`, which keeps the monitor logic separate from the ground itself.
   - During each ground tick, the controller delegates to `AtmosphericScanner`.
   - `AtmosphericScanner` calls the API via `AtmosphericApiClient`, parses the JSON with the selected parser, and then invokes each configured `AtmosphericCorruptor` with the resulting `AirQualityReport`.

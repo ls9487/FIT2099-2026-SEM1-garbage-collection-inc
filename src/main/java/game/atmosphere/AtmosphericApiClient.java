@@ -62,11 +62,11 @@ public class AtmosphericApiClient {
      * If the API key is missing, blank, or the request fails, this method
      * returns an empty JSON object string so the game can fail softly.
      *
-     * @param anchor the atmospheric anchor that identifies the monitor system
      * @param map the map containing the atmospheric monitor
+     * @param anchorLocation the current location of the atmospheric monitor
      * @return the raw JSON API response, or "{}" if the request cannot be completed
      */
-    public String fetch(AtmosphericAnchor anchor, GameMap map, Location anchorLocation) {
+    public String fetch(GameMap map, Location anchorLocation) {
         String apiKey = System.getenv("OPENWEATHER_API_KEY");
         if (apiKey == null) {
             return "{}";
@@ -77,13 +77,12 @@ public class AtmosphericApiClient {
             return "{}";
         }
 
-        Location location = anchorLocation;
-        if (location == null) {
+        if (anchorLocation == null) {
             return "{}";
         }
 
-        int x = location.x();
-        int y = location.y();
+        int x = anchorLocation.x();
+        int y = anchorLocation.y();
 
         int index = Math.floorMod(x + y, CITY_COORDS.length);
         double lat = CITY_COORDS[index][0];

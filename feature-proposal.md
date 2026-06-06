@@ -233,10 +233,10 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
     - When the flag is `false`, `SellAction` behaves normally.
 
 - **PollutantSpawnCorruptor**
-  - Reacts to severe AQI by locating the `AtmosphericAnchor` and spawning one `Undead` on a randomly selected valid adjacent tile.
+  - Reacts to severe AQI by spawning one `Undead` on a randomly selected valid empty tile adjacent to the monitor's location.
 
 - The atmospheric system is driven by a dedicated monitor ground:
-  - `AtmosphericMonitor` is a stationary `Ground` that represents the facility's automated probe and also acts as an `AtmosphericAnchor`.
+  - `AtmosphericMonitor` is a stationary `Ground` that represents the facility's automated probe. Its map `Location`, supplied by the engine on each `tick`, is used as the centre point for atmosphere effects without needing any extra marker interface.
   - It owns an `EnvironmentalMonitorController`, which keeps an internal tick counter.
   - To keep testing simple and make the feature observable in a short demo, the behaviour is configured to trigger a new scan every turn through a named refresh-interval constant.
   - During each ground tick, the controller delegates directly to `AtmosphericScanner`.
@@ -293,12 +293,12 @@ For REQ5, the feature is structured around **two primary gameplay abstractions t
 | AirQualityReport              | New      | (value object)                          | Immutable data class that stores the parsed AQI (1-5) and dominant pollutant string. |
 | AtmosphericApiClient          | New      | -                                       | Calls the external API with a query profile derived from the monitor's game-state coordinates and returns the raw JSON string. |
 | AtmosphericServicesFactory    | New      | -                                       | Factory that wires together the parser, client, and all `AtmosphericCorruptor`s so higher-level classes do not need to construct concrete implementations directly. |
-| AtmosphericMonitor            | New      | Ground, AtmosphericAnchor               | Stationary probe ground; acts as the atmospheric anchor so corruptors can locate it without downcasting to a concrete actor type. |
+| AtmosphericMonitor            | New      | Ground                                  | Stationary probe ground. Its map `Location`, supplied by the engine on each `tick`, is what every downstream class uses as the centre point for atmosphere effects. |
 | EnvironmentalMonitorController | New      | -                                       | Triggers periodic atmospheric scans and coordinates the API pipeline through abstractions. |
 | AtmosphericScanner         | New      | Action                                  | Fetches JSON, parses it, prints an AQI summary, and invokes all registered `AtmosphericCorruptor`s. |
 | HazardCorruptor               | New      | AtmosphericCorruptor                    | Calls `applyAtmosphere` on all `AtmosphereSensitiveActor`s; at moderate AQI spreads local toxic puddles; at severe AQI creates a border ring and monitor hotspot. |
 | EconomyCorruptor              | New      | AtmosphericCorruptor                    | `SO2`-driven: reduces credits for tracked actors and toggles a disruption flag consumed by `SellAction` to probabilistically void transactions. |
-| PollutantSpawnCorruptor       | New      | AtmosphericCorruptor                    | At severe AQI, locates the `AtmosphericAnchor` and spawns one `Undead` on a valid adjacent empty tile. |
+| PollutantSpawnCorruptor       | New      | AtmosphericCorruptor                    | At severe AQI, spawns one `Undead` on a valid empty tile adjacent to the monitor's location. |
 | ContractedWorker              | Existing | AtmosphereSensitiveActor                | Worker that converts AQI into HP loss and poison. |
 | Muckraker                     | Existing | AtmosphereSensitiveActor                | Scavenger that leaks `ToxicWaste` at moderate AQI and shoves adjacent actors at severe AQI. |
 | Undead                        | Existing | AtmosphereSensitiveActor                | Corrupts its tile with `ToxicWaste` at moderate AQI and radiates adjacent damage at severe AQI. |

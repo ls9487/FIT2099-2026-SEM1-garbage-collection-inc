@@ -35,10 +35,9 @@ public class EnvironmentalMonitorController {
     /**
      * Runs the monitor controller for one game turn.
      *
-     * @param anchor the atmospheric anchor owned by the monitor
      * @param location the current location of the atmospheric monitor
      */
-    public void operate(AtmosphericAnchor anchor, Location location) {
-        scanner.scan(anchor, location.map(), location);
+    public void operate(Location location) {
+        scanner.scan(location.map(), location);
     }
 }

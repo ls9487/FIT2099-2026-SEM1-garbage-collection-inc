@@ -43,14 +43,13 @@ public class AtmosphericScanner {
     }
 
     /**
-     * Runs the atmospheric scan using the supplied atmospheric anchor.
+     * Runs the atmospheric scan centred on the supplied monitor location.
      *
-     * @param anchor the atmospheric anchor that acts as the scan source
      * @param map the map containing the atmospheric monitor
      * @param anchorLocation the current location of the atmospheric monitor
      */
-    public void scan(AtmosphericAnchor anchor, GameMap map, Location anchorLocation) {
-        String json = apiClient.fetch(anchor, map, anchorLocation);
+    public void scan(GameMap map, Location anchorLocation) {
+        String json = apiClient.fetch(map, anchorLocation);
         AirQualityReport report = parser.parse(json);
 
         for (AtmosphericCorruptor corruptor : corruptors) {
