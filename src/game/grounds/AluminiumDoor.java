@@ -69,7 +69,7 @@ public class AluminiumDoor extends Door implements Cuttable {
                 String.format("%s cuts the Aluminium Door, it crumbles into scrap!", actor));
         if (new Random().nextDouble() < 0.25) {
             result.append(" The door EXPLODES!");
-            for (Exit exit : map.locationOf(actor).getExits()) {
+            for (Exit exit : location.getExits()) {
                 Location adjacent = exit.getDestination();
                 if (adjacent.containsAnActor()) {
                     adjacent.getActor().hurt(100);
