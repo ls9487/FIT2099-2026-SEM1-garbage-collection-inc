@@ -96,17 +96,18 @@ public class SiphonTurret extends Turret {
 
     /**
      * Attempts to register an actor standing on its adjacent tiles.
-     * Only actors with the PLAYER ability may be registered.
+     * Only actors with the PLAYER ability may be registered (they have to be alive too!)
      * If there's multiple candidates for registration, a random one is chosen.
      * @param location The location of the turret.
      */
     private void registerSurroundingActor(Location location) {
         // Store the nearby actors in a list here, to be used later.
         List<Actor> candidateActors = new ArrayList<>();
-        // Go through each nearby location and add any actor with PLAYER ability.
+        // Go through each nearby location and add any (alive) actor with PLAYER ability.
         for (Location nearbyLocation : location.getNearbyLocations(REGISTRATION_RADIUS)) {
             if (nearbyLocation.containsAnActor() &&
-                    nearbyLocation.getActor().hasAbility(ActorAbilities.PLAYER)) {
+                    nearbyLocation.getActor().hasAbility(ActorAbilities.PLAYER) &&
+                    nearbyLocation.getActor().isConscious()) {
                 candidateActors.add(nearbyLocation.getActor());
             }
         }

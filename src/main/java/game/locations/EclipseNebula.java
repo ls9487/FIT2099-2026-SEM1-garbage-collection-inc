@@ -19,6 +19,9 @@ import game.atmosphere.AtmosphericApiClient;
 import game.atmosphere.AtmosphericMonitor;
 import game.atmosphere.EnvironmentalMonitorController;
 import game.items.IndustrialFan;
+import game.turrets.GunTurret;
+import game.turrets.NuclearPad;
+import game.turrets.SiphonTurret;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +57,10 @@ public class EclipseNebula extends World {
         groundCreator.registerGround('N', IronDoor::new);
         groundCreator.registerGround('M', TitaniumDoor::new);
         groundCreator.registerGround('≈', ToxicWaste::new);
-        groundCreator.registerGround('≡', () -> new SuperComputer(SuperComputer.defaultCatalogue()));
-        // Placeholder mappings for special glyphs that are decorated later
+        // Turrets can also use the DefaultGroundCreator for easier setup.
+        groundCreator.registerGround('♖', GunTurret::new);
+        groundCreator.registerGround('◬', SiphonTurret::new);
+        groundCreator.registerGround('⦻', NuclearPad::new);
 
         // NOTE: We cannot use the default ground creator to create holes,
         // as holes take a parameter of what they can spawn.
