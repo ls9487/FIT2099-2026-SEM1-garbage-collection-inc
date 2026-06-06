@@ -1,6 +1,5 @@
 package game.locations;
 
-import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
@@ -20,7 +19,6 @@ import game.atmosphere.AtmosphericApiClient;
 import game.atmosphere.AtmosphericMonitor;
 import game.atmosphere.EnvironmentalMonitorController;
 import game.items.IndustrialFan;
-import game.atmosphere.AtmosphericServicesFactory;
 
 import java.util.ArrayList;
 import java.util.List;
