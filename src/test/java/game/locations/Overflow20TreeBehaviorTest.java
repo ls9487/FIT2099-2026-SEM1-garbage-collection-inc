@@ -13,8 +13,17 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for fleshy tree evolution behaviour on the {@link Overflow20} map.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class Overflow20TreeBehaviorTest {
 
+    /**
+     * Tests that Overflow20 places a {@link FleshyTreeSprout} at the configured tree tile.
+     */
     @Test
     void setTrees_PositiveCondition_VerifiesFullEvolutionaryChainOnOverflow20() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
@@ -31,6 +40,9 @@ class Overflow20TreeBehaviorTest {
         );
     }
 
+    /**
+     * Tests that a sprout on Overflow20 grows into a {@link FleshyTreeSapling}.
+     */
     @Test
     void treeEvolution_BoundaryCondition_SproutTransitionsToSaplingSuccessfully() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
@@ -46,6 +58,9 @@ class Overflow20TreeBehaviorTest {
                 "On Map 20, Sprout must advance sequentially to a Fleshy Tree Sapling");
     }
 
+    /**
+     * Tests that tree evolution on Overflow20 stops at mature and never reaches monolith stage.
+     */
     @Test
     void treeEvolution_EdgeCondition_FullChainCompletesAtMatureWithoutMonolith() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);

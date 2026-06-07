@@ -18,10 +18,18 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link ScrapSnatcherSpawner} spawn placement and loot explosion behaviour.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class ScrapSnatcherSpawnerTest {
-
-    // Concrete lightweight stub actor to resolve engine-internal NullPointerExceptions
-    // exactly as instructed by the course's applied session handbook guidelines.
+    /**
+     * Dummy actor to be used in these tests.
+     * This is used because PLAYER ability is to be checked, but since Actor's hasAbility
+     * is final, Mockito cannot override it for testing, so when() can't be used.
+     */
     private static class TestActor extends Actor {
         public TestActor(String name, char displayChar, int hitPoints, Inventory inventory) {
             super(name, displayChar, hitPoints, inventory);
@@ -33,6 +41,9 @@ class ScrapSnatcherSpawnerTest {
         }
     }
 
+    /**
+     * Tests that spawning places a snatcher and drops loot on all enterable adjacent tiles.
+     */
     @Test
     void spawnAt_NormalCondition_SpawnsActorAndTriggersLootExplosion() throws GameEngineException {
         Supplier<Item> s1 = () -> mock(Item.class);
@@ -62,6 +73,9 @@ class ScrapSnatcherSpawnerTest {
         );
     }
 
+    /**
+     * Tests that loot is not dropped on adjacent tiles that block actor entry.
+     */
     @Test
     void spawnAt_BoundaryCondition_NoLootExplosionOnBlockedAdjacentTiles() throws GameEngineException {
         Supplier<Item> s1 = () -> mock(Item.class);
@@ -89,6 +103,9 @@ class ScrapSnatcherSpawnerTest {
         );
     }
 
+    /**
+     * Tests that the snatcher is placed on the spawn tile when no adjacent locations exist.
+     */
     @Test
     void spawnAt_EdgeCondition_PlacesSnatcherDirectlyOnTargetTile() throws GameEngineException {
         Supplier<Item> s1 = () -> mock(Item.class);
@@ -103,6 +120,9 @@ class ScrapSnatcherSpawnerTest {
         verify(spawnLocation, times(1)).addActor(any());
     }
 
+    /**
+     * Tests that spawning succeeds on hole, vent, and floor ground types.
+     */
     @Test
     void spawnAt_NormalCondition_ValidSpawnerGroundPlacements() throws GameEngineException {
         ScrapSnatcherSpawner spawner = new ScrapSnatcherSpawner(Collections.singletonList(() -> mock(Item.class)));
@@ -119,11 +139,12 @@ class ScrapSnatcherSpawnerTest {
         verify(mockFloor).addActor(any());
     }
 
+    /**
+     * Tests that normal workers do not have the {@link game.actors.ActorAbilities#WORKER_HOSTILE} ability.
+     */
     @Test
     void canActorEnter_BoundaryCondition_BlocksNormalWorkerEntry() {
-        // Instantiate three distinct valid actors instead of raw uninitialized mocks.
-        // The parent constructor populates abilitySet cleanly, entirely preventing the NPE.
-        Inventory inventoryA =  mock(Inventory.class);
+        Inventory inventoryA = mock(Inventory.class);
         Inventory inventoryB = mock(Inventory.class);
         Inventory inventoryC = mock(Inventory.class);
 
@@ -138,6 +159,9 @@ class ScrapSnatcherSpawnerTest {
         );
     }
 
+    /**
+     * Tests that vents with no nearby locations return an empty but non-null nearby list.
+     */
     @Test
     void spawnAt_NegativeCondition_NoAdjacentWorkerDoesNotSpawn() {
         Location ventA = mock(Location.class);
@@ -155,6 +179,9 @@ class ScrapSnatcherSpawnerTest {
         );
     }
 
+    /**
+     * Tests that a {@link GameEngineException} during spawn is caught and prevents loot drops.
+     */
     @Test
     void spawnAt_ErrorCondition_CatchesEngineExceptionAndStopsLootExplosion() throws GameEngineException {
         Supplier<Item> s1 = () -> mock(Item.class);

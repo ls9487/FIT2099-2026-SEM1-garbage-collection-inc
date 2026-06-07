@@ -13,8 +13,17 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for fleshy tree evolution behaviour on the {@link Deprecated99} map.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class Deprecated99TreeBehaviorTest {
 
+    /**
+     * Tests that Deprecated99 spawns a {@link FleshyTreeSprout} with display character {@code 'y'}.
+     */
     @Test
     void setTrees_PositiveCondition_VerifiesCorrectTreeHierarchyOnMoon99() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
@@ -25,7 +34,6 @@ class Deprecated99TreeBehaviorTest {
         Deprecated99 map99 = new Deprecated99(mockFactory, mockPool);
         Location treeLocation = map99.at(1, 16);
 
-        // Combined string identity and character validation from friend's test runner checks
         FleshyTreeSprout sprout = (FleshyTreeSprout) treeLocation.getGround();
 
         assertAll("Verify Deprecated99 specific configuration and display icons",
@@ -35,6 +43,9 @@ class Deprecated99TreeBehaviorTest {
         );
     }
 
+    /**
+     * Tests that a sprout on Deprecated99 skips sapling and grows directly into mature stage.
+     */
     @Test
     void treeEvolution_BoundaryCondition_DirectlyLinksSproutToMatureSkippingSapling() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
@@ -50,6 +61,9 @@ class Deprecated99TreeBehaviorTest {
                 "On Map 99, Sprout must bypass Sapling and transition directly to Mature");
     }
 
+    /**
+     * Tests that a mature tree on Deprecated99 evolves into a {@link game.trees.FleshyTreeMonolith}.
+     */
     @Test
     void treeEvolution_EdgeCondition_MatureEvolvesIntoFleshyMonolithOnMap99() throws Exception {
         GroundCreator mockFactory = mock(GroundCreator.class);
