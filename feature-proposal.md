@@ -119,6 +119,7 @@ Moving entities that travel toward a destination location set by whoever fired i
 - Has a destination location (determined by the turret that fired it) that the projectile travels towards.
 - Has a velocity, which determines up to how many tiles it can move per turn (diagonals are counted as 1 tile).
 - Projectile is stopped (and removed) when it reaches its final destination, or hits an actor or ground that blocks projectiles (blocksThrownObjects method).
+    - Hit actors also include workers. Turrets don't target workers, but the projectiles they fire don't care who it hits.
 - When stopped, it activates its hit effect. This is up to the subclasses of Projectile.
 - Walls and locked Doors should block projectiles.
 
@@ -180,6 +181,7 @@ Still, these things are dangerous if not carefully handled! Nuclear blasts are u
     - 5 damage to any actor standing there
     - Spawns a fire, lasting 5-10 turns (random)
     - 50% chance to turn the ground into toxic waste
+- Note that items on the ground will not be affected by the blast.
 
 ---
 
