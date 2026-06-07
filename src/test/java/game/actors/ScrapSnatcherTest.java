@@ -56,9 +56,9 @@ class ScrapSnatcherTest {
         ScrapSnatcher snatcherC = new ScrapSnatcher();
 
         assertAll("Verify target capabilities are omitted on fresh initiation loops",
-                () -> assertFalse(snatcherA.hasAbility(game.actors.ActorAbilities.WORKER_HOSTILE)),
-                () -> assertFalse(snatcherB.hasAbility(game.actors.ActorAbilities.WORKER_HOSTILE)),
-                () -> assertFalse(snatcherC.hasAbility(game.actors.ActorAbilities.WORKER_HOSTILE))
+                () -> assertFalse(snatcherA.hasAbility(ActorAbilities.WORKER_HOSTILE)),
+                () -> assertFalse(snatcherB.hasAbility(ActorAbilities.WORKER_HOSTILE)),
+                () -> assertFalse(snatcherC.hasAbility(ActorAbilities.WORKER_HOSTILE))
         );
     }
 
@@ -92,7 +92,7 @@ class ScrapSnatcherTest {
         snatcher.infection(mockLocB);
         snatcher.infection(mockLocC);
 
-        assertTrue(snatcher.hasAbility(game.actors.ActorAbilities.WORKER_HOSTILE));
+        assertTrue(snatcher.hasAbility(ActorAbilities.WORKER_HOSTILE));
     }
 
     /**
