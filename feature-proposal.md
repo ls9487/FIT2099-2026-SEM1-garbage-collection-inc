@@ -109,7 +109,7 @@ Stationary grounded entities that fire at non-workers.
 - Carries a limited number of ammunition (projectiles). Firing a projectile costs 1 ammo. Does not despawn when running out of ammo.
 - Has a 3-turn cooldown between firing projectiles to avoid wasting ammo.
 - Does not allow actors to walk onto it.
-- Logic for handling firing projectiles is up to subclasses of Turret.
+- The different type of projectiles being fired is up to subclasses of Turret.
 - Can check surrounding locations (this radius varies) for any non-workers to target. If multiple targets exist, a random one is chosen.
 
 **Abstract Class 2: Projectile**  
@@ -120,18 +120,18 @@ Moving entities that travel toward a destination location set by whoever fired i
 - Has a velocity, which determines up to how many tiles it can move per turn (diagonals are counted as 1 tile).
 - Projectile is stopped (and removed) when it reaches its final destination, or hits an actor or ground that blocks projectiles (blocksThrownObjects method).
 - When stopped, it activates its hit effect. This is up to the subclasses of Projectile.
-- Walls and Doors should block projectiles.
+- Walls and locked Doors should block projectiles.
 
 ---
 
 ### Turret
 **Concrete Class 1: GunTurret**  
-This will likely be placed outside the ship in case there's any lifeforms that aren't so welcoming of the ship landing on their moon.
+This is placed outside a ship in case there's any lifeforms that aren't so welcoming of the ship landing on their moon.
 - Detection radius of 7.
 - Shoots FireBullets, capacity of 15 ammunition.
 
 **Concrete Class 2: SiphonTurret**  
-This experimental tech will likely be placed inside facilities since it's still under development and isn't standard issue.
+This experimental tech is placed inside the 20-overflow facility since it was still under development and isn't standard issue.
 - Detection radius of 5.
 - Shoots SiphonBullets, capacity of 10 ammunition.
 - BUT, before it can fire bullets, it needs to register a worker as the "source" for the SiphonBullets to heal.
@@ -142,12 +142,13 @@ This experimental tech will likely be placed inside facilities since it's still 
 - Note that registration and firing can happen on the same turn.
 
 **Concrete Class 3: NuclearPad**  
-This will likely be placed outside a facility on a moon.
+One has been set up outside the 99-deprecated facility.
 - Detection radius of 10.
-- Carries 1 big, bad NuclearMissile.
-- But, to avoid wrecking the entire place, these cannot fire unless the NuclearPad detects that there is any worker standing adjacent to it for at least 3 consecutive turns.
+- Carries 1 big, bad NuclearMissile (blast radius of 4).
+- But, to avoid wrecking the entire place, these cannot fire unless the NuclearPad detects that there is any worker standing adjacent to it for at least 3 consecutive turns (arming cooldown).
     - This doesn't have to be the same worker, just any worker.
     - This timer resets if it finds that there are no adjacent workers.
+    - When the arming cooldown reaches 0, it may fire on the same turn (if there's an enemy in range).
 
 ### Projectile
 **Concrete Class 1: FireBullet**  
@@ -169,7 +170,8 @@ A type of bullet that uses weird science to draw life force from targets near th
 The company has authorized the use of extremely low-yield nuclear missiles to (somehow) help with the workers' operations. This isn't powerful enough to destroy an entire moon.
 Still, these things are dangerous if not carefully handled! Nuclear blasts are unpredictably destructive here, but you can expect long-lasting fires and significant permanent damage to the terrain.
 - Velocity of 1 (slow).
-- Upon hitting, it has a blast radius of 4, meaning its impact affects a 9x9 area.
+- Upon hitting, it has a blast radius. This varies depending on whatever fired it.
+    - NuclearPad sets this radius to 4
 - On the same tile the missile landed:
     - 500 damage to an actor, if they're standing there
     - Spawns a fire, lasting 20 turns
