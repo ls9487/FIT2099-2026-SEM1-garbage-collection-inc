@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -55,9 +56,12 @@ public class MagneticField extends RideableUpgrade implements Igniter {
             Display display = new Display();
             for (Location here : currentLocation.getNearbyLocations(1)) {
                 for (Item item : here.getItems()) {
-                    actor.getInventory().add(item);
-                    here.removeItem(item);
-                    display.println(String.format("%s ran into %s's %s", item, actor, this));
+                    if (item.hasAbility(ItemAbility.PORTABLE)) {
+                        actor.getInventory().add(item);
+                        here.removeItem(item);
+
+                        display.println(String.format("%s ran into %s's %s", item, actor, this));
+                    }
                 }
             }
 
