@@ -64,7 +64,7 @@ public class MechSuit extends Rideable implements Overclockable {
         if (previousLocation == null) {
             previousLocation = currentLocation;
         } else if (random.nextDouble() < COLLAPSE_CHANCE) {
-            mechSuitMessage += String.format("The ground is collapsing! %s stomp out a Hole.", this);
+            mechSuitMessage += String.format(" The ground is collapsing! %s stomp out a Hole.", this);
             List<Spawner> holeSpawners = new ArrayList<>();
             holeSpawners.add(new ParasiteSpawner());
 
