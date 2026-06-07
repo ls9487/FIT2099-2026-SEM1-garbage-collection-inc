@@ -85,12 +85,12 @@ public class AtmosphericApiClient {
         int y = anchorLocation.y();
 
         int index = Math.floorMod(x + y, CITY_COORDS.length);
-        double lat = CITY_COORDS[index][0];
-        double lon = CITY_COORDS[index][1];
+        double latitude = CITY_COORDS[index][0];
+        double longtitude = CITY_COORDS[index][1];
 
         String url = String.format(
                 "https://api.openweathermap.org/data/2.5/air_pollution?lat=%f&lon=%f&appid=%s",
-                lat, lon, apiKey
+                latitude, longtitude, apiKey
         );
 
         HttpRequest request = HttpRequest.newBuilder()
