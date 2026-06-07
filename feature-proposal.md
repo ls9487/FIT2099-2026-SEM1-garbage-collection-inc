@@ -244,7 +244,7 @@ The moon facility has an automated monitor that calls the OpenWeather Air Pollut
 
 ### Testing Highlights
 
-- REQ5 unit tests are located in `src/test/game/atmosphere` and are intended to validate the new atmospheric feature classes rather than pre-existing engine internals.
+- REQ5 unit tests are located in `src/test/java/game/atmosphere` and are intended to validate the new atmospheric feature classes rather than pre-existing engine internals.
 - The tests currently cover:
   - `AirQualityReport` as the data carrier for AQI and dominant pollutant.
   - `OpenWeatherPollutionParser` for valid payload parsing and safe default behaviour on null or incomplete JSON.
