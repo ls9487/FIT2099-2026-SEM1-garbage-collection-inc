@@ -10,7 +10,6 @@ import game.actors.Undead;
 import game.grounds.*;
 import game.items.AlienCube;
 import game.items.Flask;
-import game.items.IndustrialFan;
 import game.spawners.*;
 import game.trees.*;
 import game.vehicles.AlienBeast;

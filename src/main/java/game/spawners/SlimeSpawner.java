@@ -2,6 +2,7 @@ package game.spawners;
 
 import edu.monash.fit2099.engine.GameEngineException;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.DropAction;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.Exit;
@@ -35,6 +36,8 @@ public class SlimeSpawner implements Spawner {
             // At this point, spawning was successful. Trigger the environmental reaction.
             this.forceAdjacentDropping(location);
 
+            Display display = new Display();
+            display.println(String.format("%s spawned at %s", spawnedSlime, location));
         } catch (GameEngineException ignored) {
             // Spawn failed (likely because location was occupied).
             // It's fine to proceed, this attempt is just ignored.
