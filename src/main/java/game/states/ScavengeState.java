@@ -64,10 +64,13 @@ public class ScavengeState extends State {
 
         // steal nearest player most valuable item
         Actor nearestPlayer = nearestWorker(getActorVigilanceRange(), location);
-        Item item = getValuableItem(nearestPlayer, ValuableItemOperations.MOST);
-        nearestPlayer.getInventory().remove(item);
-        getStatefulCreature().getInventory().add(item);
+        if (nearestPlayer != null) {
+            Item item = getValuableItem(nearestPlayer, ValuableItemOperations.MOST);
+            nearestPlayer.getInventory().remove(item);
+            getStatefulCreature().getInventory().add(item);
 
-        display.println(String.format("%s steals %s from %s", getStatefulCreature(), item, nearestPlayer));
+            display.println(String.format("%s steals %s from %s", getStatefulCreature(), item, nearestPlayer));
+        }
+
     }
 }
