@@ -260,7 +260,7 @@ The game reads `list[0].main.aqi` and compares `components.no2` and `components.
 
 ## Testing
 
-REQ5 unit tests are located in `src/test/game/atmosphere`.
+REQ5 unit tests are located in `src/test/java/game/atmosphere`.
 
 Current REQ5-focused tests include:
 - `AirQualityReportTest`, which verifies that `AirQualityReport` stores and returns the AQI and dominant pollutant correctly.
