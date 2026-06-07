@@ -4,6 +4,12 @@ import edu.monash.fit2099.engine.items.ItemAbility;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link RideableUpgrade} portable and non-portable state transitions.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 class RideableUpgradeTest {
 
     private static class StubRideableUpgrade extends RideableUpgrade {
@@ -12,39 +18,44 @@ class RideableUpgradeTest {
         }
     }
 
+    /**
+     * Tests that {@link RideableUpgrade#makePortable()} and {@link RideableUpgrade#makeNonPortable()}
+     * toggle the {@link ItemAbility#PORTABLE} ability.
+     */
     @Test
     void portability_NormalCondition_AllowsPickingUpAndDropping() {
         StubRideableUpgrade upgrade = new StubRideableUpgrade("Test Upgrade", 'U', 10);
 
-        // Case 1: Initial state can explicitly make portable
         upgrade.makePortable();
         assertTrue(upgrade.hasAbility(ItemAbility.PORTABLE));
 
-        // Case 2: Changing to non-portable removes it cleanly
         upgrade.makeNonPortable();
         assertFalse(upgrade.hasAbility(ItemAbility.PORTABLE));
     }
 
+    /**
+     * Tests that repeated portable and non-portable calls do not corrupt ability state.
+     */
     @Test
     void portability_BoundaryCondition_RedundantCallsDoNotStateFlip() {
         StubRideableUpgrade upgrade = new StubRideableUpgrade("Test Upgrade", 'U', 10);
 
-        // Case 3: Calling makePortable multiple times keeps it portable without double-adding
         upgrade.makePortable();
         upgrade.makePortable();
         assertTrue(upgrade.hasAbility(ItemAbility.PORTABLE));
 
-        // Case 4: Calling makeNonPortable multiple times handles clean state restriction
         upgrade.makeNonPortable();
         upgrade.makeNonPortable();
         assertFalse(upgrade.hasAbility(ItemAbility.PORTABLE));
     }
 
+    /**
+     * Tests that querying an unregistered vehicle ability returns false without error.
+     */
     @Test
     void portability_NegativeCondition_NullCheckCapabilitySearch() {
         StubRideableUpgrade upgrade = new StubRideableUpgrade("Test Upgrade", 'U', 10);
 
-        // Case 5: Ensure custom capability system handles missing capability cleanly without exception
         assertFalse(upgrade.hasAbility(VehicleAbilities.EXTRA_ENERGY));
     }
 }

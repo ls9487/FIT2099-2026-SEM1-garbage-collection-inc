@@ -8,8 +8,17 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link WarpBattery} teleportation, knockback, and occupant handling.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 class WarpBatteryTest {
 
+    /**
+     * Tests that teleporting to an empty destination moves the rider and reports success.
+     */
     @Test
     void teleport_NormalCondition_MovesRiderAndAppliesBasePoison() {
         WarpBattery warpBattery = new WarpBattery();
@@ -26,6 +35,9 @@ class WarpBatteryTest {
         assertTrue(result.contains("teleported"));
     }
 
+    /**
+     * Tests that an occupied destination knocks the occupant to an adjacent tile.
+     */
     @Test
     void teleport_BoundaryCondition_KnocksBackOccupantWhenTargetOccupied() {
         WarpBattery warpBattery = new WarpBattery();
@@ -56,11 +68,13 @@ class WarpBatteryTest {
 
         String result = warpBattery.teleport(rider, gameMap, destination);
 
-        // Match the specific moving target being displaced
         verify(gameMap).moveActor(eq(occupant), eq(knockbackLocation));
         assertTrue(result.contains("toxicity"));
     }
 
+    /**
+     * Tests that the occupant is sent unconscious when knockback to an adjacent tile is blocked.
+     */
     @Test
     void teleport_EdgeCondition_WarpsOccupantToHellIfKnockbackBlocked() {
         WarpBattery warpBattery = new WarpBattery();

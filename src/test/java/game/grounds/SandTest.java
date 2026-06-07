@@ -9,8 +9,16 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link Sand} slippery movement behaviour during tick.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 class SandTest {
-
+    /**
+     * Tests that an actor on sand is moved to a nearby enterable location when sand ticks.
+     */
     @Test
     void slippery_NormalCondition_SlippingMovesActor() {
         Sand sand = new Sand();
@@ -23,16 +31,17 @@ class SandTest {
         when(location.getActor()).thenReturn(runner);
         when(location.map()).thenReturn(map);
 
-        // Populate valid destination paths
         when(location.getNearbyLocations(2)).thenReturn(List.of(adjacentLocation));
         when(adjacentLocation.containsAnActor()).thenReturn(false);
         when(adjacentLocation.canActorEnter(runner)).thenReturn(true);
 
-        // Case 1: Standing on loose sand shifts the actor's position
         sand.tick(location);
         verify(map).moveActor(eq(runner), eq(adjacentLocation));
     }
 
+    /**
+     * Tests that sand tick completes without error when no valid slip destination exists.
+     */
     @Test
     void slippery_BoundaryCondition_TrappedActorKeepsBalance() {
         Sand sand = new Sand();
@@ -41,18 +50,19 @@ class SandTest {
 
         when(location.containsAnActor()).thenReturn(true);
         when(location.getActor()).thenReturn(runner);
-        // No adjacent tiles available to slip into
         when(location.getNearbyLocations(2)).thenReturn(new ArrayList<Location>());
 
-        // Case 2: Trapped actor retains balance without throwing exceptions
         assertDoesNotThrow(() -> sand.tick(location));
     }
 
+    /**
+     * Tests that a sand instance is of type {@link Sand} and not {@link Wall}.
+     */
     @Test
     void slippery_EdgeCondition_VerifyGroundTypeExplicitly() {
         Sand sand = new Sand();
 
         assertEquals(Sand.class, sand.getClass());
-        assertNotEquals(game.grounds.Wall.class, sand.getClass());
+        assertNotEquals(Wall.class, sand.getClass());
     }
 }

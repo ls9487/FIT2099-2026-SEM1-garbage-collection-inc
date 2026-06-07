@@ -14,8 +14,18 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link ToxicWaste} hazard damage and hover immunity during tick.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 class ToxicWasteTest {
-
+    /**
+     * Dummy actor to be used in these tests.
+     * This is used because PLAYER ability is to be checked, but since Actor's hasAbility
+     * is final, Mockito cannot override it for testing, so when() can't be used.
+     */
     private static class TestActor extends Actor {
         public TestActor(String name, char displayChar, int hitPoints, Inventory inventory) {
             super(name, displayChar, hitPoints, inventory);
@@ -27,6 +37,9 @@ class ToxicWasteTest {
         }
     }
 
+    /**
+     * Tests that {@link ToxicWaste#tick(Location)} damages a walking actor on the tile.
+     */
     @Test
     void hazard_NormalCondition_DamagesWalkingActors() {
         ToxicWaste waste = new ToxicWaste();
@@ -36,13 +49,14 @@ class ToxicWasteTest {
         when(location.containsAnActor()).thenReturn(true);
         when(location.getActor()).thenReturn(victim);
 
-        // Case 1: Damage calculation path reduces overall health profile
         waste.tick(location);
 
-        // Assert that the real internal attributes collections were correctly mutated
         assertNotEquals(50, victim.getStatistic(ActorStatistics.HEALTH));
     }
 
+    /**
+     * Tests that actors with {@link VehicleAbilities#HOVER} take no damage from toxic waste.
+     */
     @Test
     void hazard_BoundaryCondition_ImmunityForHoveringActors() {
         ToxicWaste waste = new ToxicWaste();
@@ -53,12 +67,14 @@ class ToxicWasteTest {
         when(location.containsAnActor()).thenReturn(true);
         when(location.getActor()).thenReturn(flyer);
 
-        // Case 2: Hovering status provides perfect immunity to environmental damage loops
         waste.tick(location);
 
         assertEquals(50, flyer.getStatistic(ActorStatistics.HEALTH));
     }
 
+    /**
+     * Tests that ticking an empty tile does not throw and never queries the actor on that tile.
+     */
     @Test
     void hazard_EdgeCondition_NoOpOnEmptyTile() {
         ToxicWaste waste = new ToxicWaste();
@@ -66,7 +82,6 @@ class ToxicWasteTest {
 
         when(location.containsAnActor()).thenReturn(false);
 
-        // Case 3: Scanning an empty tile processes smoothly with no mutations
         assertDoesNotThrow(() -> waste.tick(location));
         verify(location, never()).getActor();
     }
