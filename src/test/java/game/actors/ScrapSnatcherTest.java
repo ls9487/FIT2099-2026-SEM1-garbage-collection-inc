@@ -7,8 +7,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link ScrapSnatcher} display, stats, abilities, and infection behaviour.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class ScrapSnatcherTest {
-
+    /**
+     * Tests that newly created scrap snatchers use display character {@code 's'}.
+     */
     @Test
     void getDisplayChar_NormalCondition_MatchesSpecificationCharacter() {
         ScrapSnatcher snatcherA = new ScrapSnatcher();
@@ -22,6 +30,9 @@ class ScrapSnatcherTest {
         );
     }
 
+    /**
+     * Tests that scrap snatchers start with 25 hit points.
+     */
     @Test
     void getStatistic_NormalCondition_TracksCorrectHitPointsPool() {
         ScrapSnatcher snatcherA = new ScrapSnatcher();
@@ -35,6 +46,9 @@ class ScrapSnatcherTest {
         );
     }
 
+    /**
+     * Tests that scrap snatchers do not start with the {@link ActorAbilities#WORKER_HOSTILE} ability.
+     */
     @Test
     void hasAbility_BoundaryCondition_StartsNonHostileToWorkers() {
         ScrapSnatcher snatcherA = new ScrapSnatcher();
@@ -48,6 +62,9 @@ class ScrapSnatcherTest {
         );
     }
 
+    /**
+     * Tests that scrap snatchers expose the {@link Infectable} capability.
+     */
     @Test
     void asCapability_NormalCondition_ImplementsInfectableRegistration() {
         ScrapSnatcher snatcherA = new ScrapSnatcher();
@@ -61,6 +78,9 @@ class ScrapSnatcherTest {
         );
     }
 
+    /**
+     * Tests that infection grants the {@link ActorAbilities#WORKER_HOSTILE} ability.
+     */
     @Test
     void infection_EdgeCondition_GivesWorkerHostileAbilityAndRemovesSnatch() {
         ScrapSnatcher snatcher = new ScrapSnatcher();
@@ -75,6 +95,9 @@ class ScrapSnatcherTest {
         assertTrue(snatcher.hasAbility(game.actors.ActorAbilities.WORKER_HOSTILE));
     }
 
+    /**
+     * Tests that each infection call reduces health by exactly one hit point.
+     */
     @Test
     void infection_BoundaryCondition_AppliesExactlyOnePointDamageOnInfectionTurn() {
         ScrapSnatcher snatcher = new ScrapSnatcher();
