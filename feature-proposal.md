@@ -9,13 +9,13 @@ by Li Shen
 ## Core Abstractions
 
 **Rideable** (abstract)  
-A non-portable item that an actor can mount or dismount. Mounting adds `RideStatus` to the actor and moves the rideable into the actor's inventory. Dismounting removes the status and places the rideable back on the ground.
+A non-portable item that an actor can mount or dismount. Mounting adds `VehicleAbilities.MOUNTED` to the actor and moves the rideable into the actor's inventory. Dismounting removes the status and places the rideable back on the ground.
 
 **RideableUpgrade** (abstract)  
-A portable item that can be carried in inventory. Its special abilities are only active while the carrier has `RideStatus` (i.e., is mounted on a rideable).
+A portable item that can be carried in inventory. Its special abilities are only active while the carrier has `VehicleAbilities.MOUNTED` (i.e., is mounted on a rideable).
 
 **VehicleAbilities** (enum)  
-`HOVER`, `CRUSH`, `PURIFY`, `BULLDOZE`, `EXTRA_ENERGY`
+`HOVER`, `CRUSH`, `PURIFY`, `BULLDOZE`, `EXTRA_ENERGY`, `MOUNTED`
 
 ---
 
@@ -90,7 +90,7 @@ A portable item that can be carried in inventory. Its special abilities are only
 
 ## Status Effect
 
-**RideStatus** - Indicates that an actor is currently mounted on a rideable. This status never expires on its own; it is removed only by dismounting.
+**VehicleAbilities.MOUNTED** - Indicates that an actor is currently mounted on a rideable. This status never expires on its own; it is removed only by dismounting.
 
 ---
 
