@@ -1,5 +1,6 @@
 package game.grounds;
 
+import edu.monash.fit2099.engine.actors.ActorLocationsIterator;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -11,6 +12,9 @@ import game.items.ItemStatistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for AluminiumDoor.cutBy()(REQ1).
  * Tests the behaviour of cutting an Aluminium Door with a Plasma Cutter.
+ *
+ * NOTE: GameMap.actorLocations is only set when a map is added to a World.
+ * Since tests don't use a World, actorLocations is injected via reflection
+ * in setUp() so that addActor() / moveActor() work correctly.
  *
  * @author eche0116
  */
@@ -33,9 +41,16 @@ public class AluminiumDoorTest {
      *   _ = _    (= is the AluminiumDoor at x=1, y=1)
      *   _ _ _
      * Actor is placed at (1, 0), adjacent to the door.
+     * actorLocations is injected via reflection because GameMap only
+     * initialises it when registered with a World.
      */
     @BeforeEach
     public void setUp() throws Exception {
+        // Suppress Display output during tests
+        System.setOut(new PrintStream(new OutputStream() {
+            public void write(int b) { /* discard */ }
+        }));
+
         GroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('_', Floor::new);
         groundCreator.registerGround('=', AluminiumDoor::new);
@@ -45,6 +60,12 @@ public class AluminiumDoorTest {
                 "_=_",
                 "___"
         ));
+
+        // Inject a real ActorLocationsIterator so addActor() doesn't NPE.
+        // GameMap.actorLocations is only set by World, which we don't use in tests.
+        Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
+        actorLocationsField.setAccessible(true);
+        actorLocationsField.set(map, new ActorLocationsIterator());
 
         // Actor placed north of the door at (1, 0)
         Inventory inventory = new BasicInventory();

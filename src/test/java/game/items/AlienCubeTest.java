@@ -1,5 +1,6 @@
 package game.items;
 
+import edu.monash.fit2099.engine.actors.ActorLocationsIterator;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -13,6 +14,9 @@ import game.spawners.Spawner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for AlienCube.cutBy()(REQ1).
  * Tests the behaviour of cutting an Alien Cube with a Plasma Cutter.
+ *
+ * NOTE: GameMap.actorLocations is only set when a map is added to a World.
+ * Since tests don't use a World, actorLocations is injected via reflection
+ * in setUp() so that addActor() works correctly.
  *
  * @author eche0116
  */
@@ -38,9 +46,16 @@ public class AlienCubeTest {
      *   _ _ _
      *   _ _ _
      * Actor placed at (1,1). AlienCube added to actor's inventory.
+     * actorLocations is injected via reflection because GameMap only
+     * initialises it when registered with a World.
      */
     @BeforeEach
     public void setUp() throws Exception {
+        // Suppress Display output during tests
+        System.setOut(new PrintStream(new OutputStream() {
+            public void write(int b) { /* discard */ }
+        }));
+
         GroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('_', Floor::new);
 
@@ -49,6 +64,12 @@ public class AlienCubeTest {
                 "___",
                 "___"
         ));
+
+        // Inject a real ActorLocationsIterator so addActor() doesn't NPE.
+        // GameMap.actorLocations is only set by World, which we don't use in tests.
+        Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
+        actorLocationsField.setAccessible(true);
+        actorLocationsField.set(map, new ActorLocationsIterator());
 
         Inventory inventory = new BasicInventory();
         actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
@@ -92,24 +113,6 @@ public class AlienCubeTest {
     }
 
     /**
-     * Cutting the Alien Cube poisons the worker.
-     * PoisonStatus deals 1 damage per turn
-     * after the actor's statuses are ticked via the location tick.
-     */
-//    @Test
-//    public void cuttingAlienCubeAppliesPoisonToWorker() {
-//        int healthBefore = actor.getHitPoints();
-//        alienCube.cutBy(actor, map, actorLocation);
-//
-//        // Tick the location (which ticks actor statuses) to trigger poison damage
-//        actorLocation.tick();
-//        int healthAfter = actor.getHitPoints();
-//
-//        assertTrue(healthAfter < healthBefore,
-//                "Worker's HP should decrease from poison after cutting the Alien Cube.");
-//    }
-
-    /**
      * Cut result message contains key information.
      * Should mention cutting, artifact, and poison.
      */
@@ -136,5 +139,4 @@ public class AlienCubeTest {
         assertDoesNotThrow(() -> alienCube.cutBy(actor, map, actorLocation),
                 "Cutting an Alien Cube not in inventory should not throw.");
     }
-
 }

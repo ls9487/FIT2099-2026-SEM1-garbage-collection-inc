@@ -1,5 +1,6 @@
 package game.grounds;
 
+import edu.monash.fit2099.engine.actors.ActorLocationsIterator;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -13,6 +14,9 @@ import game.spawners.Spawner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for Vent.cutBy()(REQ1).
  * Tests the behaviour of cutting a Vent with a Plasma Cutter.
- * Checks for:
- *  - IndustrialFan is dropped on the vent tile after cutting
- *  - The vent tile transforms into a Floor (passable) after cutting
- *  - An Undead is spawned on the exact tile after cutting
- *  - The result message contains key information about the cut
- *  - Cutting a vent when the tile is occupied does not crash
+ *
+ * NOTE: GameMap.actorLocations is only set when a map is added to a World.
+ * Since tests don't use a World, actorLocations is injected via reflection
+ * in setUp() so that addActor() works correctly.
  *
  * @author eche0116
  */
@@ -43,10 +45,16 @@ public class REQ1VentTest {
      *   _ V _    (V is the Vent at x=1, y=1)
      *   _ _ _
      * Actor is placed at (1, 0), adjacent to the vent.
-     * Vent is created manually with a SlimeSpawner as its tickSpawner.
+     * actorLocations is injected via reflection because GameMap only
+     * initialises it when registered with a World.
      */
     @BeforeEach
     public void setUp() throws Exception {
+        // Suppress Display output during tests
+        System.setOut(new PrintStream(new OutputStream() {
+            public void write(int b) { /* discard */ }
+        }));
+
         GroundCreator groundCreator = new DefaultGroundCreator();
         groundCreator.registerGround('_', Floor::new);
         groundCreator.registerGround('V', () -> {
@@ -60,6 +68,12 @@ public class REQ1VentTest {
                 "_V_",
                 "___"
         ));
+
+        // Inject a real ActorLocationsIterator so addActor() doesn't NPE.
+        // GameMap.actorLocations is only set by World, which we don't use in tests.
+        Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
+        actorLocationsField.setAccessible(true);
+        actorLocationsField.set(map, new ActorLocationsIterator());
 
         // Actor placed north of the vent at (1, 0)
         Inventory inventory = new BasicInventory();
