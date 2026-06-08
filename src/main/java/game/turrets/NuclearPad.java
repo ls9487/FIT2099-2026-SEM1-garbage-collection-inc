@@ -36,8 +36,7 @@ public class NuclearPad extends Turret {
     }
 
     /**
-     * Before firing, this turret will need to check if its registered worker is still alive
-     * or even exists. It'll try to register a worker in its surroundings if it doesn't have one yet.
+     * Before firing, this turret will need to check there's a worker around so it can arm the missile.
      * @param location The location of the turret.
      */
     @Override
@@ -72,18 +71,15 @@ public class NuclearPad extends Turret {
      */
     @Override
     public boolean isReady() {
-        return this.getStatistic(GroundStatistics.AMMUNITION) > 0
-                && this.getStatistic(GroundStatistics.COOLDOWN) <= 0
-                && this.getStatistic(GroundStatistics.ARMING_COOLDOWN) <= 0;
+        return super.isReady() && this.getStatistic(GroundStatistics.ARMING_COOLDOWN) <= 0;
     }
 
     /**
      * Checks for adjacent workers (actors with PLAYER ability). As long as one is nearby,
      * it continues arming (-1 cooldown). If no one is nearby, the arming cooldown resets.
-     * To be used internally within this class only.
      * @param location The location of the turret.
      */
-    private void checkArmingStatus(Location location) {
+    public void checkArmingStatus(Location location) {
         // Get the adjacent locations.
         for (Location nearbyLocation : location.getNearbyLocations(ARMING_RADIUS)) {
             if (nearbyLocation.containsAnActor() &&

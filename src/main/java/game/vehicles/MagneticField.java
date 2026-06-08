@@ -4,6 +4,7 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Exit;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -12,6 +13,7 @@ import game.grounds.ToxicWaste;
 import game.items.Fire;
 import game.statuses.RideStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -54,10 +56,15 @@ public class MagneticField extends RideableUpgrade implements Igniter {
         if (actor.hasStatus(RideStatus.class)) {
             Display display = new Display();
             for (Location here : currentLocation.getNearbyLocations(1)) {
-                for (Item item : here.getItems()) {
-                    actor.getInventory().add(item);
-                    here.removeItem(item);
-                    display.println(String.format("%s ran into %s's %s", item, actor, this));
+
+                List<Item> itemsOnGround = new ArrayList<>(here.getItems());
+                for (Item item : itemsOnGround) {
+                    if (item.hasAbility(ItemAbility.PORTABLE)) {
+                        actor.getInventory().add(item);
+                        here.removeItem(item);
+
+                        display.println(String.format("%s ran into %s's %s", item, actor, this));
+                    }
                 }
             }
 

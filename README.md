@@ -127,6 +127,75 @@ The Phantasm Wisp is a mischievous ethereal creature that reacts to player proxi
 - Stun effect on Panic entry lasts exactly 2 ticks
 - Item pulling on Defensive entry works within vigilanceRange
 
+## Unit testing
+
+All formal JUnit tests live under `src/test/java/game/...` and run with Maven from the project root:
+
+```bash
+mvn test
+```
+
+This project uses a custom Maven layout:
+- main source code in `src/main/java`
+- test source code in `src/test/java`
+
+Each requirement also has a standalone console runner under `src/main/java/game/REQ{n}TestRunner.java` (REQ1 through REQ5) that can be executed directly with `java game.REQ{n}TestRunner` after a normal compile. The runners give a colour-coded visual sweep of the whole feature without needing Maven and are useful for quick regression checks during development.
+
+### REQ1 unit tests (Quota, Plasma Cutter, Deposit)
+
+REQ1's quota cycle, Plasma Cutter purchase + cutting flow, and the sell/deposit side effects on Aluminium Scrap, Industrial Fan, and Alien Artifact are exercised end-to-end by the standalone runner `src/main/java/game/REQ1TestRunner.java`. The runner covers the QuotaManager rank cycle, the firing-of-adjacent-workers deadline tick, cutting Aluminium Doors and Vents, and the depositable/sellable behaviour for each REQ1 item.
+
+### REQ2 unit tests (Scrap Snatcher + Fleshy Trees)
+
+Located under `src/test/java/game/`:
+
+- `actors/ScrapSnatcherTest.java`, which verifies the Scrap Snatcher's base stats, non-hostile starting ability, and behaviour swap on infection.
+- `behaviours/SnatchBehaviourTest.java`, which verifies that SnatchBehaviour picks up only depositable items and returns null otherwise.
+- `spawners/ScrapSnatcherSpawnerTest.java`, which verifies the loot explosion drops depositables on valid adjacent tiles when a Snatcher is spawned.
+- `trees/FleshyTreeMatureTest.java`, which verifies the mature tree's grow chance, grow turns, and spawn behaviour next to a worker.
+- `trees/FleshyTreeMonolithTest.java`, which verifies that the monolith teleports adjacent workers on tick.
+- `locations/Deprecated99TreeBehaviorTest.java`, which verifies that the 99-deprecated map seeds the correct tree stages and that growth advances through Sprout to Mature to Monolith.
+- `locations/Overflow20TreeBehaviorTest.java`, which verifies the 20-overflow map's tree pipeline including the sapling stage.
+
+### REQ3 unit tests (Vehicle System)
+
+Located under `src/test/java/game/`:
+
+- `vehicles/RideableTest.java`, which verifies the mount and dismount flow including RideStatus and item placement.
+- `vehicles/RideableUpgradeTest.java`, which verifies that upgrade abilities turn on only while the carrier has RideStatus.
+- `vehicles/HoverBikeTest.java`, which verifies the HOVER ability is present and the hover blast action becomes available when the rider has EXTRA_ENERGY.
+- `vehicles/MechSuitTest.java`, which verifies the CRUSH ability and the per-turn fire and collapse effects while mounted.
+- `vehicles/BulldozerPloughTest.java`, which verifies the BULLDOZE ability is toggled by mount state.
+- `vehicles/MagneticFieldTest.java`, which verifies the EXTRA_ENERGY ability, the per-turn item collection, and the previous-tile toxic waste effect.
+- `vehicles/WarpBatteryTest.java`, which verifies the EXTRA_ENERGY ability and the teleport action through impassable tiles.
+- `grounds/HoleTest.java`, which verifies that only actors with HOVER may enter a hole.
+- `grounds/VentTest.java`, which verifies that only actors with HOVER may enter a vent, and that the vent's ground identity stays consistent.
+- `grounds/ToxicWasteTest.java`, which verifies tile damage on tick and the hover immunity that lets HOVER actors stand on the tile safely.
+- `grounds/SandTest.java`, which verifies that an actor standing on sand is shifted to a nearby enterable location each tick.
+
+### REQ4 unit tests (Turrets and Projectiles)
+
+Located under `src/test/java/game/`:
+
+- `turrets/GunTurretTest.java`, which verifies turrets targeting non-workers, ignoring workers, and checks boundary values for being able to fire.
+- `turrets/SiphonTurretTest.java`, which verifies only non-dead worker registration, which impacts its readiness to fire, and the 3 damage registration cost.
+- `turrets/NuclearPadTest.java`, which verifies the arming cooldown progresses only while a worker is adjacent, and progresses only once per turn even with multiple workers.
+- `projectiles/FireBulletTest.java`, which verifies the case when an actor is hit by the projectile (direct damage), as well as when the projectile misses (no effect, but it mustn't crash).
+- `projectiles/SiphonBulletTest.java`, which verifies the 3-damage direct hit, 1-damage indirect hits, and that the source actor is healed by the total damage dealt (if no source actor, damage is still done, just no healing).
+- `projectiles/NuclearMissileTest.java`, which verifies the 500-damage direct hit, 5-damage indirect hits, as well as changes to the terrain (even when no actor was standing there).
+
+### REQ5 unit tests (Toxic Atmosphere)
+
+Located under `src/test/java/game/atmosphere/`:
+
+- `AirQualityReportTest`, which verifies that AirQualityReport stores and returns the AQI and dominant pollutant correctly.
+- `OpenWeatherPollutionParserTest`, which verifies that the API parser extracts AQI correctly and chooses the correct dominant pollutant from valid API-like JSON.
+- `OpenWeatherPollutionParserDefaultTest`, which verifies that the parser falls back to safe defaults when JSON is null or missing AQI data.
+- `FallbackPollutionParserTest`, which verifies that the fallback parser always returns a safe AQI-1 report with no active pollutant.
+- `EconomyCorruptorTest`, which verifies that economy disruption is toggled correctly based on the dominant pollutant.
+- `HazardCorruptorTest`, which verifies that safe AQI causes HazardCorruptor to return immediately without applying corruption.
+- `PollutantSpawnCorruptorTest`, which verifies that AQI below the severe threshold does not attempt undead spawning.
+
 ## REQ 5: A.P.I : Toxic Atmosphere (HD Requirement)
 
 ### Pitch
@@ -257,31 +326,6 @@ The game reads `list[0].main.aqi` and compares `components.no2` and `components.
 2. Launch the game normally.
 3. Travel to the Moonbase map and observe the atmospheric monitor effects over time.
 4. If no API key is configured, the system falls back to a safe pollution report.
-
-## Testing
-
-REQ5 unit tests are located in `src/test/game/atmosphere`.
-
-Current REQ5-focused tests include:
-- `AirQualityReportTest`, which verifies that `AirQualityReport` stores and returns the AQI and dominant pollutant correctly.
-- `OpenWeatherPollutionParserTest`, which verifies that the API parser extracts AQI correctly and chooses the correct dominant pollutant from valid API-like JSON.
-- `OpenWeatherPollutionParserDefaultTest`, which verifies that the parser falls back to safe defaults when JSON is null or missing AQI data.
-- `FallbackPollutionParserTest`, which verifies that the fallback parser always returns a safe AQI-1 report with no active pollutant.
-- `EconomyCorruptorTest`, which verifies that economy disruption is toggled correctly based on the dominant pollutant.
-- `HazardCorruptorTest`, which verifies that safe AQI causes `HazardCorruptor` to return immediately without applying corruption.
-- `PollutantSpawnCorruptorTest`, which verifies that AQI below the severe threshold does not attempt undead spawning.
-
-Tests are run with Maven from the project root:
-
-```bash
-mvn test
-```
-
-This project uses a custom Maven layout:
-- main source code in `src`
-- test source code in `src/test`
-
-The tests are intended to focus mainly on the new REQ5 atmospheric classes and behaviours rather than on existing engine classes.
 
 ## Environment variable setup
 

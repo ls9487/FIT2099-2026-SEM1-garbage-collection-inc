@@ -10,8 +10,17 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link HoverBike} hover blast and hover ability registration.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
 class HoverBikeTest {
 
+    /**
+     * Tests that hover blast removes ground items within the blast radius.
+     */
     @Test
     void hoverBlast_NormalCondition_ClearsGroundItemsInRadius() {
         HoverBike hoverBike = new HoverBike();
@@ -19,7 +28,6 @@ class HoverBikeTest {
         GameMap gameMap = mock(GameMap.class);
         Location blastCentre = mock(Location.class);
 
-        // Case 1: Loose ground items get completely removed within the range profile
         when(gameMap.locationOf(rider)).thenReturn(blastCentre);
         Location affectedLocation = mock(Location.class);
         when(blastCentre.getNearbyLocations(3)).thenReturn(List.of(affectedLocation));
@@ -30,20 +38,24 @@ class HoverBikeTest {
 
         String response = hoverBike.hoverBlast(rider, gameMap);
 
-        // Verification of item destruction rules
         verify(affectedLocation).removeItem(looseGroundItem);
         assertTrue(response.contains("uses hover blast"));
     }
 
+    /**
+     * Tests that a hover bike registers {@link VehicleAbilities#HOVER} and has the correct name.
+     */
     @Test
     void initialize_BoundaryCondition_VerifiesHoverAbilityRegistered() {
         HoverBike hoverBike = new HoverBike();
 
-        // Case 2: Assures system configuration properties are set properly on boot
         assertTrue(hoverBike.hasAbility(VehicleAbilities.HOVER));
         assertEquals("Hover Bike", hoverBike.toString());
     }
 
+    /**
+     * Tests that hover blast completes successfully when no nearby locations are affected.
+     */
     @Test
     void hoverBlast_NegativeCondition_HandlesEmptyMapScenariosGracefully() {
         HoverBike hoverBike = new HoverBike();
@@ -51,7 +63,6 @@ class HoverBikeTest {
         GameMap gameMap = mock(GameMap.class);
         Location blastCentre = mock(Location.class);
 
-        // Case 3: Empty tile profile checks execute cleanly without hitting null pointers
         when(gameMap.locationOf(rider)).thenReturn(blastCentre);
         when(blastCentre.getNearbyLocations(3)).thenReturn(new ArrayList<>());
         when(blastCentre.getNearbyLocations(5)).thenReturn(new ArrayList<>());

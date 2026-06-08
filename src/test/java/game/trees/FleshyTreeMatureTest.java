@@ -9,8 +9,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link FleshyTreeMature} growth, tick timing, display, and tree statistics.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class FleshyTreeMatureTest {
 
+    /**
+     * Tests that growing a mature tree replaces the ground with the next stage and returns a message.
+     */
     @Test
     void grow_PositiveCondition_MutatesGroundToNextStageAndReturnsCorrectString() {
         Location mockLocation = mock(Location.class);
@@ -30,6 +39,9 @@ class FleshyTreeMatureTest {
         );
     }
 
+    /**
+     * Tests that each tick queries nearby locations to advance the growth timer.
+     */
     @Test
     void tick_BoundaryCondition_IncrementsGrowthTurnsTimerEachTick() {
         Location mockLocation = mock(Location.class);
@@ -44,6 +56,9 @@ class FleshyTreeMatureTest {
         verify(mockLocation, times(2)).getNearbyLocations(anyInt());
     }
 
+    /**
+     * Tests that a mature fleshy tree uses display character {@code 'Y'}.
+     */
     @Test
     void verifyDisplayChar_EdgeCondition_ChecksValidVisualRepresentation() {
         List<Spawner> emptySpawners = Collections.emptyList();
@@ -52,6 +67,9 @@ class FleshyTreeMatureTest {
         assertEquals('Y', matureTree.getDisplayChar(), "Mature display character must be 'Y'");
     }
 
+    /**
+     * Tests that a mature tree exposes grow chance and grow turns statistics.
+     */
     @Test
     void stats_NormalCondition_VerifiesGrowthParameters() {
         List<Spawner> emptySpawners = Collections.emptyList();

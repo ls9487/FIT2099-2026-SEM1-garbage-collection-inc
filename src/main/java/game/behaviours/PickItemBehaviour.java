@@ -5,6 +5,7 @@ import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.behaviours.Behaviour;
 import edu.monash.fit2099.engine.items.Item;
+import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.items.PickUpAction;
 import edu.monash.fit2099.engine.positions.Location;
 
@@ -29,7 +30,8 @@ public class PickItemBehaviour implements Behaviour<Actor, Action> {
     public Action operate(Actor entity, Location location) {
         ActionList actions = new ActionList();
         for (Item item : location.getItems()) {
-            actions.add(new PickUpAction(item));
+            if (item.hasAbility(ItemAbility.PORTABLE))
+                actions.add(new PickUpAction(item));
         }
 
         if (actions.size() == 0) return null;

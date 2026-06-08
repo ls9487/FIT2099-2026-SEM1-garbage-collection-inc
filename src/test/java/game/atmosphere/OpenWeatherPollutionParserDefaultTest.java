@@ -13,6 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OpenWeatherPollutionParserDefaultTest {
 
+    /**
+     * Feeds null into the real OpenWeather parser to make sure it does not
+     * throw and instead returns the safe defaults of AQI 1 and the
+     * "unknown" pollutant label. This is the "we never even got a payload"
+     * case, distinct from the fallback parser's "we will never trust input"
+     * case.
+     */
     @Test
     void parseReturnsSafeDefaultsForNullJson() {
         OpenWeatherPollutionParser parser = new OpenWeatherPollutionParser();
@@ -23,6 +30,13 @@ class OpenWeatherPollutionParserDefaultTest {
         assertEquals("unknown", report.getDominantPollutant());
     }
 
+    /**
+     * Sends a payload that has the two pollutant numbers but is missing the
+     * AQI field. The parser should default AQI to 1 so no effects fire,
+     * while still picking SO2 as dominant because 9.0 is higher than 2.0.
+     * This proves the AQI default and the dominant-pollutant logic are
+     * decoupled.
+     */
     @Test
     void parseReturnsSafeAqiWhenAqiFieldIsMissing() {
         OpenWeatherPollutionParser parser = new OpenWeatherPollutionParser();

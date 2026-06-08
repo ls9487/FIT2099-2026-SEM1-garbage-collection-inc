@@ -13,6 +13,18 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link Vent} actor entry rules and ground type identity.
+ *
+ * @author lyan0121
+ * @version 1.0
+ */
+class VentTest {
+    /**
+     * Dummy actor to be used in these tests.
+     * This is used because PLAYER ability is to be checked, but since Actor's hasAbility
+     * is final, Mockito cannot override it for testing, so when() can't be used.
+     */
 class REQ3VentTest {
 
     private static class TestActor extends Actor {
@@ -26,15 +38,20 @@ class REQ3VentTest {
         }
     }
 
+    /**
+     * Tests that a standard actor without {@link VehicleAbilities#HOVER} cannot enter a vent.
+     */
     @Test
     void entry_NormalCondition_BlocksStandardActors() {
         Vent vent = new Vent(new ArrayList<Spawner>());
         TestActor worker = new TestActor("Worker", 'W', 100, new BasicInventory());
 
-        // Case 1: Actor without HOVER cannot traverse vent tiles
         assertFalse(vent.canActorEnter(worker));
     }
 
+    /**
+     * Tests that an actor with {@link VehicleAbilities#HOVER} is allowed to enter a vent.
+     */
     @Test
     void entry_BoundaryCondition_AllowsHoveringActors() {
         Vent vent = new Vent(new ArrayList<Spawner>());
@@ -42,15 +59,16 @@ class REQ3VentTest {
 
         pilot.enableAbility(VehicleAbilities.HOVER);
 
-        // Case 2: Flying actors can enter vents safely
         assertTrue(vent.canActorEnter(pilot));
     }
 
+    /**
+     * Tests that a vent instance is of type {@link Vent} and not {@link Dirt}.
+     */
     @Test
     void entry_EdgeCondition_PolymorphicCheck() {
         Vent vent = new Vent(new ArrayList<Spawner>());
 
-        // Case 3: Strictly matches direct class metadata layout mapping checks
         assertEquals(Vent.class, vent.getClass());
         assertNotEquals(Dirt.class, vent.getClass());
     }

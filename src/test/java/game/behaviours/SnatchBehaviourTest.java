@@ -9,13 +9,22 @@ import game.items.Depositable;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link SnatchBehaviour} item selection and pickup action generation.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class SnatchBehaviourTest {
 
+    /**
+     * Minimal concrete {@link Item} used instead of a Mockito mock because
+     * {@link SnatchBehaviour} selects loot via {@code asCapability(Depositable.class)},
+     * which requires a real item instance with a proper capability map.
+     */
     private static class TestItem extends Item {
         public TestItem(String name, char displayChar) {
             super(name, displayChar);
@@ -34,6 +43,9 @@ class SnatchBehaviourTest {
         public String depositedBy(Actor actor, GameMap map) { return "Deposited"; }
     }
 
+    /**
+     * Tests that the first depositable item on a tile produces a pick-up action.
+     */
     @Test
     void operate_NormalCondition_ReturnsPickUpActionForFirstDepositable() {
         SnatchBehaviour snatchBehaviour = new SnatchBehaviour();
@@ -55,6 +67,9 @@ class SnatchBehaviourTest {
         );
     }
 
+    /**
+     * Tests that only non-depositable items on a tile result in no action.
+     */
     @Test
     void operate_NegativeCondition_ReturnsNullWhenOnlyNonDepositableItemsExist() {
         SnatchBehaviour snatchBehaviour = new SnatchBehaviour();
@@ -72,6 +87,9 @@ class SnatchBehaviourTest {
         assertNull(result, "Should ignore non-depositable items cleanly");
     }
 
+    /**
+     * Tests that an empty tile returns no action.
+     */
     @Test
     void operate_BoundaryCondition_ReturnsNullForEntirelyEmptyTile() {
         SnatchBehaviour snatchBehaviour = new SnatchBehaviour();
@@ -85,6 +103,9 @@ class SnatchBehaviourTest {
         assertNull(result, "Should return null smoothly on empty floor tiles");
     }
 
+    /**
+     * Tests that the first depositable item is chosen when multiple depositable items are present.
+     */
     @Test
     void operate_EdgeCondition_PicksFirstDepositableWhenMultipleDepositableItemsExist() {
         SnatchBehaviour snatchBehaviour = new SnatchBehaviour();

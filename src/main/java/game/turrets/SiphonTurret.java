@@ -78,16 +78,14 @@ public class SiphonTurret extends Turret {
      */
     @Override
     public boolean isReady() {
-        return registeredActor != null && this.getStatistic(GroundStatistics.AMMUNITION) > 0
-                && this.getStatistic(GroundStatistics.COOLDOWN) <= 0;
+        return registeredActor != null && super.isReady();
     }
 
     /**
      * Checks the registered actor to see if they're still conscious.
      * If they AREN'T conscious anymore, this turret will no longer recognize them.
-     * To be used internally within this class only.
      */
-    private void checkRegisteredActor() {
+    public void checkRegisteredActor() {
         if (registeredActor != null && !registeredActor.isConscious()) {
             // Registered actor exists, but is no longer conscious, so release them.
             registeredActor = null;
@@ -100,7 +98,7 @@ public class SiphonTurret extends Turret {
      * If there's multiple candidates for registration, a random one is chosen.
      * @param location The location of the turret.
      */
-    private void registerSurroundingActor(Location location) {
+    public void registerSurroundingActor(Location location) {
         // Store the nearby actors in a list here, to be used later.
         List<Actor> candidateActors = new ArrayList<>();
         // Go through each nearby location and add any (alive) actor with PLAYER ability.

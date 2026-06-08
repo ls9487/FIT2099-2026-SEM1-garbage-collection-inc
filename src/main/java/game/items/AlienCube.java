@@ -105,7 +105,7 @@ public class AlienCube extends EclipseItem implements Teleporter, Sellable, Cutt
         return String.format("%s teleported to %s by %s.",
                 actor,
                 destination,
-                this.getClass().getSimpleName()
+                this
         );
     }
 

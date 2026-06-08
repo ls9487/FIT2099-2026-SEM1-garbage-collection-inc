@@ -7,8 +7,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link FleshyTreeMonolith} teleportation, display character, and growth behaviour.
+ *
+ * @author lden0031
+ * @version 1.0
+ */
 class FleshyTreeMonolithTest {
 
+    /**
+     * Tests that teleport moves the actor to the destination and returns a descriptive message.
+     */
     @Test
     void teleport_PositiveCondition_MovesActorToDestinationAndReturnsCorrectMessage() {
         FleshyTreeMonolith monolith = new FleshyTreeMonolith();
@@ -29,6 +38,9 @@ class FleshyTreeMonolithTest {
         );
     }
 
+    /**
+     * Tests that teleport completes without error for different destination locations.
+     */
     @Test
     void teleport_BoundaryCondition_HandlesDifferentDestinationCoordinatesCleanly() {
         FleshyTreeMonolith monolith = new FleshyTreeMonolith();
@@ -47,14 +59,19 @@ class FleshyTreeMonolithTest {
         );
     }
 
+    /**
+     * Tests that the monolith display character matches the configured symbol.
+     */
     @Test
     void verifyDisplayChar_EdgeCondition_MatchesConfiguredSymbol() {
         FleshyTreeMonolith monolith = new FleshyTreeMonolith();
-        // Checked against either structural implementation configurations 'M' or 'H'
         char symbol = monolith.getDisplayChar();
         assertTrue(symbol == 'M' || symbol == 'H', "Monolith character must match game configuration settings");
     }
 
+    /**
+     * Tests that ticking a monolith does not mutate the ground beneath it.
+     */
     @Test
     void grow_NegativeCondition_MonolithDoesNotCrashAndNeverMutatesGround() {
         FleshyTreeMonolith monolith = new FleshyTreeMonolith();
