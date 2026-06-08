@@ -77,7 +77,7 @@ public class REQ1VentTest {
 
         // Actor placed north of the vent at (1, 0)
         Inventory inventory = new BasicInventory();
-        actor = new ContractedWorker("Worker", 'W', 100, inventory);
+        actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
         map.at(1, 0).addActor(actor);
 
         // Get the vent instance at (1, 1)
