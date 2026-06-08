@@ -61,7 +61,7 @@ public class AluminiumDoorTest {
                 "___"
         ));
 
-        // Inject a real ActorLocationsIterator so addActor() doesn't NPE.
+        // Inject a real ActorLocationsIterator.
         // GameMap.actorLocations is only set by World, which we don't use in tests.
         Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
         actorLocationsField.setAccessible(true);
@@ -69,8 +69,8 @@ public class AluminiumDoorTest {
 
         // Actor placed north of the door at (1, 0)
         Inventory inventory = new BasicInventory();
-        actor = new ContractedWorker("Worker", 'W', 100, inventory);
-        map.at(1, 0).addActor(actor);
+        actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
+        try { map.addActor(actor, map.at(1, 0)); } catch (Exception e) { throw new RuntimeException(e); }
 
         // Get the door instance at (1, 1)
         door = (AluminiumDoor) map.at(1, 1).getGround();
@@ -79,7 +79,7 @@ public class AluminiumDoorTest {
     /**
      * Typical: Cutting the door drops AluminiumScrap on the door tile.
      * After cutBy(), the tile at (1,1) should have at least one item.
-     * AluminiumScrap has weight 2
+     * AluminiumScrap has weight 2.
      */
     @Test
     public void cuttingDoorDropsAluminiumScrap() {
@@ -129,7 +129,6 @@ public class AluminiumDoorTest {
      */
     @Test
     public void cuttingDoorWithNoAdjacentActorsDoesNotCrash() {
-        // Move actor away, place them at (0,0), far from the door
         map.moveActor(actor, map.at(0, 0));
         Location doorLocation = map.at(1, 1);
 
@@ -138,9 +137,25 @@ public class AluminiumDoorTest {
     }
 
     /**
+     * Cutting a door with an actor on an adjacent tile does not crash.
+     * The explosion path (hurt on adjacent actor) is exercised without asserting
+     * damage since the 25% explosion chance is non deterministic.
+     */
+    @Test
+    public void cuttingDoorWithAdjacentActorDoesNotCrash() throws Exception {
+        Inventory inventory = new BasicInventory();
+        ContractedWorker bystander = new ContractedWorker("Bystander", 'ඞ', 100, inventory);
+        // (2,1) is directly east of the door inside explosion range.
+        map.addActor(bystander, map.at(2, 1));
+
+        assertDoesNotThrow(() -> door.cutBy(actor, map, map.at(1, 1)),
+                "Cutting door with an adjacent actor in explosion range should not throw.");
+    }
+
+    /**
      * Invalid test. Cutting the same tile twice does not crash.
-     * After the first cut, the tile is a Floor cutting it again
-     * should not throw even though it's no longer a door.
+     * After the first cut, the tile is a Floor; cutting it again
+     * should not throw even though it is no longer a door.
      */
     @Test
     public void cuttingAlreadyCutTileDoesNotCrash() {
