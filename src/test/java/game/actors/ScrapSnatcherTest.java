@@ -8,25 +8,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link ScrapSnatcher} display, stats, abilities, and infection behaviour.
+ * REQ2 unit tests for {@link ScrapSnatcher} health, abilities, infection behaviour,
+ * and {@link Infectable} capability registration.
  *
  * @author lden0031
  * @version 1.0
  */
 class ScrapSnatcherTest {
+
     /**
-     * Tests that newly created scrap snatchers use display character {@code 's'}.
+     * Tests that newly created scrap snatchers start conscious with positive health.
      */
     @Test
-    void getDisplayChar_NormalCondition_MatchesSpecificationCharacter() {
+    void initialize_NormalCondition_StartsConsciousWithPositiveHealth() {
         ScrapSnatcher snatcherA = new ScrapSnatcher();
         ScrapSnatcher snatcherB = new ScrapSnatcher();
         ScrapSnatcher snatcherC = new ScrapSnatcher();
 
-        assertAll("Verify symbol outputs match across entity layouts",
-                () -> assertEquals('s', snatcherA.getDisplayChar()),
-                () -> assertEquals('s', snatcherB.getDisplayChar()),
-                () -> assertEquals('s', snatcherC.getDisplayChar())
+        assertAll("Verify fresh snatchers are alive and conscious",
+                () -> assertTrue(snatcherA.isConscious()),
+                () -> assertTrue(snatcherB.isConscious()),
+                () -> assertTrue(snatcherC.isConscious()),
+                () -> assertTrue(snatcherA.getStatistic(ActorStatistics.HEALTH) > 0),
+                () -> assertTrue(snatcherB.getStatistic(ActorStatistics.HEALTH) > 0),
+                () -> assertTrue(snatcherC.getStatistic(ActorStatistics.HEALTH) > 0)
         );
     }
 
