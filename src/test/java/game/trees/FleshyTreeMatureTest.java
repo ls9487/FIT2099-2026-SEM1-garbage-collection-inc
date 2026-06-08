@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link FleshyTreeMature} growth, tick timing, display, and tree statistics.
+ * REQ2 unit tests for {@link FleshyTreeMature} growth, tick timing, and tree statistics.
+ * Verifies ground mutation and growth parameters through behaviour rather than display symbols.
  *
  * @author lden0031
  * @version 1.0
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.*;
 class FleshyTreeMatureTest {
 
     /**
-     * Tests that growing a mature tree replaces the ground with the next stage and returns a message.
+     * Tests that growing a mature tree replaces the ground with the next stage.
      */
     @Test
     void grow_PositiveCondition_MutatesGroundToNextStageAndReturnsCorrectString() {
@@ -29,13 +30,13 @@ class FleshyTreeMatureTest {
         FleshyTreeMature matureTree = new FleshyTreeMature(emptySpawners, mockNextStage);
 
         when(mockLocation.getGround()).thenReturn(mockNextStage);
-        when(mockNextStage.toString()).thenReturn("Fleshy Tree Monolith");
 
         String outputMessage = matureTree.grow(mockLocation);
 
-        assertAll("Verify ground mutation logs match specifications",
+        assertAll("Verify ground mutation occurs and growth is reported",
                 () -> verify(mockLocation).setGround(mockNextStage),
-                () -> assertNotNull(outputMessage)
+                () -> assertNotNull(outputMessage),
+                () -> assertTrue(outputMessage.toLowerCase().contains("grow"))
         );
     }
 
@@ -57,27 +58,30 @@ class FleshyTreeMatureTest {
     }
 
     /**
-     * Tests that a mature fleshy tree uses display character {@code 'Y'}.
-     */
-    @Test
-    void verifyDisplayChar_EdgeCondition_ChecksValidVisualRepresentation() {
-        List<Spawner> emptySpawners = Collections.emptyList();
-        FleshyTreeMature matureTree = new FleshyTreeMature(emptySpawners);
-
-        assertEquals('Y', matureTree.getDisplayChar(), "Mature display character must be 'Y'");
-    }
-
-    /**
-     * Tests that a mature tree exposes grow chance and grow turns statistics.
+     * Tests that a mature tree with a next stage exposes growth statistics.
      */
     @Test
     void stats_NormalCondition_VerifiesGrowthParameters() {
         List<Spawner> emptySpawners = Collections.emptyList();
         FleshyTreeMature matureTree = new FleshyTreeMature(emptySpawners, mock(Tree.class));
 
-        assertAll("Verify standard growth configurations match metrics exactly",
+        assertAll("Verify standard growth configurations are present",
                 () -> assertTrue(matureTree.hasStatistic(TreeStatistics.GROW_CHANCE)),
                 () -> assertTrue(matureTree.hasStatistic(TreeStatistics.GROW_TURNS))
+        );
+    }
+
+    /**
+     * Tests that a mature tree without a next stage remains a spawner tree only.
+     */
+    @Test
+    void stats_EdgeCondition_TerminalMatureTreeOmitsGrowthStatistics() {
+        List<Spawner> emptySpawners = Collections.emptyList();
+        FleshyTreeMature matureTree = new FleshyTreeMature(emptySpawners);
+
+        assertAll("Verify terminal mature tree does not track further growth",
+                () -> assertFalse(matureTree.hasStatistic(TreeStatistics.GROW_CHANCE)),
+                () -> assertFalse(matureTree.hasStatistic(TreeStatistics.GROW_TURNS))
         );
     }
 }
