@@ -11,7 +11,6 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actions.IgniteAction;
 import game.grounds.ToxicWaste;
 import game.items.Fire;
-import game.statuses.RideStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class MagneticField extends RideableUpgrade implements Igniter {
     public void tick(Location currentLocation, Actor actor) {
         super.tick(currentLocation, actor);
 
-        if (actor.hasStatus(RideStatus.class)) {
+        if (actor.hasAbility(VehicleAbilities.MOUNTED)) {
             Display display = new Display();
             for (Location here : currentLocation.getNearbyLocations(1)) {
 
@@ -104,7 +103,7 @@ public class MagneticField extends RideableUpgrade implements Igniter {
     public ActionList allowableActions(Actor owner, GameMap map) {
         ActionList actions = new ActionList();
 
-        if (owner.hasStatus(RideStatus.class)) {
+        if (owner.hasAbility(VehicleAbilities.MOUNTED)) {
             for (Exit exit : map.locationOf(owner).getExits()) {
                 Location here = exit.getDestination();
                 if (here.containsAnActor() && !owner.getInventory().getItems().isEmpty()) {

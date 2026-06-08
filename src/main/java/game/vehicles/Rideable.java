@@ -7,12 +7,11 @@ import edu.monash.fit2099.engine.positions.Location;
 import game.actions.DismountAction;
 import game.actions.MountAction;
 import game.items.EclipseItem;
-import game.statuses.RideStatus;
 
 /**
  * Abstract non-portable vehicle that an actor can mount or dismount.
- * Mounting adds RideStatus to the rider and places this rideable in the rider's inventory
- * dismounting removes the status and returns the rideable to the ground.
+ * Mounting adds VehicleAbilities.MOUNTED to the rider and places this rideable in the rider's inventory
+ * dismounting removes the ability and returns the rideable to the ground.
  *
  * @author lyan0121
  * @version 1.0
@@ -31,7 +30,7 @@ public abstract class Rideable extends EclipseItem {
 
     /**
      * Mounts this rideable: removes it from the ground, adds it to the actor's inventory,
-     * and applies RideStatus to the rider.
+     * and applies VehicleAbilities.MOUNTED to the rider.
      *
      * @param actor the actor mounting this rideable
      * @param itemLocation the ground location where this rideable currently lies
@@ -41,13 +40,13 @@ public abstract class Rideable extends EclipseItem {
         // cannot use pickup action then execute because non-portable
         itemLocation.removeItem(this);
         actor.getInventory().add(this);
-        actor.addStatus(new RideStatus());
+        actor.enableAbility(VehicleAbilities.MOUNTED);
         return String.format("%s mounts %s", actor, this);
     }
 
     /**
      * Dismounts this rideable: removes it from the actor's inventory, places it on the
-     * actor's current tile, and clears RideStatus from the rider.
+     * actor's current tile, and clears VehicleAbilities.MOUNTED from the rider.
      *
      * @param actor the actor dismounting this rideable
      * @param map the map containing the actor
@@ -56,7 +55,7 @@ public abstract class Rideable extends EclipseItem {
     public String dismount(Actor actor, GameMap map) {
         actor.getInventory().remove(this);
         map.locationOf(actor).addItem(this);
-        actor.removeStatus(new RideStatus());
+        actor.disableAbility(VehicleAbilities.MOUNTED);
         return String.format("%s dismounts %s", actor, this);
     }
 
@@ -69,7 +68,7 @@ public abstract class Rideable extends EclipseItem {
     @Override
     public ActionList allowableActions(Location location) {
         ActionList actions = new ActionList();
-        if (location.containsAnActor() && !location.getActor().hasStatus(RideStatus.class)) {
+        if (location.containsAnActor() && !location.getActor().hasAbility(VehicleAbilities.MOUNTED)) {
             actions.add(new MountAction(this, location));
         }
         return actions;

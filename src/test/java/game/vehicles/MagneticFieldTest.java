@@ -6,7 +6,6 @@ import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.statuses.RideStatus;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +62,7 @@ class MagneticFieldTest {
         Inventory inventory = createPortableAwareInventory(heldItems);
         Actor rider = mock(Actor.class);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(true);
+        when(rider.hasAbility(VehicleAbilities.MOUNTED)).thenReturn(true);
         when(rider.getInventory()).thenReturn(inventory);
 
         Location currentLocation = mock(Location.class);
@@ -90,7 +89,7 @@ class MagneticFieldTest {
         Inventory inventory = createPortableAwareInventory(heldItems);
         Actor rider = mock(Actor.class);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(true);
+        when(rider.hasAbility(VehicleAbilities.MOUNTED)).thenReturn(true);
         when(rider.getInventory()).thenReturn(inventory);
 
         Location currentLocation = mock(Location.class);
@@ -146,7 +145,7 @@ class MagneticFieldTest {
         Inventory inventory = createPortableAwareInventory(heldItems);
         Actor rider = mock(Actor.class);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(false);
+        when(rider.hasAbility(VehicleAbilities.MOUNTED)).thenReturn(false);
         when(rider.getInventory()).thenReturn(inventory);
 
         Location currentLocation = mock(Location.class);

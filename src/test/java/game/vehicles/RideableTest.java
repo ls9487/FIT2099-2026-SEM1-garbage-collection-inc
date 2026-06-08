@@ -5,10 +5,7 @@ import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
-import game.statuses.RideStatus;
-import game.vehicles.Rideable;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +35,7 @@ class RideableTest {
 
     /**
      * Tests that mounting removes the vehicle from the ground, adds it to inventory, and applies
-     * {@link RideStatus}.
+     * VehicleAbilities.MOUNTED
      */
     @Test
     void mount_BoundaryCondition_MutatesActorStateCleanly() {
@@ -53,12 +50,12 @@ class RideableTest {
 
         verify(location).removeItem(eq(rideable));
         verify(inventory).add(eq(rideable));
-        verify(actor).addStatus(any(RideStatus.class));
+        verify(actor).enableAbility(VehicleAbilities.MOUNTED);
         assertTrue(message.contains("mounts"));
     }
 
     /**
-     * Tests that dismounting returns the vehicle to the ground and removes {@link RideStatus}.
+     * Tests that dismounting returns the vehicle to the ground and removes VehicleAbilities.MOUNTED.
      */
     @Test
     void dismount_EdgeCondition_ReturnsVehicleToGround() {
@@ -75,7 +72,7 @@ class RideableTest {
 
         verify(inventory).remove(eq(rideable));
         verify(location).addItem(eq(rideable));
-        verify(actor).removeStatus(any(RideStatus.class));
+        verify(actor).disableAbility(VehicleAbilities.MOUNTED);
         assertTrue(message.contains("dismounts"));
     }
 }

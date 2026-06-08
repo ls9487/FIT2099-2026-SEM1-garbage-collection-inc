@@ -8,7 +8,6 @@ import game.actions.TeleportAction;
 import game.grounds.Teleporter;
 import game.statuses.PoisonStatus;
 import game.statuses.Poisonable;
-import game.statuses.RideStatus;
 
 /**
  * Portable rideable upgrade that grants VehicleAbilities.EXTRA_ENERGY while mounted.
@@ -46,7 +45,7 @@ public class WarpBattery extends RideableUpgrade implements Teleporter {
     public ActionList allowableActions(Actor owner, GameMap map) {
         ActionList actions = new ActionList();
 
-        if (owner.hasStatus(RideStatus.class)) {
+        if (owner.hasAbility(VehicleAbilities.MOUNTED)) {
             Location ownerLocation = map.locationOf(owner);
 
             for (Location here : ownerLocation.getNearbyLocations(1)) {
