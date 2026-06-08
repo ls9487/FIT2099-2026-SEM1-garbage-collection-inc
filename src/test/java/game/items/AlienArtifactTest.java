@@ -46,7 +46,6 @@ class AlienArtifactTest {
 
     /**
      * AlienArtifact must be both Sellable and Depositable.
-     * Three checks: Sellable present, Depositable present, same instance returned.
      */
     @Test
     void capabilities_typicalCondition_isSellableAndDepositable() {
