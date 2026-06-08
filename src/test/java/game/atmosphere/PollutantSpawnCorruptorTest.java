@@ -11,6 +11,13 @@ import org.junit.jupiter.api.Test;
 
 class PollutantSpawnCorruptorTest {
 
+    /**
+     * Calls corrupt with a moderate AQI of 3 and a null map. The corruptor
+     * should return early before it touches the map or tries to spawn
+     * anything, because severe spawning only kicks in at AQI 4 or above.
+     * If it ever reached the spawn logic this would throw, so passing
+     * without exception confirms the early-exit guard works.
+     */
     @Test
     void corruptDoesNothingBelowSevereAqiWhenMapIsNull() {
         PollutantSpawnCorruptor corruptor = new PollutantSpawnCorruptor();

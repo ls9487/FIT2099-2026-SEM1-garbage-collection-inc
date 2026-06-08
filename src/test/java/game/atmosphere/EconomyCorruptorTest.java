@@ -21,6 +21,12 @@ import static org.mockito.Mockito.when;
 
 class EconomyCorruptorTest {
 
+    /**
+     * Starts the SuperComputer with the disruption flag off, then runs the
+     * corruptor on a tiny 1*1 mocked map with an SO2-dominant report. After
+     * the call the flag should be on, which proves the corruptor reacts to
+     * SO2 in particular and is the class actually flipping that switch.
+     */
     @Test
     void corruptEnablesEconomyDisruptionWhenSo2IsDominant() {
         SuperComputer.setEconomyDisrupted(false);
@@ -40,6 +46,12 @@ class EconomyCorruptorTest {
         assertTrue(SuperComputer.isEconomyDisrupted());
     }
 
+    /**
+     * Pre-sets the disruption flag to true and runs the corruptor with an
+     * NO2-dominant report. The corruptor should clear the flag back to false
+     * because anything that is not SO2 means the shop should behave normally
+     * again. This guards against a previous turn leaving disruption stuck on.
+     */
     @Test
     void corruptDisablesEconomyDisruptionWhenDominantPollutantIsNotSo2() {
         SuperComputer.setEconomyDisrupted(true);
