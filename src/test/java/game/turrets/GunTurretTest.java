@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for GunTurret.
+ * Unit test for GunTurret (REQ 4).
  * Includes targeting tests and readiness to fire.
  * Note that since all turrets currently have the same targeting system, the targeting tests
  * essentially cover Turret as a whole.

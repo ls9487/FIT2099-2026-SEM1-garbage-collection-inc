@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for SiphonTurret.
+ * Unit test for SiphonTurret (REQ 4).
  * Includes registering tests.
  *
  * @author echu0057

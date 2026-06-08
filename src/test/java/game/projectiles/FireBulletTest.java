@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for FireBullet.
+ * Unit test for FireBullet (REQ 4).
  * Includes tests for hitting a location.
  *
  * @author echu0057

@@ -177,12 +177,12 @@ Located under `src/test/java/game/`:
 
 Located under `src/test/java/game/`:
 
-- `turrets/GunTurretTest.java`, which verifies ammo capacity, detection radius, cooldown ticking, target selection ignoring workers, and FireBullet firing.
-- `turrets/SiphonTurretTest.java`, which verifies worker registration, the 3-damage registration cost, and the gate that blocks firing until a worker is registered.
-- `turrets/NuclearPadTest.java`, which verifies the arming cooldown progresses only while a worker is adjacent and resets when the worker steps away.
-- `projectiles/FireBulletTest.java`, which verifies the 2-damage hit and the chance-based BurnStatus application.
-- `projectiles/SiphonBulletTest.java`, which verifies the 3-damage direct hit, 1-damage indirect hits, and that the source actor is healed by the total damage dealt unless they are unconscious.
-- `projectiles/NuclearMissileTest.java`, which verifies the 500-damage direct hit, the ToxicWaste conversion on the impact tile, and the blast-radius damage on adjacent actors.
+- `turrets/GunTurretTest.java`, which verifies turrets targeting non-workers, ignoring workers, and checks boundary values for being able to fire.
+- `turrets/SiphonTurretTest.java`, which verifies only non-dead worker registration, which impacts its readiness to fire, and the 3 damage registration cost.
+- `turrets/NuclearPadTest.java`, which verifies the arming cooldown progresses only while a worker is adjacent, and progresses only once per turn even with multiple workers.
+- `projectiles/FireBulletTest.java`, which verifies the case when an actor is hit by the projectile (direct damage), as well as when the projectile misses (no effect, but it mustn't crash).
+- `projectiles/SiphonBulletTest.java`, which verifies the 3-damage direct hit, 1-damage indirect hits, and that the source actor is healed by the total damage dealt (if no source actor, damage is still done, just no healing).
+- `projectiles/NuclearMissileTest.java`, which verifies the 500-damage direct hit, 5-damage indirect hits, as well as changes to the terrain (even when no actor was standing there).
 
 ### REQ5 unit tests (Toxic Atmosphere)
 

@@ -22,8 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for NuclearMissile.
- * Includes tests for hitting a location.
+ * Unit test for NuclearMissile (REQ 4).
+ * Includes tests for hitting a location, impacting actors and terrain.
  *
  * @author echu0057
  */

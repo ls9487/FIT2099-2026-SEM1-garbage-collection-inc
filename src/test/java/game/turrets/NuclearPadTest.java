@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for NuclearPad.
+ * Unit test for NuclearPad (REQ 4).
  * Includes tests for arming progression.
  *
  * @author echu0057
