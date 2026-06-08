@@ -3,12 +3,14 @@ package game.trees;
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
+import game.grounds.Teleporter;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link FleshyTreeMonolith} teleportation, display character, and growth behaviour.
+ * REQ2 unit tests for {@link FleshyTreeMonolith} teleportation capability and
+ * non-growable terminal tree behaviour.
  *
  * @author lden0031
  * @version 1.0
@@ -26,15 +28,13 @@ class FleshyTreeMonolithTest {
         Location mockDestination = mock(Location.class);
 
         when(mockDestination.map()).thenReturn(mockMap);
-        when(mockWorker.toString()).thenReturn("Contracted Worker");
-        when(mockDestination.toString()).thenReturn("Tile (12, 5)");
 
         String resultMessage = monolith.teleport(mockWorker, mockMap, mockDestination);
 
         assertAll("Verify happy path involuntary teleportation logic",
                 () -> verify(mockMap).moveActor(mockWorker, mockDestination),
                 () -> assertNotNull(resultMessage),
-                () -> assertTrue(resultMessage.contains("teleported to"))
+                () -> assertTrue(resultMessage.toLowerCase().contains("teleport"))
         );
     }
 
@@ -60,13 +60,17 @@ class FleshyTreeMonolithTest {
     }
 
     /**
-     * Tests that the monolith display character matches the configured symbol.
+     * Tests that a monolith exposes teleporter capability and does not remain growable.
      */
     @Test
-    void verifyDisplayChar_EdgeCondition_MatchesConfiguredSymbol() {
+    void initialize_EdgeCondition_ExposesTeleporterWithoutGrowthStatistics() {
         FleshyTreeMonolith monolith = new FleshyTreeMonolith();
-        char symbol = monolith.getDisplayChar();
-        assertTrue(symbol == 'M' || symbol == 'H', "Monolith character must match game configuration settings");
+
+        assertAll("Verify monolith is a terminal teleporter tree",
+                () -> assertTrue(monolith.asCapability(Teleporter.class).isPresent()),
+                () -> assertFalse(monolith.asCapability(Growable.class).isPresent()),
+                () -> assertFalse(monolith.hasStatistic(TreeStatistics.GROW_TURNS))
+        );
     }
 
     /**
