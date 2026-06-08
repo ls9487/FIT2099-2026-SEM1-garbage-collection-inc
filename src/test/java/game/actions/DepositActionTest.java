@@ -31,21 +31,18 @@ class DepositActionTest {
         GameMap map = mock(GameMap.class);
         QuotaManager quotaManager = mock(QuotaManager.class);
 
-        // Fan: 10 credits
         Depositable fan = mock(Depositable.class);
         when(fan.getDepositValue()).thenReturn(10);
         when(fan.depositedBy(actor, map)).thenReturn("Fan deposited.");
         new DepositAction(fan, quotaManager).execute(actor, map);
         verify(quotaManager).addCompanyCredits(10);
 
-        // Scrap: 50 credits
         Depositable scrap = mock(Depositable.class);
         when(scrap.getDepositValue()).thenReturn(50);
         when(scrap.depositedBy(actor, map)).thenReturn("Scrap deposited.");
         new DepositAction(scrap, quotaManager).execute(actor, map);
         verify(quotaManager).addCompanyCredits(50);
 
-        // Artifact: 100 credits
         Depositable artifact = mock(Depositable.class);
         when(artifact.getDepositValue()).thenReturn(100);
         when(artifact.depositedBy(actor, map)).thenReturn("Artifact deposited.");
