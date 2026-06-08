@@ -4,14 +4,13 @@ import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.Location;
 import game.items.EclipseItem;
-import game.statuses.RideStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Portable upgrade item whose granted vehicle abilities are active only while the
- * carrier has RideStatus (is mounted on a rideable).
+ * carrier has VehicleAbilities.MOUNTED (is mounted on a rideable).
  *
  * @author lyan0121
  * @version 1.0
@@ -71,7 +70,7 @@ public abstract class RideableUpgrade extends EclipseItem {
      * @param actor the actor carrying this upgrade
      */
     private void updateAbilities(Actor actor) {
-        if (actor.hasStatus(RideStatus.class)) {
+        if (actor.hasAbility(VehicleAbilities.MOUNTED)) {
             for (Enum<?> ability : abilities) {
                 super.enableAbility(ability);
             }

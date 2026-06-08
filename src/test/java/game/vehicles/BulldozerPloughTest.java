@@ -2,7 +2,6 @@ package game.vehicles;
 
 import edu.monash.fit2099.engine.actors.Actor;
 import edu.monash.fit2099.engine.items.Inventory;
-import game.statuses.RideStatus;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.mockito.Mockito.*;
@@ -36,7 +35,7 @@ class BulldozerPloughTest {
         Actor rider = mock(Actor.class);
         Inventory inventory = mock(Inventory.class);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(true);
+        when(rider.hasAbility(VehicleAbilities.MOUNTED)).thenReturn(true);
         when(inventory.getItems()).thenReturn(List.of(plough));
         when(rider.getInventory()).thenReturn(inventory);
 
@@ -54,7 +53,7 @@ class BulldozerPloughTest {
         Actor civilian = mock(Actor.class);
         Inventory inventory = mock(Inventory.class);
 
-        when(civilian.hasStatus(RideStatus.class)).thenReturn(false);
+        when(civilian.hasAbility(VehicleAbilities.MOUNTED)).thenReturn(false);
         when(inventory.getItems()).thenReturn(List.of(plough));
         when(civilian.getInventory()).thenReturn(inventory);
 
