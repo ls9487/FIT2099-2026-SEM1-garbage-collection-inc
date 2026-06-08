@@ -36,10 +36,8 @@ public class AluminiumDoorTest {
     private AluminiumDoor door;
 
     /**
-     * Sets up a small real GameMap with
-     *   _ _ _
-     *   _ = _    (= is the AluminiumDoor at x=1, y=1)
-     *   _ _ _
+     * Sets up a small real GameMap with (= is the AluminiumDoor at x=1, y=1)
+     *
      * Actor is placed at (1, 0), adjacent to the door.
      * actorLocations is injected via reflection because GameMap only
      * initialises it when registered with a World.
@@ -48,7 +46,7 @@ public class AluminiumDoorTest {
     public void setUp() throws Exception {
         // Suppress Display output during tests
         System.setOut(new PrintStream(new OutputStream() {
-            public void write(int b) { /* discard */ }
+            public void write(int b) {}
         }));
 
         GroundCreator groundCreator = new DefaultGroundCreator();
@@ -61,8 +59,6 @@ public class AluminiumDoorTest {
                 "___"
         ));
 
-        // Inject a real ActorLocationsIterator.
-        // GameMap.actorLocations is only set by World, which we don't use in tests.
         Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
         actorLocationsField.setAccessible(true);
         actorLocationsField.set(map, new ActorLocationsIterator());
@@ -72,7 +68,6 @@ public class AluminiumDoorTest {
         actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
         try { map.addActor(actor, map.at(1, 0)); } catch (Exception e) { throw new RuntimeException(e); }
 
-        // Get the door instance at (1, 1)
         door = (AluminiumDoor) map.at(1, 1).getGround();
     }
 
