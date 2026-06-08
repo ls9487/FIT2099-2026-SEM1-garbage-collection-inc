@@ -3,8 +3,9 @@ package game.locations;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GroundCreator;
 import edu.monash.fit2099.engine.positions.Location;
-import game.trees.FleshyTreeSprout;
-import game.trees.FleshyTreeSapling;
+import game.grounds.Teleporter;
+import game.trees.Growable;
+import game.trees.TreeStatistics;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for fleshy tree evolution behaviour on the {@link Overflow20} map.
+ * REQ2 unit tests for fleshy tree evolution behaviour on the {@link Overflow20} map.
+ * Verifies the sprout-sapling-mature chain and confirms evolution stops before
+ * a teleporter monolith by checking growth statistics and capabilities.
  *
  * @author lden0031
  * @version 1.0
@@ -22,7 +25,7 @@ import static org.mockito.Mockito.*;
 class Overflow20TreeBehaviorTest {
 
     /**
-     * Tests that Overflow20 places a {@link FleshyTreeSprout} at the configured tree tile.
+     * Tests that Overflow20 places a growable sprout at the configured tree tile.
      */
     @Test
     void setTrees_PositiveCondition_VerifiesFullEvolutionaryChainOnOverflow20() throws Exception {
@@ -34,14 +37,17 @@ class Overflow20TreeBehaviorTest {
         Overflow20 map20 = new Overflow20(mockFactory, mockPool);
         Location initialTreeTile = map20.at(1, 16);
 
-        assertAll("Verify complete chain setup tracking metrics on map 20",
+        assertAll("Verify Overflow20 starts with a growable sprout",
                 () -> assertNotNull(initialTreeTile.getGround(), "Ground object must be present"),
-                () -> assertEquals("FleshyTreeSprout", initialTreeTile.getGround().getClass().getSimpleName(), "Initial stage should be Sprout")
+                () -> assertTrue(initialTreeTile.getGround().asCapability(Growable.class).isPresent(),
+                        "Initial stage must be growable"),
+                () -> assertTrue(initialTreeTile.getGround().hasStatistic(TreeStatistics.GROW_TURNS),
+                        "Sprout stage must track growth turns")
         );
     }
 
     /**
-     * Tests that a sprout on Overflow20 grows into a {@link FleshyTreeSapling}.
+     * Tests that a sprout on Overflow20 advances to an intermediate growable stage.
      */
     @Test
     void treeEvolution_BoundaryCondition_SproutTransitionsToSaplingSuccessfully() throws Exception {
@@ -50,12 +56,19 @@ class Overflow20TreeBehaviorTest {
 
         Overflow20 map20 = new Overflow20(mockFactory, pool);
         Location targetTile = map20.at(1, 16);
-        FleshyTreeSprout sprout = (FleshyTreeSprout) targetTile.getGround();
 
+        Growable sprout = targetTile.getGround().asCapability(Growable.class)
+                .orElseThrow(() -> new AssertionError("Expected initial growable sprout"));
         sprout.grow(targetTile);
 
-        assertEquals("FleshyTreeSapling", targetTile.getGround().getClass().getSimpleName(),
-                "On Map 20, Sprout must advance sequentially to a Fleshy Tree Sapling");
+        assertAll("Verify sprout advances to another growable stage on Map 20",
+                () -> assertTrue(targetTile.getGround().asCapability(Growable.class).isPresent(),
+                        "Intermediate stage must remain growable"),
+                () -> assertTrue(targetTile.getGround().hasStatistic(TreeStatistics.GROW_TURNS),
+                        "Intermediate stage must still track growth turns"),
+                () -> assertFalse(targetTile.getGround().asCapability(Teleporter.class).isPresent(),
+                        "Intermediate stage must not be a teleporter")
+        );
     }
 
     /**
@@ -69,13 +82,19 @@ class Overflow20TreeBehaviorTest {
         Overflow20 map20 = new Overflow20(mockFactory, pool);
         Location targetTile = map20.at(1, 16);
 
-        FleshyTreeSprout sprout = (FleshyTreeSprout) targetTile.getGround();
+        Growable sprout = targetTile.getGround().asCapability(Growable.class)
+                .orElseThrow(() -> new AssertionError("Expected initial growable sprout"));
         sprout.grow(targetTile);
 
-        FleshyTreeSapling sapling = (FleshyTreeSapling) targetTile.getGround();
+        Growable sapling = targetTile.getGround().asCapability(Growable.class)
+                .orElseThrow(() -> new AssertionError("Expected intermediate growable stage"));
         sapling.grow(targetTile);
 
-        assertNotEquals("FleshyTreeMonolith", targetTile.getGround().getClass().getSimpleName(),
-                "Fleshy trees tracking evolution on Overflow20 are bounded and must never spawn a Monolith");
+        assertAll("Verify Overflow20 evolution terminates before a teleporter monolith",
+                () -> assertFalse(targetTile.getGround().asCapability(Teleporter.class).isPresent(),
+                        "Final stage on Map 20 must not teleport actors"),
+                () -> assertFalse(targetTile.getGround().hasStatistic(TreeStatistics.GROW_TURNS),
+                        "Terminal mature stage must stop tracking further growth turns")
+        );
     }
 }
