@@ -31,7 +31,7 @@ LINK TO OUR CONTRIBUTION LOGS FOR ASSIGNMENT 3:
 
 https://docs.google.com/spreadsheets/d/1pSkZRv998trWtFAZIj4YCjXskz3HTpm3TfvSJoTNiO0/edit?usp=sharing
 
-## REQ 5: Stateful Creatures (HD Requirement)
+## Assignment 2 REQ 5: Stateful Creatures (HD Requirement)
 
 We have implemented **two stateful creatures** as required for the HD component:
 
@@ -180,7 +180,7 @@ Located under `src/test/java/game/`:
 - `vehicles/MagneticFieldTest.java`, which verifies the EXTRA_ENERGY ability, the per-turn item collection, and the previous-tile toxic waste effect.
 - `vehicles/WarpBatteryTest.java`, which verifies the EXTRA_ENERGY ability and the teleport action through impassable tiles.
 - `grounds/HoleTest.java`, which verifies that only actors with HOVER may enter a hole.
-- `grounds/VentTest.java`, which verifies that only actors with HOVER may enter a vent, and that the vent's ground identity stays consistent.
+- `grounds/REQ3VentTest.java`, which verifies that only actors with HOVER may enter a vent, and that the vent's ground identity stays consistent.
 - `grounds/ToxicWasteTest.java`, which verifies tile damage on tick and the hover immunity that lets HOVER actors stand on the tile safely.
 - `grounds/SandTest.java`, which verifies that an actor standing on sand is shifted to a nearby enterable location each tick.
 
