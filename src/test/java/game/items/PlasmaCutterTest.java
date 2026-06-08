@@ -57,6 +57,11 @@ class PlasmaCutterTest {
         assertNotEquals(51, cutter.getBuyPrice());
     }
 
+    /**
+     * PlasmaCutter must be Buyable but not Sellable.
+     * Checks that asCapability(Buyable.class) is present and
+     * asCapability(Sellable.class) is empty on the same instance.
+     */
     @Test
     void buyable_typicalCondition_isBuyableButNotSellable() {
         PlasmaCutter cutter = new PlasmaCutter();
