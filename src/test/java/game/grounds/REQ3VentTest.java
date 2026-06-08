@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
-class VentTest {
+class REQ3VentTest {
 
     private static class TestActor extends Actor {
         public TestActor(String name, char displayChar, int hitPoints, Inventory inventory) {
