@@ -71,8 +71,7 @@ public class NuclearPad extends Turret {
      */
     @Override
     public boolean isReady() {
-        return this.getStatistic(GroundStatistics.AMMUNITION) > 0
-                && this.getStatistic(GroundStatistics.COOLDOWN) <= 0
+        return super.isReady()
                 && this.getStatistic(GroundStatistics.ARMING_COOLDOWN) <= 0;
     }
 

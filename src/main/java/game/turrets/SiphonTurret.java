@@ -78,8 +78,7 @@ public class SiphonTurret extends Turret {
      */
     @Override
     public boolean isReady() {
-        return registeredActor != null && this.getStatistic(GroundStatistics.AMMUNITION) > 0
-                && this.getStatistic(GroundStatistics.COOLDOWN) <= 0;
+        return registeredActor != null && super.isReady();
     }
 
     /**
