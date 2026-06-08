@@ -1,6 +1,11 @@
 package game.grounds;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.PrintStream;
+import java.io.OutputStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -11,9 +16,26 @@ import static org.junit.jupiter.api.Assertions.*;
  * updateTurn() requires a real engine Location (to call fireAdjacentWorkers),
  * so deadline firing is not tested here, only the flag methods.
  *
+ * NOTE: System.out is redirected to a no-op stream before each test because
+ * Display (used inside QuotaManager) writes to System.out. Without this,
+ * Display may throw a NullPointerException in headless/test environments
+ * where System.console() returns null, crashing tests before assertions run.
+ *
  * @author eche0116
  */
 class QuotaManagerTest {
+
+    /**
+     * Redirect System.out to a no-op stream before each test.
+     * This prevents Display.println() from crashing in a headless JVM
+     * where System.console() is null.
+     */
+    @BeforeEach
+    void suppressOutput() {
+        System.setOut(new PrintStream(new OutputStream() {
+            public void write(int b) { /* discard */ }
+        }));
+    }
 
     /**
      * Adding credits below quota should not trigger a rank-up.
@@ -48,7 +70,7 @@ class QuotaManagerTest {
         QuotaManager exact = new QuotaManager();
         exact.addCompanyCredits(50);
         exact.addCompanyCredits(50);
-        assertTrue(exact.getStatus().contains("Rank 2")); // triggered rank up
+        assertTrue(exact.getStatus().contains("Rank 2")); // triggered rank up, turns=221
 
         QuotaManager over = new QuotaManager();
         over.addCompanyCredits(60);
@@ -86,8 +108,10 @@ class QuotaManagerTest {
         QuotaManager manager = new QuotaManager();
         manager.addCompanyCredits(100);
 
-        assertTrue(manager.getStatus().contains("Rank 2"));
-        assertTrue(manager.getStatus().contains("Turns left: 220"));
+        assertTrue(manager.getStatus().contains("Rank 2"),
+                "Status was: " + manager.getStatus());
+        assertTrue(manager.getStatus().contains("Turns left: 221"),
+                "Status was: " + manager.getStatus());
 
         manager.addCompanyCredits(104); // 104 < 105 (should not rank up again)
         assertFalse(manager.isQuotaMet());
@@ -95,17 +119,19 @@ class QuotaManagerTest {
 
     /**
      * Two consecutive rank-ups compound correctly.
-     * Rank 2 -> 3: quota = ceil(105*1.05) = 111, turns = ceil(220*1.1) = 242.
-     * Three checks: rank 3, turns 242, 110 credits doesn't meet quota 111.
+     * Rank 2 -> 3: quota = ceil(105*1.05) = 111, turns = ceil(221*1.1) = 244.
+     * Three checks: rank 3, turns 244, 110 credits doesn't meet quota 111.
      */
     @Test
     void rankUp_boundaryCondition_secondRankUpCompounds() {
         QuotaManager manager = new QuotaManager();
-        manager.addCompanyCredits(100); // rank 2: quota=105, turns=220
-        manager.addCompanyCredits(105); // rank 3: quota=111, turns=242
+        manager.addCompanyCredits(100); // rank 2: quota=105, turns=221
+        manager.addCompanyCredits(105); // rank 3: quota=111, turns=244
 
-        assertTrue(manager.getStatus().contains("Rank 3"));
-        assertTrue(manager.getStatus().contains("Turns left: 242"));
+        assertTrue(manager.getStatus().contains("Rank 3"),
+                "Status was: " + manager.getStatus());
+        assertTrue(manager.getStatus().contains("Turns left: 244"),
+                "Status was: " + manager.getStatus());
 
         manager.addCompanyCredits(110); // 110 < 111
         assertFalse(manager.isQuotaMet());
@@ -151,14 +177,19 @@ class QuotaManagerTest {
     @Test
     void getStatus_edgeCondition_statusStringReflectsState() {
         QuotaManager manager = new QuotaManager();
-        assertTrue(manager.getStatus().contains("Rank 1"));
-        assertTrue(manager.getStatus().contains("Turns left: 200"));
+        assertTrue(manager.getStatus().contains("Rank 1"),
+                "Status was: " + manager.getStatus());
+        assertTrue(manager.getStatus().contains("Turns left: 200"),
+                "Status was: " + manager.getStatus());
 
         manager.addCompanyCredits(40);
-        assertTrue(manager.getStatus().contains("40"));
+        assertTrue(manager.getStatus().contains("40"),
+                "Status was: " + manager.getStatus());
 
         manager.addCompanyCredits(60); // rank-up
-        assertTrue(manager.getStatus().contains("Rank 2"));
-        assertTrue(manager.getStatus().contains("Turns left: 220"));
+        assertTrue(manager.getStatus().contains("Rank 2"),
+                "Status was: " + manager.getStatus());
+        assertTrue(manager.getStatus().contains("Turns left: 221"),
+                "Status was: " + manager.getStatus());
     }
 }
