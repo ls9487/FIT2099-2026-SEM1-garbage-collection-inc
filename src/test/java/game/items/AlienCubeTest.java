@@ -73,7 +73,7 @@ public class AlienCubeTest {
         actorLocationsField.set(map, new ActorLocationsIterator());
 
         Inventory inventory = new BasicInventory();
-        actor = new ContractedWorker("Worker", 'W', 100, inventory);
+        actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
         actorLocation = map.at(1, 1);
         actorLocation.addActor(actor);
 
