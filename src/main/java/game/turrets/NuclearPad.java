@@ -36,7 +36,7 @@ public class NuclearPad extends Turret {
     }
 
     /**
-     * Before firing, this turret will need to there's a worker around it so it can arm the missile.
+     * Before firing, this turret will need to check there's a worker around so it can arm the missile.
      * @param location The location of the turret.
      */
     @Override
@@ -71,8 +71,7 @@ public class NuclearPad extends Turret {
      */
     @Override
     public boolean isReady() {
-        return super.isReady()
-                && this.getStatistic(GroundStatistics.ARMING_COOLDOWN) <= 0;
+        return super.isReady() && this.getStatistic(GroundStatistics.ARMING_COOLDOWN) <= 0;
     }
 
     /**
