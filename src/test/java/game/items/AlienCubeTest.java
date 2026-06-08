@@ -42,10 +42,7 @@ public class AlienCubeTest {
     private Location actorLocation;
 
     /**
-     * Sets up a small real GameMap:
-     *   _ _ _
-     *   _ _ _
-     *   _ _ _
+     * Sets up a small real GameMap,
      * Actor placed at (1,1). AlienCube added to actor's inventory.
      * actorLocations is injected via reflection because GameMap only
      * initialises it when registered with a World.
@@ -54,7 +51,7 @@ public class AlienCubeTest {
     public void setUp() throws Exception {
         // Suppress Display output during tests
         System.setOut(new PrintStream(new OutputStream() {
-            public void write(int b) { /* discard */ }
+            public void write(int b) {}
         }));
 
         GroundCreator groundCreator = new DefaultGroundCreator();
@@ -66,8 +63,6 @@ public class AlienCubeTest {
                 "___"
         ));
 
-        // Inject a real ActorLocationsIterator so addActor() doesn't NPE.
-        // GameMap.actorLocations is only set by World, which we don't use in tests.
         Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
         actorLocationsField.setAccessible(true);
         actorLocationsField.set(map, new ActorLocationsIterator());
