@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests that CutAction correctly delegates to the Cuttable's cutBy(),
  * passes the right arguments, and returns the result unchanged.
  *
- * Uses Mockito to avoid needing real engine objects.
  *
  * @author eche0116
  */
@@ -31,19 +30,16 @@ class CutActionTest {
         GameMap map = mock(GameMap.class);
         Location location = mock(Location.class);
 
-        // Case 1: simple cut message
         Cuttable scrapCut = mock(Cuttable.class);
         when(scrapCut.cutBy(actor, map, location)).thenReturn("Door crumbles into scrap!");
         CutAction action1 = new CutAction(scrapCut, location);
         assertEquals("Door crumbles into scrap!", action1.execute(actor, map));
 
-        // Case 2: explosion message
         Cuttable explodingCut = mock(Cuttable.class);
         when(explodingCut.cutBy(actor, map, location)).thenReturn("Door EXPLODES!");
         CutAction action2 = new CutAction(explodingCut, location);
         assertEquals("Door EXPLODES!", action2.execute(actor, map));
 
-        // Case 3: vent cut message
         Cuttable ventCut = mock(Cuttable.class);
         when(ventCut.cutBy(actor, map, location)).thenReturn("Industrial Fan crashes to the floor!");
         CutAction action3 = new CutAction(ventCut, location);
