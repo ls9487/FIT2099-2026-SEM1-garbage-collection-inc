@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link Vent} actor entry rules and ground type identity.
+ * REQ3 unit tests for {@link Vent} actor entry rules based on
+ * {@link VehicleAbilities#HOVER} capability.
  *
  * @author lyan0121
  * @version 1.0
@@ -62,13 +63,17 @@ class REQ3VentTest {
     }
 
     /**
-     * Tests that a vent instance is of type {@link Vent} and not {@link Dirt}.
+     * Tests that only hover capability changes vent entry permission for the same actor.
      */
     @Test
-    void entry_EdgeCondition_PolymorphicCheck() {
+    void entry_EdgeCondition_HoverCapabilityTogglesVentAccess() {
         Vent vent = new Vent(new ArrayList<Spawner>());
+        TestActor pilot = new TestActor("Pilot", 'P', 100, new BasicInventory());
 
-        assertEquals(Vent.class, vent.getClass());
-        assertNotEquals(Dirt.class, vent.getClass());
+        assertFalse(vent.canActorEnter(pilot), "Without hover, vent entry must be blocked");
+
+        pilot.enableAbility(VehicleAbilities.HOVER);
+
+        assertTrue(vent.canActorEnter(pilot), "Hover capability must grant vent entry");
     }
 }
