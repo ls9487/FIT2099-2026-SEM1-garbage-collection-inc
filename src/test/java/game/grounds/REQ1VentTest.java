@@ -40,10 +40,8 @@ public class REQ1VentTest {
     private Vent vent;
 
     /**
-     * Sets up a small real GameMap with:
-     *   _ _ _
-     *   _ V _    (V is the Vent at x=1, y=1)
-     *   _ _ _
+     * Sets up a small real GameMap with V is the Vent at x=1, y=1
+     *
      * Actor is placed at (1, 0), adjacent to the vent.
      * actorLocations is injected via reflection because GameMap only
      * initialises it when registered with a World.
@@ -52,7 +50,7 @@ public class REQ1VentTest {
     public void setUp() throws Exception {
         // Suppress Display output during tests
         System.setOut(new PrintStream(new OutputStream() {
-            public void write(int b) { /* discard */ }
+            public void write(int b) {}
         }));
 
         GroundCreator groundCreator = new DefaultGroundCreator();
@@ -69,8 +67,6 @@ public class REQ1VentTest {
                 "___"
         ));
 
-        // Inject a real ActorLocationsIterator so addActor() doesn't NPE.
-        // GameMap.actorLocations is only set by World, which we don't use in tests.
         Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
         actorLocationsField.setAccessible(true);
         actorLocationsField.set(map, new ActorLocationsIterator());
@@ -80,7 +76,6 @@ public class REQ1VentTest {
         actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
         map.at(1, 0).addActor(actor);
 
-        // Get the vent instance at (1, 1)
         vent = (Vent) map.at(1, 1).getGround();
     }
 
