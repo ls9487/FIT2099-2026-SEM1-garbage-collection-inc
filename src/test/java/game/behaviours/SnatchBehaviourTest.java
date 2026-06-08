@@ -2,6 +2,7 @@ package game.behaviours;
 
 import edu.monash.fit2099.engine.actions.Action;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.positions.GameMap;
 import edu.monash.fit2099.engine.positions.Location;
@@ -13,7 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link SnatchBehaviour} item selection and pickup action generation.
+ * REQ2 unit tests for {@link SnatchBehaviour} depositable item selection and pick-up execution.
+ * Verifies that snatch behaviour picks up the first {@link Depositable} item on a tile
+ * by executing the returned action, not by inspecting action types.
  *
  * @author lden0031
  * @version 1.0
@@ -44,6 +47,30 @@ class SnatchBehaviourTest {
     }
 
     /**
+     * creates mock Inventory, mock GameMap, mock Location and tests whether pick up action exists
+     * @param action
+     * @param actor
+     * @param expectedItem
+     */
+    private void assertPickUpActionTargetsItem(Action action, Actor actor, Item expectedItem) {
+        assertNotNull(action);
+
+        Inventory inventory = mock(Inventory.class);
+        when(inventory.add(expectedItem)).thenReturn(true);
+        when(actor.getInventory()).thenReturn(inventory);
+
+        GameMap map = mock(GameMap.class);
+        Location actorLocation = mock(Location.class);
+        when(map.locationOf(actor)).thenReturn(actorLocation);
+
+        String result = action.execute(actor, map);
+
+        verify(inventory).add(expectedItem);
+        verify(actorLocation).removeItem(expectedItem);
+        assertTrue(result.toLowerCase().contains("pick"));
+    }
+
+    /**
      * Tests that the first depositable item on a tile produces a pick-up action.
      */
     @Test
@@ -60,11 +87,7 @@ class SnatchBehaviourTest {
 
         Action result = snatchBehaviour.operate(mockSnatcher, mockLocation);
 
-        assertAll("Verify pickup action created from ground items",
-                () -> assertNotNull(result),
-                () -> assertEquals("PickUpAction", result.getClass().getSimpleName()),
-                () -> assertNotEquals("DropItemAction", result.getClass().getSimpleName())
-        );
+        assertPickUpActionTargetsItem(result, mockSnatcher, depositableItem);
     }
 
     /**
@@ -120,9 +143,6 @@ class SnatchBehaviourTest {
 
         Action result = snatchBehaviour.operate(mockSnatcher, mockLocation);
 
-        assertAll("Verify execution selection logic captures zero index elements",
-                () -> assertNotNull(result),
-                () -> assertEquals("PickUpAction", result.getClass().getSimpleName())
-        );
+        assertPickUpActionTargetsItem(result, mockSnatcher, firstDepositable);
     }
 }
