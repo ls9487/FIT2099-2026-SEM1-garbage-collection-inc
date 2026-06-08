@@ -77,7 +77,7 @@ public class AluminiumDoorTest {
     }
 
     /**
-     * Typical: Cutting the door drops AluminiumScrap on the door tile.
+     * Cutting the door drops AluminiumScrap on the door tile.
      * After cutBy(), the tile at (1,1) should have at least one item.
      * AluminiumScrap has weight 2.
      */
