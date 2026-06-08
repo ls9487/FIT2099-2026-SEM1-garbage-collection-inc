@@ -13,9 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests credit accumulation, quota detection, rank-up math,
  * deadline detection, and deposit-blocked-after-deadline guard.
  *
- * updateTurn() requires a real engine Location (to call fireAdjacentWorkers),
- * so deadline firing is not tested here, only the flag methods.
- *
  * NOTE: System.out is redirected to a no-op stream before each test because
  * Display (used inside QuotaManager) writes to System.out. Without this,
  * Display may throw a NullPointerException in headless/test environments
@@ -27,13 +24,12 @@ class QuotaManagerTest {
 
     /**
      * Redirect System.out to a no-op stream before each test.
-     * This prevents Display.println() from crashing in a headless JVM
-     * where System.console() is null.
+     * This prevents Display.println() from crashing in a headless JVM where System.console() is null.
      */
     @BeforeEach
     void suppressOutput() {
         System.setOut(new PrintStream(new OutputStream() {
-            public void write(int b) { /* discard */ }
+            public void write(int b) {}
         }));
     }
 
@@ -70,12 +66,12 @@ class QuotaManagerTest {
         QuotaManager exact = new QuotaManager();
         exact.addCompanyCredits(50);
         exact.addCompanyCredits(50);
-        assertTrue(exact.getStatus().contains("Rank 2")); // triggered rank up, turns=221
+        assertTrue(exact.getStatus().contains("Rank 2"));
 
         QuotaManager over = new QuotaManager();
         over.addCompanyCredits(60);
         over.addCompanyCredits(60);
-        assertTrue(over.getStatus().contains("Rank 2")); // also triggers
+        assertTrue(over.getStatus().contains("Rank 2"));
     }
 
     /**
@@ -113,7 +109,7 @@ class QuotaManagerTest {
         assertTrue(manager.getStatus().contains("Turns left: 221"),
                 "Status was: " + manager.getStatus());
 
-        manager.addCompanyCredits(104); // 104 < 105 (should not rank up again)
+        manager.addCompanyCredits(104);
         assertFalse(manager.isQuotaMet());
     }
 
@@ -125,15 +121,15 @@ class QuotaManagerTest {
     @Test
     void rankUp_boundaryCondition_secondRankUpCompounds() {
         QuotaManager manager = new QuotaManager();
-        manager.addCompanyCredits(100); // rank 2: quota=105, turns=221
-        manager.addCompanyCredits(105); // rank 3: quota=111, turns=244
+        manager.addCompanyCredits(100);
+        manager.addCompanyCredits(105);
 
         assertTrue(manager.getStatus().contains("Rank 3"),
                 "Status was: " + manager.getStatus());
         assertTrue(manager.getStatus().contains("Turns left: 244"),
                 "Status was: " + manager.getStatus());
 
-        manager.addCompanyCredits(110); // 110 < 111
+        manager.addCompanyCredits(110);
         assertFalse(manager.isQuotaMet());
     }
 
@@ -150,7 +146,7 @@ class QuotaManagerTest {
         assertFalse(fresh.isPastDeadline());
 
         QuotaManager ranked = new QuotaManager();
-        ranked.addCompanyCredits(100); // rank-up resets turns
+        ranked.addCompanyCredits(100);
         assertFalse(ranked.isPastDeadline());
     }
 
@@ -166,7 +162,7 @@ class QuotaManagerTest {
         m.addCompanyCredits(30);
         assertFalse(m.isOnDeadline());
 
-        m.addCompanyCredits(70); // rank-up
+        m.addCompanyCredits(70);
         assertFalse(m.isOnDeadline());
     }
 
