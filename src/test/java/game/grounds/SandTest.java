@@ -10,12 +10,14 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link Sand} slippery movement behaviour during tick.
+ * REQ3 unit tests for {@link Sand} slippery movement behaviour during tick.
+ * Contrasts sand relocation with blocking ground that prevents actor entry.
  *
  * @author lyan0121
  * @version 1.0
  */
 class SandTest {
+
     /**
      * Tests that an actor on sand is moved to a nearby enterable location when sand ticks.
      */
@@ -56,13 +58,28 @@ class SandTest {
     }
 
     /**
-     * Tests that a sand instance is of type {@link Sand} and not {@link Wall}.
+     * Tests that sand relocates actors while blocking ground prevents entry entirely.
      */
     @Test
-    void slippery_EdgeCondition_VerifyGroundTypeExplicitly() {
+    void slippery_EdgeCondition_RelocatesActorsUnlikeBlockingGround() {
         Sand sand = new Sand();
+        Wall wall = new Wall();
+        Actor runner = mock(Actor.class);
+        GameMap map = mock(GameMap.class);
+        Location sandLocation = mock(Location.class);
+        Location slipTarget = mock(Location.class);
 
-        assertEquals(Sand.class, sand.getClass());
-        assertNotEquals(Wall.class, sand.getClass());
+        assertFalse(wall.canActorEnter(runner), "Blocking ground must reject actor entry");
+
+        when(sandLocation.containsAnActor()).thenReturn(true);
+        when(sandLocation.getActor()).thenReturn(runner);
+        when(sandLocation.map()).thenReturn(map);
+        when(sandLocation.getNearbyLocations(2)).thenReturn(List.of(slipTarget));
+        when(slipTarget.containsAnActor()).thenReturn(false);
+        when(slipTarget.canActorEnter(runner)).thenReturn(true);
+
+        sand.tick(sandLocation);
+
+        verify(map).moveActor(runner, slipTarget);
     }
 }
