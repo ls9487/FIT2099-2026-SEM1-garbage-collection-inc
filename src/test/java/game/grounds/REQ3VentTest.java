@@ -44,7 +44,7 @@ class REQ3VentTest {
     @Test
     void entry_NormalCondition_BlocksStandardActors() {
         Vent vent = new Vent(new ArrayList<Spawner>());
-        TestActor worker = new TestActor("Worker", 'W', 100, new BasicInventory());
+        TestActor worker = new TestActor("Worker", 'W', 10, new BasicInventory());
 
         assertFalse(vent.canActorEnter(worker));
     }
@@ -55,7 +55,7 @@ class REQ3VentTest {
     @Test
     void entry_BoundaryCondition_AllowsHoveringActors() {
         Vent vent = new Vent(new ArrayList<Spawner>());
-        TestActor pilot = new TestActor("Pilot", 'P', 100, new BasicInventory());
+        TestActor pilot = new TestActor("Pilot", 'P', 10, new BasicInventory());
 
         pilot.enableAbility(VehicleAbilities.HOVER);
 
@@ -68,7 +68,7 @@ class REQ3VentTest {
     @Test
     void entry_EdgeCondition_HoverCapabilityTogglesVentAccess() {
         Vent vent = new Vent(new ArrayList<Spawner>());
-        TestActor pilot = new TestActor("Pilot", 'P', 100, new BasicInventory());
+        TestActor pilot = new TestActor("Pilot", 'P', 10, new BasicInventory());
 
         assertFalse(vent.canActorEnter(pilot), "Without hover, vent entry must be blocked");
 

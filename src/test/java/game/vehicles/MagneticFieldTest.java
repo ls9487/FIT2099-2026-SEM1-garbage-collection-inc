@@ -1,25 +1,47 @@
 package game.vehicles;
 
+import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.actors.ActorStatistics;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
 import edu.monash.fit2099.engine.items.Item;
 import edu.monash.fit2099.engine.items.ItemAbility;
 import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Ground;
 import edu.monash.fit2099.engine.positions.Location;
-import game.statuses.RideStatus;
+import game.inventories.BasicInventory;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import java.util.ArrayList;
 import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link MagneticField} item pull, ignite, and mounted-rider tick behaviour.
+ * REQ3 unit tests for {@link MagneticField} mounted-rider behaviour: adjacent item
+ * collection, toxic waste trail, and ignite sacrifice.
  *
  * @author lyan0121
  * @version 1.0
  */
 class MagneticFieldTest {
+
+    /**
+     * Dummy actor used to toggle {@link VehicleAbilities#MOUNTED} through
+     * {@link Actor#enableAbility(Enum)} and {@link Actor#disableAbility(Enum)}.
+     */
+    private static class TestActor extends Actor {
+        public TestActor(String name, char displayChar, int hitPoints, Inventory inventory) {
+            super(name, displayChar, hitPoints, inventory);
+        }
+
+        @Override
+        public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+            return null;
+        }
+    }
 
     /**
      * Minimal concrete {@link Item} used instead of a Mockito mock because
@@ -33,38 +55,28 @@ class MagneticFieldTest {
     }
 
     /**
-     * Returns a mocked {@link Inventory} that only accepts items with
-     * {@link ItemAbility#PORTABLE}, mirroring normal pickup behaviour.
-     *
-     * @param heldItems list updated when a portable item is successfully added
-     * @return a mocked inventory backed by the supplied held-items list
+     * Inventory that only accepts portable items, mirroring normal pickup behaviour.
      */
-    private Inventory createPortableAwareInventory(List<Item> heldItems) {
-        Inventory inventory = mock(Inventory.class);
-        when(inventory.getItems()).thenAnswer(invocation -> List.copyOf(heldItems));
-        when(inventory.add(any(Item.class))).thenAnswer(invocation -> {
-            Item item = invocation.getArgument(0);
+    private static class PortableAwareInventory extends BasicInventory {
+        @Override
+        public boolean add(Item item) {
             if (!item.hasAbility(ItemAbility.PORTABLE)) {
                 return false;
             }
-            heldItems.add(item);
-            return true;
-        });
-        return inventory;
+            return super.add(item);
+        }
     }
 
     /**
      * Tests that a mounted rider does not pull non-portable adjacent ground items into inventory.
      */
     @Test
-    void tick_NormalCondition_PullsAdjacentItemsIntoRiderInventory() {
+    void tick_NormalCondition_SkipsNonPortableAdjacentItems() {
         MagneticField magneticField = new MagneticField();
-        List<Item> heldItems = new ArrayList<>();
-        Inventory inventory = createPortableAwareInventory(heldItems);
-        Actor rider = mock(Actor.class);
+        PortableAwareInventory inventory = new PortableAwareInventory();
+        TestActor rider = new TestActor("Rider", 'R', 10, inventory);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(true);
-        when(rider.getInventory()).thenReturn(inventory);
+        rider.enableAbility(VehicleAbilities.MOUNTED);
 
         Location currentLocation = mock(Location.class);
         Location adjacentLocation = mock(Location.class);
@@ -76,7 +88,7 @@ class MagneticFieldTest {
         magneticField.tick(currentLocation, rider);
 
         assertFalse(looseItem.hasAbility(ItemAbility.PORTABLE));
-        assertTrue(heldItems.isEmpty());
+        assertTrue(inventory.getItems().isEmpty());
         verify(adjacentLocation, never()).removeItem(looseItem);
     }
 
@@ -86,12 +98,10 @@ class MagneticFieldTest {
     @Test
     void tick_BoundaryCondition_PullsPortableAdjacentItemsIntoRiderInventory() {
         MagneticField magneticField = new MagneticField();
-        List<Item> heldItems = new ArrayList<>();
-        Inventory inventory = createPortableAwareInventory(heldItems);
-        Actor rider = mock(Actor.class);
+        PortableAwareInventory inventory = new PortableAwareInventory();
+        TestActor rider = new TestActor("Rider", 'R', 10, inventory);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(true);
-        when(rider.getInventory()).thenReturn(inventory);
+        rider.enableAbility(VehicleAbilities.MOUNTED);
 
         Location currentLocation = mock(Location.class);
         Location adjacentLocation = mock(Location.class);
@@ -104,8 +114,39 @@ class MagneticFieldTest {
         magneticField.tick(currentLocation, rider);
 
         assertTrue(looseItem.hasAbility(ItemAbility.PORTABLE));
-        assertTrue(heldItems.contains(looseItem));
+        assertTrue(inventory.getItems().contains(looseItem));
         verify(adjacentLocation).removeItem(looseItem);
+    }
+
+    /**
+     * Tests that moving while mounted corrupts the previously occupied tile into damaging ground.
+     */
+    @Test
+    void tick_BoundaryCondition_CorruptsPreviouslyOccupiedTile() {
+        MagneticField magneticField = new MagneticField();
+        TestActor rider = new TestActor("Rider", 'R', 10, new BasicInventory());
+        rider.enableAbility(VehicleAbilities.MOUNTED);
+
+        Location firstTile = mock(Location.class);
+        Location secondTile = mock(Location.class);
+        when(firstTile.getNearbyLocations(1)).thenReturn(List.of());
+        when(secondTile.getNearbyLocations(1)).thenReturn(List.of());
+
+        magneticField.tick(firstTile, rider);
+        magneticField.tick(secondTile, rider);
+
+        ArgumentCaptor<Ground> groundCaptor = ArgumentCaptor.forClass(Ground.class);
+        verify(firstTile).setGround(groundCaptor.capture());
+
+        Ground corruptedGround = groundCaptor.getValue();
+        Location occupiedTile = mock(Location.class);
+        TestActor victim = new TestActor("Victim", 'V', 50, new BasicInventory());
+        when(occupiedTile.containsAnActor()).thenReturn(true);
+        when(occupiedTile.getActor()).thenReturn(victim);
+
+        corruptedGround.tick(occupiedTile);
+
+        assertNotEquals(50, victim.getStatistic(ActorStatistics.HEALTH));
     }
 
     /**
@@ -142,12 +183,8 @@ class MagneticFieldTest {
     @Test
     void tick_NegativeCondition_NoActionIfRiderNotMounted() {
         MagneticField magneticField = new MagneticField();
-        List<Item> heldItems = new ArrayList<>();
-        Inventory inventory = createPortableAwareInventory(heldItems);
-        Actor rider = mock(Actor.class);
-
-        when(rider.hasStatus(RideStatus.class)).thenReturn(false);
-        when(rider.getInventory()).thenReturn(inventory);
+        PortableAwareInventory inventory = new PortableAwareInventory();
+        TestActor rider = new TestActor("Rider", 'R', 10, inventory);
 
         Location currentLocation = mock(Location.class);
         Location adjacentLocation = mock(Location.class);
@@ -159,7 +196,7 @@ class MagneticFieldTest {
 
         magneticField.tick(currentLocation, rider);
 
-        assertTrue(heldItems.isEmpty());
+        assertTrue(inventory.getItems().isEmpty());
         verify(adjacentLocation, never()).removeItem(any());
     }
 }

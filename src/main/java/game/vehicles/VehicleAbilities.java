@@ -26,5 +26,9 @@ public enum VehicleAbilities {
     /**
      * Unlocks high-energy special actions such as hover blast and warp teleportation.
      */
-    EXTRA_ENERGY
+    EXTRA_ENERGY,
+    /**
+     * Denotes if an actor is mounted on this vehicle
+     */
+    MOUNTED
 }

@@ -1,15 +1,20 @@
 package game.vehicles;
 
+import edu.monash.fit2099.engine.actions.Action;
+import edu.monash.fit2099.engine.actions.ActionList;
 import edu.monash.fit2099.engine.actors.Actor;
+import edu.monash.fit2099.engine.displays.Display;
 import edu.monash.fit2099.engine.items.Inventory;
-import game.statuses.RideStatus;
+import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
+import game.inventories.BasicInventory;
 import org.junit.jupiter.api.Test;
-import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link BulldozerPlough} attribute registration and dynamic bulldoze ability.
+ * REQ3 unit tests for {@link BulldozerPlough} dynamic {@link VehicleAbilities#BULLDOZE}
+ * activation while the carrier is mounted on a rideable.
  *
  * @author lyan0121
  * @version 1.0
@@ -17,48 +22,64 @@ import static org.junit.jupiter.api.Assertions.*;
 class BulldozerPloughTest {
 
     /**
-     * Tests the plough name and that it lacks {@link VehicleAbilities#BULLDOZE} when grounded.
+     * Dummy actor used to toggle {@link VehicleAbilities#MOUNTED} through
+     * {@link Actor#enableAbility(Enum)} and {@link Actor#disableAbility(Enum)}.
+     */
+    private static class TestActor extends Actor {
+        public TestActor(String name, char displayChar, int hitPoints, Inventory inventory) {
+            super(name, displayChar, hitPoints, inventory);
+        }
+
+        @Override
+        public Action playTurn(ActionList actions, Action lastAction, GameMap map, Display display) {
+            return null;
+        }
+    }
+
+    /**
+     * Tests that ticking while dismounted keeps bulldoze inactive on the upgrade itself.
      */
     @Test
-    void initialize_NormalCondition_RegistersCorrectAttributes() {
+    void tick_NormalCondition_KeepsBulldozeInactiveWhileRiderNotMounted() {
         BulldozerPlough plough = new BulldozerPlough();
+        TestActor rider = new TestActor("Rider", 'R', 10, new BasicInventory());
+        Location location = mock(Location.class);
 
-        assertEquals("Bulldozer Plough", plough.toString());
+        plough.tick(location, rider);
+
         assertFalse(plough.hasAbility(VehicleAbilities.BULLDOZE));
     }
 
     /**
-     * Tests that a mounted rider carrying the plough gains {@link VehicleAbilities#BULLDOZE} on tick.
+     * Tests that a mounted rider carrying the plough activates bulldoze on tick.
      */
     @Test
-    void initialize_BoundaryCondition_AcquiresAbilityWhenCarriedByActiveRider() {
+    void tick_BoundaryCondition_ActivatesBulldozeWhileRiderMounted() {
         BulldozerPlough plough = new BulldozerPlough();
-        Actor rider = mock(Actor.class);
-        Inventory inventory = mock(Inventory.class);
+        TestActor rider = new TestActor("Rider", 'R', 10, new BasicInventory());
+        Location location = mock(Location.class);
 
-        when(rider.hasStatus(RideStatus.class)).thenReturn(true);
-        when(inventory.getItems()).thenReturn(List.of(plough));
-        when(rider.getInventory()).thenReturn(inventory);
-
-        plough.tick(mock(edu.monash.fit2099.engine.positions.Location.class), rider);
+        rider.enableAbility(VehicleAbilities.MOUNTED);
+        plough.tick(location, rider);
 
         assertTrue(plough.hasAbility(VehicleAbilities.BULLDOZE));
     }
 
     /**
-     * Tests that the plough loses {@link VehicleAbilities#BULLDOZE} when carried by a dismounted actor.
+     * Tests that bulldoze is removed after the carrier dismounts and ticks again.
      */
     @Test
-    void initialize_EdgeCondition_LosesAbilityIfCarrierDismounts() {
+    void tick_EdgeCondition_DeactivatesBulldozeAfterRiderDismounts() {
         BulldozerPlough plough = new BulldozerPlough();
-        Actor civilian = mock(Actor.class);
-        Inventory inventory = mock(Inventory.class);
+        TestActor rider = new TestActor("Rider", 'R', 10, new BasicInventory());
+        Location location = mock(Location.class);
 
-        when(civilian.hasStatus(RideStatus.class)).thenReturn(false);
-        when(inventory.getItems()).thenReturn(List.of(plough));
-        when(civilian.getInventory()).thenReturn(inventory);
+        rider.enableAbility(VehicleAbilities.MOUNTED);
+        plough.tick(location, rider);
+        assertTrue(plough.hasAbility(VehicleAbilities.BULLDOZE));
 
-        plough.tick(mock(edu.monash.fit2099.engine.positions.Location.class), civilian);
+        rider.disableAbility(VehicleAbilities.MOUNTED);
+        plough.tick(location, rider);
 
         assertFalse(plough.hasAbility(VehicleAbilities.BULLDOZE));
     }
