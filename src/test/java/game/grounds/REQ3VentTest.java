@@ -19,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author lyan0121
  * @version 1.0
  */
-class VentTest {
+class REQ3VentTest {
+
     /**
      * Dummy actor to be used in these tests.
      * This is used because PLAYER ability is to be checked, but since Actor's hasAbility

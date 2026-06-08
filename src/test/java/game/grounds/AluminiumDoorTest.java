@@ -1,0 +1,163 @@
+package game.grounds;
+
+import edu.monash.fit2099.engine.actors.ActorLocationsIterator;
+import edu.monash.fit2099.engine.items.Inventory;
+import edu.monash.fit2099.engine.positions.GameMap;
+import edu.monash.fit2099.engine.positions.Location;
+import edu.monash.fit2099.engine.positions.DefaultGroundCreator;
+import edu.monash.fit2099.engine.positions.GroundCreator;
+import game.actors.ContractedWorker;
+import game.inventories.BasicInventory;
+import game.items.ItemStatistics;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Unit tests for AluminiumDoor.cutBy()(REQ1).
+ * Tests the behaviour of cutting an Aluminium Door with a Plasma Cutter.
+ *
+ * NOTE: GameMap.actorLocations is only set when a map is added to a World.
+ * Since tests don't use a World, actorLocations is injected via reflection
+ * in setUp() so that addActor() / moveActor() work correctly.
+ *
+ * @author eche0116
+ */
+public class AluminiumDoorTest {
+
+    private GameMap map;
+    private ContractedWorker actor;
+    private AluminiumDoor door;
+
+    /**
+     * Sets up a small real GameMap with (= is the AluminiumDoor at x=1, y=1)
+     *
+     * Actor is placed at (1, 0), adjacent to the door.
+     * actorLocations is injected via reflection because GameMap only
+     * initialises it when registered with a World.
+     */
+    @BeforeEach
+    public void setUp() throws Exception {
+        // Suppress Display output during tests
+        System.setOut(new PrintStream(new OutputStream() {
+            public void write(int b) {}
+        }));
+
+        GroundCreator groundCreator = new DefaultGroundCreator();
+        groundCreator.registerGround('_', Floor::new);
+        groundCreator.registerGround('=', AluminiumDoor::new);
+
+        map = new GameMap("TestMap", groundCreator, Arrays.asList(
+                "___",
+                "_=_",
+                "___"
+        ));
+
+        Field actorLocationsField = GameMap.class.getDeclaredField("actorLocations");
+        actorLocationsField.setAccessible(true);
+        actorLocationsField.set(map, new ActorLocationsIterator());
+
+        // Actor placed north of the door at (1, 0)
+        Inventory inventory = new BasicInventory();
+        actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
+        try { map.addActor(actor, map.at(1, 0)); } catch (Exception e) { throw new RuntimeException(e); }
+
+        door = (AluminiumDoor) map.at(1, 1).getGround();
+    }
+
+    /**
+     * Cutting the door drops AluminiumScrap on the door tile.
+     * After cutBy(), the tile at (1,1) should have at least one item.
+     * AluminiumScrap has weight 2.
+     */
+    @Test
+    public void cuttingDoorDropsAluminiumScrap() {
+        Location doorLocation = map.at(1, 1);
+        door.cutBy(actor, map, doorLocation);
+
+        assertTrue(doorLocation.getItems().size() > 0,
+                "Cutting the door should drop AluminiumScrap on the tile.");
+        assertEquals(2,
+                doorLocation.getItems().get(0).getStatistic(ItemStatistics.WEIGHT),
+                "Dropped item should have weight 2 (AluminiumScrap).");
+    }
+
+    /**
+     * Cutting the door transforms the tile into a Floor.
+     * After cutBy(), the ground at (1,1) should allow actors to enter.
+     * Floor.canActorEnter() returns true, AluminiumDoor.canActorEnter() returns false.
+     */
+    @Test
+    public void cuttingDoorTransformsTileToFloor() {
+        Location doorLocation = map.at(1, 1);
+        door.cutBy(actor, map, doorLocation);
+
+        assertTrue(doorLocation.getGround().canActorEnter(actor),
+                "After cutting, the tile should become a Floor (passable by actors).");
+    }
+
+    /**
+     * Cut result message contains key information.
+     * The string should mention the actor cutting and scrap being produced.
+     */
+    @Test
+    public void cuttingDoorResultMessageContainsKeyInfo() {
+        Location doorLocation = map.at(1, 1);
+        String result = door.cutBy(actor, map, doorLocation);
+
+        assertTrue(result.contains("cuts"),
+                "Result message should mention the cutting action.");
+        assertTrue(result.toLowerCase().contains("scrap"),
+                "Result message should mention scrap being produced.");
+    }
+
+    /**
+     * Cutting a door with no adjacent actors does not crash.
+     * When no actors are adjacent, the explosion (if triggered) has no targets.
+     * The operation should complete without throwing an exception.
+     */
+    @Test
+    public void cuttingDoorWithNoAdjacentActorsDoesNotCrash() {
+        map.moveActor(actor, map.at(0, 0));
+        Location doorLocation = map.at(1, 1);
+
+        assertDoesNotThrow(() -> door.cutBy(actor, map, doorLocation),
+                "Cutting a door with no adjacent actors should not throw.");
+    }
+
+    /**
+     * Cutting a door with an actor on an adjacent tile does not crash.
+     * The explosion path (hurt on adjacent actor) is exercised without asserting
+     * damage since the 25% explosion chance is non deterministic.
+     */
+    @Test
+    public void cuttingDoorWithAdjacentActorDoesNotCrash() throws Exception {
+        Inventory inventory = new BasicInventory();
+        ContractedWorker bystander = new ContractedWorker("Bystander", 'ඞ', 100, inventory);
+        // (2,1) is directly east of the door inside explosion range.
+        map.addActor(bystander, map.at(2, 1));
+
+        assertDoesNotThrow(() -> door.cutBy(actor, map, map.at(1, 1)),
+                "Cutting door with an adjacent actor in explosion range should not throw.");
+    }
+
+    /**
+     * Invalid test. Cutting the same tile twice does not crash.
+     * After the first cut, the tile is a Floor; cutting it again
+     * should not throw even though it is no longer a door.
+     */
+    @Test
+    public void cuttingAlreadyCutTileDoesNotCrash() {
+        Location doorLocation = map.at(1, 1);
+        door.cutBy(actor, map, doorLocation); // first cut tile becomes Floor
+
+        assertDoesNotThrow(() -> door.cutBy(actor, map, doorLocation),
+                "Cutting an already-cut tile should not throw.");
+    }
+}

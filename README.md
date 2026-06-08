@@ -143,7 +143,18 @@ Each requirement also has a standalone console runner under `src/main/java/game/
 
 ### REQ1 unit tests (Quota, Plasma Cutter, Deposit)
 
-REQ1's quota cycle, Plasma Cutter purchase + cutting flow, and the sell/deposit side effects on Aluminium Scrap, Industrial Fan, and Alien Artifact are exercised end-to-end by the standalone runner `src/main/java/game/REQ1TestRunner.java`. The runner covers the QuotaManager rank cycle, the firing-of-adjacent-workers deadline tick, cutting Aluminium Doors and Vents, and the depositable/sellable behaviour for each REQ1 item.
+Located under `src/test/java/game/`:
+
+- `actions/CutActionTest.java`, which verifies that CutAction delegates to the Cuttable's cutBy() with the correct arguments, calls it exactly once, and that the menu description includes the actor's name.
+- `actions/DepositActionTest.java`, which verifies that DepositAction adds the correct company credits to QuotaManager, delegates side effects to the Depositable, confirms credits are added before side effects, and that the menu description includes the actor name and credit amount.
+- `grounds/QuotaManagerTest.java`, which verifies credit accumulation below quota, multiple deposits accumulating correctly, the exact 100-credit rank-up boundary, compounding quota and turn limit math across two rank-ups, isPastDeadline() and isOnDeadline() returning false before the deadline, and getStatus() reflecting rank, credits, and turns correctly.
+- `grounds/AluminiumDoorTest.java`, which verifies that cutting drops AluminiumScrap (weight 2), transforms the tile into a passable Floor, produces a result message mentioning the cut and scrap, does not crash with no adjacent actors, does not crash with an adjacent actor in explosion range, and does not crash when cut twice.
+- `grounds/REQ1VentTest.java`, which verifies that cutting drops an IndustrialFan (weight 5), transforms the tile into a passable Floor, spawns an Undead on the exact tile, produces a result message mentioning the cut and fan, and does not crash when cut twice.
+- `items/AlienCubeTest.java`, which verifies that cutting drops an AlienArtifact (weight 1) at the actor's location, removes the cube from inventory, applies PoisonStatus to the worker, produces a result message mentioning the cut, artifact, and poison, and does not crash when the cube is not in inventory at cut time.
+- `items/AluminiumScrapTest.java`, which verifies the deposit value is 50, that it is not Sellable, and that the deposit value is strictly positive.
+- `items/IndustrialFanTest.java`, which verifies the sell price is 150, the deposit value is 10, both values are positive and distinct, and that it is both Sellable and Depositable.
+- `items/AlienArtifactTest.java`, which verifies the sell price is 200, the deposit value is 100, both values are positive and distinct, and that it is both Sellable and Depositable.
+- `items/PlasmaCutterTest.java`, which verifies the buy price is exactly 50, the CUTTER ability is enabled, it is Buyable but not Sellable, and the buy price boundary holds against adjacent values 49 and 51.
 
 ### REQ2 unit tests (Scrap Snatcher + Fleshy Trees)
 
