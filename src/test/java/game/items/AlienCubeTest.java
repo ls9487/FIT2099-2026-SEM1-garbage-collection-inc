@@ -11,6 +11,7 @@ import game.grounds.Floor;
 import game.inventories.BasicInventory;
 import game.spawners.UndeadSpawner;
 import game.spawners.Spawner;
+import game.statuses.PoisonStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +73,7 @@ public class AlienCubeTest {
         actorLocationsField.set(map, new ActorLocationsIterator());
 
         Inventory inventory = new BasicInventory();
-        actor = new ContractedWorker("Worker", 'ඞ', 100, inventory);
+        actor = new ContractedWorker("Worker", 'W', 100, inventory);
         actorLocation = map.at(1, 1);
         actorLocation.addActor(actor);
 
@@ -110,6 +111,19 @@ public class AlienCubeTest {
 
         assertEquals(sizeBefore - 1, sizeAfter,
                 "Cutting the Alien Cube should remove it from the actor's inventory.");
+    }
+
+    /**
+     * Cutting the Alien Cube applies PoisonStatus to the worker.
+     * ContractedWorker implements Poisonable (via EclipseActor), so
+     * cutBy() calls actor.addStatus
+     * Checked by actor.hasStatus(PoisonStatus.class).
+     */
+    @Test
+    public void cuttingAlienCubeAppliesPoisonStatus() {
+        alienCube.cutBy(actor, map, actorLocation);
+        assertTrue(actor.hasStatus(PoisonStatus.class),
+                "Worker should have PoisonStatus applied after cutting the Alien Cube.");
     }
 
     /**
