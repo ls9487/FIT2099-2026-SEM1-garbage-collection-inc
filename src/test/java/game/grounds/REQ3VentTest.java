@@ -19,14 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author lyan0121
  * @version 1.0
  */
-class VentTest {
+class REQ3VentTest {
+
     /**
      * Dummy actor to be used in these tests.
      * This is used because PLAYER ability is to be checked, but since Actor's hasAbility
      * is final, Mockito cannot override it for testing, so when() can't be used.
      */
-class REQ3VentTest {
-
     private static class TestActor extends Actor {
         public TestActor(String name, char displayChar, int hitPoints, Inventory inventory) {
             super(name, displayChar, hitPoints, inventory);
