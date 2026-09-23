@@ -9,11 +9,11 @@ The project extends an existing game engine with modular actors, behaviours, veh
 - **Assignment 2 REQ 5 — Stateful Creatures:** deterministic, state-driven autonomous entities with reusable behaviour components.
 - **Assignment 3 REQ 3 — Vehicle System:** an extensible capability-driven vehicle and upgrade architecture with automated testing.
 
-**Core technologies:** Java · Object-Oriented Design · UML · JUnit 5 · Mockito · Maven · Git/GitLab
+**Core technologies:** Java · Object-Oriented Design · OOP · UML · JUnit 5 · Mockito · Maven · Git · GitLab · GitHub
 
 ---
 
-## My Contributions — lyan0121/ls9487
+## My Contributions — Yang Li Shen (lyan0121/ls9487)
 
 ### Stateful Autonomous Creatures — A2 REQ 5
 
@@ -101,11 +101,11 @@ This work gave me practical experience designing beyond individual classes and t
 ```
 LINK TO OUR CONTRIBUTION LOGS FOR ASSIGNMENT 2:
 
-https://docs.google.com/spreadsheets/d/1TWNLnvuanieYjkHCNkfedISp4kWQJtyMlGK2CqDwMns/edit?usp=sharing
+- [Assignment 2 Contribution Log]https://docs.google.com/spreadsheets/d/1TWNLnvuanieYjkHCNkfedISp4kWQJtyMlGK2CqDwMns/edit?usp=sharing
 
 LINK TO OUR CONTRIBUTION LOGS FOR ASSIGNMENT 3:
 
-https://docs.google.com/spreadsheets/d/1pSkZRv998trWtFAZIj4YCjXskz3HTpm3TfvSJoTNiO0/edit?usp=sharing
+- [Assignment 3 Contribution Log]https://docs.google.com/spreadsheets/d/1pSkZRv998trWtFAZIj4YCjXskz3HTpm3TfvSJoTNiO0/edit?usp=sharing
 
 ## Assignment 2 REQ 5: Stateful Creatures (HD Requirement)
 
