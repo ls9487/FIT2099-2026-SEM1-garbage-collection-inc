@@ -101,11 +101,11 @@ This work gave me practical experience designing beyond individual classes and t
 ```
 LINK TO OUR CONTRIBUTION LOGS FOR ASSIGNMENT 2:
 
-- [Assignment 2 Contribution Log]https://docs.google.com/spreadsheets/d/1TWNLnvuanieYjkHCNkfedISp4kWQJtyMlGK2CqDwMns/edit?usp=sharing
+- [Assignment 2 Contribution Log](https://docs.google.com/spreadsheets/d/1TWNLnvuanieYjkHCNkfedISp4kWQJtyMlGK2CqDwMns/edit?usp=sharing)
 
 LINK TO OUR CONTRIBUTION LOGS FOR ASSIGNMENT 3:
 
-- [Assignment 3 Contribution Log]https://docs.google.com/spreadsheets/d/1pSkZRv998trWtFAZIj4YCjXskz3HTpm3TfvSJoTNiO0/edit?usp=sharing
+- [Assignment 3 Contribution Log](https://docs.google.com/spreadsheets/d/1pSkZRv998trWtFAZIj4YCjXskz3HTpm3TfvSJoTNiO0/edit?usp=sharing)
 
 ## Assignment 2 REQ 5: Stateful Creatures (HD Requirement)
 
