@@ -1,5 +1,81 @@
 # FIT2099 Assignment (Semester 1, 2026)
 
+## Project Snapshot
+
+A team-based Java software engineering project developed for **FIT2099 Object-Oriented Design and Implementation** at Monash University.
+
+The project extends an existing game engine with modular actors, behaviours, vehicles, environmental systems and interactive mechanics. My primary ownership focused on two advanced subsystems:
+
+- **Assignment 2 REQ 5 — Stateful Creatures:** deterministic, state-driven autonomous entities with reusable behaviour components.
+- **Assignment 3 REQ 3 — Vehicle System:** an extensible capability-driven vehicle and upgrade architecture with automated testing.
+
+**Core technologies:** Java · Object-Oriented Design · UML · JUnit 5 · Mockito · Maven · Git/GitLab
+
+---
+
+## My Contributions — lyan0121
+
+### Stateful Autonomous Creatures — A2 REQ 5
+
+Designed and implemented the complete **HD-level Stateful Creatures requirement**, including the architecture, creature implementations, behaviours, UML and sequence design.
+
+- Built a reusable `StatefulCreature` abstraction that maps runtime emotions to independent state objects and coordinates **state transitions → transition effects → behaviour execution**.
+- Implemented **two autonomous creatures with four deterministic states each**:
+  - **Muckraker** — transitions based on inventory capacity and nearby enemy detection.
+  - **Phantasm Wisp** — transitions based on player count, proximity and adjacency.
+- Developed reusable behaviours including `FleeBehaviour`, `PickItemBehaviour`, `SwapItemsBehaviour` and `TeleportBehaviour`.
+- Designed transition logic around runtime game state rather than random state changes, while keeping behaviour and transition responsibilities separated.
+- Applied object-oriented design principles to make new states and behaviours extensible without rewriting the core creature lifecycle.
+
+**Code:**  
+[`StatefulCreature.java`](src/main/java/game/actors/StatefulCreature.java) ·
+[`Muckraker.java`](src/main/java/game/actors/Muckraker.java) ·
+[`PhantasmWisp.java`](src/main/java/game/actors/PhantasmWisp.java)
+
+**Design:**  
+[A2 REQ5 UML](docs/design/assignment2/REQ5/A2-UML-REQ5.pdf) ·
+[Sequence Diagram](docs/design/assignment2/REQ5/REQ5-SequenceDiagram.pdf)
+
+---
+
+### Extensible Vehicle & Capability System — A3 REQ 3
+
+Owned the design and implementation of the **Vehicle System**, building a reusable architecture for mountable vehicles and runtime-dependent upgrades.
+
+- Architected `Rideable` as the common abstraction for vehicle mounting/dismounting and lifecycle management.
+- Designed `RideableUpgrade` to dynamically activate and deactivate capabilities depending on the rider's runtime `MOUNTED` state.
+- Implemented **five specialised vehicle/upgrade components**:
+  - `HoverBike`
+  - `MechSuit`
+  - `BulldozerPlough`
+  - `MagneticField`
+  - `WarpBattery`
+- Used capability-based composition to support behaviours such as hovering, crushing, bulldozing, extra-energy actions and teleportation without coupling every feature directly to individual actors.
+- Built a **JUnit 5 + Mockito regression test suite** covering mounting state, capability activation, vehicle behaviour, environmental interactions, boundary cases and failure conditions.
+
+**Code:**  
+[`game/vehicles`](src/main/java/game/vehicles)
+
+**Tests:**  
+[`game/vehicles tests`](src/test/java/game/vehicles)
+
+**Design:**  
+[A3 REQ3 UML](docs/design/assignment3/REQ3/A3-UML-REQ3.png)
+
+---
+
+## Engineering Highlights
+
+This work gave me practical experience designing beyond individual classes and thinking about software at the **system level**:
+
+- **State-driven architecture** for autonomous entity behaviour
+- **Abstraction and polymorphism** for extensible software components
+- **Capability-based composition** instead of large conditional class hierarchies
+- **Separation of concerns** between state, behaviour, actions and entities
+- **UML and sequence modelling** before and alongside implementation
+- **Automated regression testing** with JUnit and Mockito
+- Extending an **existing codebase and game engine** while preserving compatibility with other team members' features
+
 ```
  _______  _______  ______    _______  _______  _______  _______                          
 |       ||   _   ||    _ |  |  _    ||   _   ||       ||       |                         
