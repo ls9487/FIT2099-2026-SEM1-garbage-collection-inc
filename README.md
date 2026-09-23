@@ -13,7 +13,7 @@ The project extends an existing game engine with modular actors, behaviours, veh
 
 ---
 
-## My Contributions — lyan0121
+## My Contributions — lyan0121/ls9487
 
 ### Stateful Autonomous Creatures — A2 REQ 5
 
